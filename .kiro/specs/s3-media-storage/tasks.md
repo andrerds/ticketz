@@ -206,7 +206,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - **Property 22: Upload failure prevents message creation**
   - **Validates: Requirements 7.5**
 
-- [-] 5. Implement hybrid media serving
+- [x] 5. Implement hybrid media serving
 
   - Update GET /public/\* endpoint to support fallback to S3
   - Check local filesystem first, then S3
@@ -225,18 +225,18 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Return 404 if file not found in either location
   - _Requirements: 3.2, 3.3, 3.4, 3.5_
 
-- [-] 5.2 Write property test for local filesystem priority
+- [x] 5.2 Write property test for local filesystem priority
 
   - **Property 11: Local filesystem priority**
   - **Property 16: Local precedence in hybrid mode**
   - **Validates: Requirements 3.2, 4.3**
 
-- [ ] 5.3 Write property test for S3 fallback
+- [x] 5.3 Write property test for S3 fallback
 
   - **Property 12: S3 fallback retrieval**
   - **Validates: Requirements 3.3**
 
-- [ ] 5.4 Write property test for Content-Type headers
+- [x] 5.4 Write property test for Content-Type headers
 
   - **Property 13: Content-Type headers**
   - **Validates: Requirements 3.4**
@@ -248,16 +248,16 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Keep error handling for ENOENT and other errors
   - _Requirements: 3.2, 3.3_
 
-- [ ] 5.3 Write property test for backward compatibility
+- [x] 5.3 Write property test for backward compatibility
 
   - **Property 14: Backward compatibility**
   - **Validates: Requirements 4.1**
 
-- [ ] 6. Checkpoint - Ensure all tests pass
+- [x] 6. Checkpoint - Ensure all tests pass
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Implement image optimization
+- [-] 7. Implement image optimization
 
   - Create OptimizeImageService using sharp
   - Add configuration for maxWidth, quality, maxBytes
@@ -265,7 +265,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add error recovery (save original on failure)
   - _Requirements: 5.1, 5.2, 5.4_
 
-- [ ] 7.1 Create OptimizeImageService
+- [x] 7.1 Create OptimizeImageService
 
   - Create service with optimizeImage() method
   - Check if file is image/\* mimetype
@@ -276,7 +276,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Log optimization results (original size vs optimized size)
   - _Requirements: 5.1, 5.2_
 
-- [ ] 7.2 Write property test for image-only optimization
+- [-] 7.2 Write property test for image-only optimization
 
   - **Property 18: Image-only optimization**
   - **Validates: Requirements 5.1**
@@ -291,7 +291,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - **Property 20: Optimization failure recovery**
   - **Validates: Requirements 5.4**
 
-- [ ] 7.2 Integrate optimization into saveMediaToFile
+- [x] 7.2 Integrate optimization into saveMediaToFile
 
   - Get image optimization config from storage settings
   - Call OptimizeImageService before writing to storage

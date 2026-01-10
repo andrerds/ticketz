@@ -5,6 +5,7 @@ import { makeRandomId } from "./MakeRandomId";
 import Ticket from "../models/Ticket";
 import GetStorageConfigService from "../services/StorageServices/GetStorageConfigService";
 import { StorageDriverFactory } from "../infrastructure/storage/StorageDriverFactory";
+import OptimizeImageService from "../services/StorageServices/OptimizeImageService";
 
 async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -78,7 +79,17 @@ export default async function saveMediaToFile(
     const storageConfig = await GetStorageConfigService({ companyId });
     const driver = await StorageDriverFactory.createDriver(storageConfig);
 
-    const dataBuffer = await convertToBuffer(media.data);
+    let dataBuffer = await convertToBuffer(media.data);
+
+    if (storageConfig.imageOptimization) {
+      const optimizationResult = await OptimizeImageService({
+        data: dataBuffer,
+        mimetype: media.mimetype,
+        config: storageConfig.imageOptimization
+      });
+
+      dataBuffer = optimizationResult.data;
+    }
 
     await driver.write(mediaPath, dataBuffer, media.mimetype);
 
