@@ -647,7 +647,7 @@ const MessagesList = ({
             setLoading(false);
           }
 
-          if (pageNumber === 1 && data.messages.length > 1) {
+          if (thisPageNumber === 1 && data.messages.length > 1) {
             scrollToBottom();
           }
         } catch (err) {
