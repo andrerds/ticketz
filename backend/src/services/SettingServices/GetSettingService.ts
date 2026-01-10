@@ -18,6 +18,21 @@ const safeSettingsKeys = {
   tagsMode: "ticket"
 };
 
+const maskS3Secret = (key: string, value: string): string => {
+  if (key === "storageS3Config" && value) {
+    try {
+      const config = JSON.parse(value);
+      if (config.secretAccessKey) {
+        config.secretAccessKey = "*****";
+        return JSON.stringify(config);
+      }
+    } catch (error) {
+      // If parsing fails, return original
+    }
+  }
+  return value;
+};
+
 export const GetSettingService = async ({
   key,
   user
@@ -37,5 +52,6 @@ export const GetSettingService = async ({
     return safeSettingsKeys[key];
   }
 
-  return setting?.value || "";
+  const value = setting?.value || "";
+  return maskS3Secret(key, value);
 };

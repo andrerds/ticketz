@@ -61,4 +61,19 @@ export class SimpleObjectCache {
     this.logger?.debug(`Cache key ${key} was accessed`);
     return data.value;
   }
+
+  /**
+   * Remove a key from the cache
+   * @param key
+   * @returns void
+   * @example cache.remove('foo');
+   */
+  remove(key: string) {
+    const data = this.cache.get(key);
+    if (data) {
+      clearTimeout(data.timer);
+      this.cache.delete(key);
+      this.logger?.debug(`Cache key ${key} was manually deleted`);
+    }
+  }
 }
