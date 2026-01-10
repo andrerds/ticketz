@@ -13,20 +13,10 @@ const settingRoutes = Router();
 
 settingRoutes.get("/settings", isAuth, isAdmin, SettingController.index);
 
-settingRoutes.get("/settings/:settingKey", isAuth, SettingController.show);
-
 settingRoutes.get(
   "/public-settings/:settingKey",
   envTokenAuth,
   SettingController.publicShow
-);
-
-// change setting key to key in future
-settingRoutes.put(
-  "/settings/:settingKey",
-  isAuth,
-  isAdmin,
-  SettingController.update
 );
 
 const upload = multer(uploadConfig);
@@ -46,6 +36,36 @@ settingRoutes.post(
   isSuper,
   uploadPrivate.single("file"),
   SettingController.storePrivateFile
+);
+
+settingRoutes.get(
+  "/settings/storage",
+  isAuth,
+  isAdmin,
+  SettingController.getStorageSettings
+);
+
+settingRoutes.put(
+  "/settings/storage",
+  isAuth,
+  isAdmin,
+  SettingController.updateStorageSettings
+);
+
+settingRoutes.post(
+  "/settings/storage/test",
+  isAuth,
+  isAdmin,
+  SettingController.testStorageConnection
+);
+
+settingRoutes.get("/settings/:settingKey", isAuth, SettingController.show);
+
+settingRoutes.put(
+  "/settings/:settingKey",
+  isAuth,
+  isAdmin,
+  SettingController.update
 );
 
 export default settingRoutes;

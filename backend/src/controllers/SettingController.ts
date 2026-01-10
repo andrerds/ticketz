@@ -7,6 +7,9 @@ import UpdateSettingService from "../services/SettingServices/UpdateSettingServi
 import ListSettingsService from "../services/SettingServices/ListSettingsService";
 import GetPublicSettingService from "../services/SettingServices/GetPublicSettingService";
 import { GetSettingService } from "../services/SettingServices/GetSettingService";
+import GetStorageConfigService from "../services/StorageServices/GetStorageConfigService";
+import UpdateStorageConfigService from "../services/StorageServices/UpdateStorageConfigService";
+import TestStorageConnectionService from "../services/StorageServices/TestStorageConnectionService";
 
 type LogoRequest = {
   mode: string;
@@ -109,4 +112,53 @@ export const storePrivateFile = async (
   });
 
   return res.status(200).json(setting.value);
+};
+
+export const getStorageSettings = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const config = await GetStorageConfigService({ companyId });
+  const maskedConfig = config.maskSecrets();
+
+  return res.status(200).json({
+    driver: maskedConfig.driver,
+    s3Config: maskedConfig.s3Config,
+    imageOptimization: maskedConfig.imageOptimization
+  });
+};
+
+export const updateStorageSettings = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+  const { driver, s3Config, imageOptimization } = req.body;
+
+  await UpdateStorageConfigService({
+    companyId,
+    driver,
+    s3Config,
+    imageOptimization
+  });
+
+  return res
+    .status(200)
+    .json({ message: "Storage configuration updated successfully" });
+};
+
+export const testStorageConnection = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { driver, s3Config } = req.body;
+
+  const result = await TestStorageConnectionService({
+    driver,
+    s3Config
+  });
+
+  return res.status(200).json(result);
 };

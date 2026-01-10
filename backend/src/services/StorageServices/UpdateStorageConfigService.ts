@@ -62,11 +62,16 @@ const UpdateStorageConfigService = async ({
     );
   }
 
-  await Setting.upsert({
-    companyId,
-    key: "storageDriver",
-    value: driver
-  });
+  await Setting.upsert(
+    {
+      companyId,
+      key: "storageDriver",
+      value: driver
+    },
+    {
+      conflictFields: ["key", "companyId"]
+    }
+  );
 
   if (s3Config && driver === "s3") {
     const encryptedSecretAccessKey = EncryptionService.encrypt(
@@ -84,19 +89,29 @@ const UpdateStorageConfigService = async ({
       prefix: s3Config.prefix
     };
 
-    await Setting.upsert({
-      companyId,
-      key: "storageS3Config",
-      value: JSON.stringify(s3ConfigToStore)
-    });
+    await Setting.upsert(
+      {
+        companyId,
+        key: "storageS3Config",
+        value: JSON.stringify(s3ConfigToStore)
+      },
+      {
+        conflictFields: ["key", "companyId"]
+      }
+    );
   }
 
   if (imageOptimization) {
-    await Setting.upsert({
-      companyId,
-      key: "storageImageOptimization",
-      value: JSON.stringify(imageOptimization)
-    });
+    await Setting.upsert(
+      {
+        companyId,
+        key: "storageImageOptimization",
+        value: JSON.stringify(imageOptimization)
+      },
+      {
+        conflictFields: ["key", "companyId"]
+      }
+    );
   }
 
   StorageDriverFactory.clearCache(companyId);

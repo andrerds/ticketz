@@ -257,7 +257,7 @@ This implementation plan breaks down the S3 media storage feature into increment
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [-] 7. Implement image optimization
+- [x] 7. Implement image optimization
 
   - Create OptimizeImageService using sharp
   - Add configuration for maxWidth, quality, maxBytes
@@ -286,7 +286,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - **Property 19: Size-based optimization**
   - **Validates: Requirements 5.2**
 
-- [ ] 7.4 Write property test for optimization failure recovery
+- [x] 7.4 Write property test for optimization failure recovery
 
   - **Property 20: Optimization failure recovery**
   - **Validates: Requirements 5.4**
@@ -299,7 +299,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Update media.data with optimized buffer
   - _Requirements: 5.1, 5.2, 5.4_
 
-- [ ] 8. Create storage configuration UI
+- [x] 8. Create storage configuration UI
 
   - Add storage section to Settings page
   - Create form for S3 configuration
@@ -307,7 +307,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add validation and error display
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 8.1 Add storage settings to backend API
+- [x] 8.1 Add storage settings to backend API
 
   - Create GET /api/settings/storage endpoint
   - Create PUT /api/settings/storage endpoint
@@ -315,7 +315,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Validate S3 config before saving in PUT
   - _Requirements: 1.4, 8.3_
 
-- [ ] 8.2 Create StorageSettings component
+- [x] 8.2 Create StorageSettings component
 
   - Create new component in frontend/src/components/Settings/
   - Add driver selection radio buttons (Local / S3)
@@ -327,7 +327,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Show success/error messages
   - _Requirements: 8.1, 8.2, 8.4, 8.5_
 
-- [ ] 8.3 Integrate StorageSettings into Settings page
+- [x] 8.3 Integrate StorageSettings into Settings page
 
   - Add StorageSettings component to SettingsCustom page
   - Add navigation tab for "Storage"
