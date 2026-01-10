@@ -2,630 +2,533 @@
 
 ## Overview
 
-This implementation plan breaks down the file preview feature into incremental, testable tasks. Each task builds on previous work and includes specific requirements references. The plan follows a phased approach to deliver value incrementally while maintaining system stability and ensuring seamless integration with the s3-media-storage spec.
+This implementation plan transforms the file preview design into a series of incremental coding tasks that build upon each other. The plan focuses on resolving the THUMBNAIL_FIX issue while creating a robust, unified preview system that works seamlessly with both S3 and local storage.
+
+Each task is designed to be executed by a coding agent and includes specific requirements references. The implementation follows a bottom-up approach, building core services first, then controllers, and finally frontend components.
 
 ## Task List
 
-- [ ] 1. Set up core preview infrastructure
+- [x] 1. Set up core preview system infrastructure
 
-  - Install react-pdf and configure PDF.js worker
-  - Create base component structure and types
-  - Set up error handling foundation
-  - _Requirements: 1.1, 4.1, 14.1_
+  - Create domain interfaces and value objects for preview system
+  - Set up TypeScript types and enums for storage locations
+  - Create base error classes for preview system
+  - _Requirements: 1.1, 2.1, 3.1_
 
-- [ ] 1.1 Install dependencies and configure PDF.js
+- [x] 1.1 Create preview system domain interfaces
 
-  - Install react-pdf, pdfjs-dist packages
-  - Configure PDF.js worker URL to use CDN
-  - Add react-pdf CSS imports for annotations and text layer
-  - Update package.json with correct versions
-  - _Requirements: 1.1_
+  - Define IStorageDetectionService interface with detectStorageLocation, validateFileExistence, getCachedLocation methods
+  - Define IPreviewURLGeneratorService interface with generatePreviewURL, generateThumbnailURL, validateURLFormat methods
+  - Define IThumbnailHandlerService interface with generateThumbnail, getThumbnail, cacheThumbnail methods
+  - Create StorageLocation type ('local' | 's3')
+  - Create PreviewOptions and ThumbnailOptions interfaces
+  - _Requirements: 1.1, 2.1, 3.1_
 
-- [ ] 1.2 Create base types and interfaces
+- [ ]\* 1.2 Write property test for interface compliance
 
-  - Create FilePreview/types.ts with FileType, FileMetadata, PreviewState, PreviewError types
-  - Define FilePreviewProps interface
-  - Define component prop interfaces for all preview components
-  - _Requirements: 4.1, 4.3_
+  - **Property 1: Storage location detection consistency**
+  - **Validates: Requirements 1.1, 1.4**
 
-- [ ] 1.3 Create error classes
+- [x] 1.3 Create preview system value objects and types
 
-  - Implement PreviewError base class
-  - Implement NetworkError, CORSError, FormatError, MemoryError classes
-  - Add error type discrimination logic
-  - _Requirements: 14.1, 14.2, 14.3_
+  - Create PreviewCache interface with mediaKey, storageLocation, previewURL fields
+  - Create PreviewMetadata interface with dimensions, contentType, fileSize fields
+  - Create PreviewError class extending AppError with specific error codes
+  - Create PreviewSize enum ('thumbnail', 'medium', 'full')
+  - _Requirements: 1.1, 2.1, 3.1_
 
-- [ ]\* 1.4 Write property test for error class creation
+- [ ]\* 1.4 Write property test for value object validation
 
-  - **Property 59: React-pdf error catching**
-  - **Property 60: CORS error messages**
-  - **Property 61: Corrupted file handling**
-  - **Validates: Requirements 14.1, 14.2, 14.3**
+  - **Property 7: URL format validation**
+  - **Validates: Requirements 2.5**
 
-- [ ] 2. Implement file type detection
+- [x] 2. Implement storage detection service
 
-  - Create utility for detecting file types from URLs and filenames
-  - Support PDF, image, and text file extensions
-  - Handle edge cases and unknown types
-  - _Requirements: 4.2_
-
-- [ ] 2.1 Create file type detection utility
-
-  - Implement detectFileType() function
-  - Support extensions: pdf, jpg, jpeg, png, gif, webp, svg, bmp, txt, log, md, csv, json, xml
-  - Return 'pdf' | 'image' | 'text' | 'unsupported'
-  - Implement getMimeType() helper function
-  - _Requirements: 4.2_
-
-- [ ]\* 2.2 Write property test for file type detection
-
-  - **Property 17: Automatic file type detection**
-  - **Validates: Requirements 4.2**
-
-- [ ] 3. Implement PDF preview component
-
-  - Create PDFPreview component using react-pdf
-  - Implement page navigation for multi-page PDFs
-  - Add loading and error states
+  - Create service to detect file storage location with caching
+  - Integrate with existing s3-media-storage configuration
+  - Implement file existence validation
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 3.1 Create PDFPreview component
+- [x] 2.1 Implement StorageDetectionService
 
-  - Implement component with Document and Page from react-pdf
-  - Add state for numPages, currentPage, loading, error
-  - Implement handleLoadSuccess and handleLoadError
-  - Add scale prop support
-  - Render loading spinner during load
-  - Render error display on failure
-  - _Requirements: 1.1, 1.4, 1.5_
+  - Create StorageDetectionService class implementing IStorageDetectionService
+  - Implement detectStorageLocation method that checks local filesystem first, then S3
+  - Use GetStorageConfigService to determine if S3 is configured
+  - Implement file existence validation using fs.access for local, HeadObjectCommand for S3
+  - Add SimpleObjectCache for caching storage location results (5-minute TTL)
+  - _Requirements: 1.1, 1.2, 1.5_
 
-- [ ]\* 3.2 Write property test for PDF rendering
+- [ ]\* 2.2 Write property test for local storage priority
 
-  - **Property 1: PDF rendering with react-pdf**
-  - **Property 4: PDF loading indicator**
-  - **Property 5: PDF error handling**
-  - **Validates: Requirements 1.1, 1.4, 1.5**
+  - **Property 2: Local storage priority**
+  - **Validates: Requirements 1.2**
 
-- [ ] 3.3 Add page navigation controls
+- [ ]\* 2.3 Write property test for file existence validation
 
-  - Create PageNavigation component
-  - Implement goToNextPage and goToPreviousPage functions
-  - Show controls only when numPages > 1
-  - Display current page and total pages
-  - Add next/previous buttons
-  - _Requirements: 1.2, 1.3_
+  - **Property 3: File existence validation**
+  - **Validates: Requirements 1.5**
 
-- [ ]\* 3.4 Write property test for page navigation
+- [x] 2.4 Implement storage detection caching
 
-  - **Property 2: Multi-page PDF navigation controls**
-  - **Property 3: Page navigation updates display**
-  - **Validates: Requirements 1.2, 1.3**
+  - Add getCachedLocation and setCachedLocation methods
+  - Implement cache key generation based on mediaKey and companyId
+  - Add cache invalidation logic for file updates
+  - Add logging for cache hits and misses
+  - _Requirements: 1.4_
 
-- [ ] 4. Implement image preview component
+- [ ]\* 2.5 Write property test for caching effectiveness
 
-  - Create ImagePreview component with native img element
-  - Add loading placeholder and error handling
-  - Implement zoom support
+  - **Property 13: Caching effectiveness**
+  - **Validates: Requirements 4.1**
+
+- [x] 2.6 Add graceful error handling to storage detection
+
+  - Implement try-catch blocks with specific error types
+  - Add fallback logic when both storage locations fail
+  - Ensure no internal system details are exposed in error messages
+  - Add comprehensive logging for debugging
+  - _Requirements: 1.3_
+
+- [ ]\* 2.7 Write property test for graceful error handling
+
+  - **Property 4: Graceful error handling**
+  - **Validates: Requirements 1.3**
+
+- [ ] 3. Implement preview URL generation service
+
+  - Create service to generate appropriate URLs based on storage location
+  - Add authentication token support for secure access
+  - Implement URL format validation
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 4.1 Create ImagePreview component
+- [x] 3.1 Implement PreviewURLGeneratorService
 
-  - Implement component with img element
-  - Add state for loading and error
-  - Implement onLoad and onError handlers
-  - Apply scale transform via style
-  - Set objectFit: contain and maxWidth/maxHeight: 100%
-  - Render loading placeholder during load
-  - Render broken image placeholder on error
-  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+  - Create PreviewURLGeneratorService class implementing IPreviewURLGeneratorService
+  - Implement generatePreviewURL method that creates URLs based on storage location
+  - For S3: use getSignedUrl with appropriate expiration times
+  - For local: use application host with /public/media/ prefix
+  - Add support for different preview sizes in URL parameters
+  - _Requirements: 2.1, 2.2_
 
-- [ ]\* 4.2 Write property test for image preview
+- [ ]\* 3.2 Write property test for S3 URL format
 
-  - **Property 6: Image rendering**
-  - **Property 7: Image loading placeholder**
-  - **Property 8: Image error placeholder**
-  - **Property 9: Image aspect ratio preservation**
-  - **Property 10: Image zoom scaling**
-  - **Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5**
+  - **Property 5: S3 URL format consistency**
+  - **Validates: Requirements 2.1, 2.3**
 
-- [ ] 5. Implement text preview component
+- [ ]\* 3.3 Write property test for local URL format
 
-  - Create TextPreview component with fetch and display
-  - Add loading and error states
-  - Preserve formatting and enable scrolling
+  - **Property 6: Local URL format consistency**
+  - **Validates: Requirements 2.2**
+
+- [x] 3.4 Implement authentication token support
+
+  - Add addAuthenticationToken method for secure URL generation
+  - Implement JWT token generation for preview access
+  - Add token validation middleware for preview endpoints
+  - Set appropriate expiration times based on security configuration
+  - _Requirements: 2.3, 7.1, 7.2_
+
+- [ ]\* 3.5 Write property test for authentication tokens
+
+  - **Property 28: Permission validation**
+  - **Validates: Requirements 7.1**
+
+- [x] 3.6 Implement URL format validation and consistency
+
+  - Add validateURLFormat method with comprehensive URL validation
+  - Ensure consistent URL patterns across different file types
+  - Add URL sanitization to prevent injection attacks
+  - Implement URL format testing for various edge cases
+  - _Requirements: 2.4, 2.5, 7.3_
+
+- [ ]\* 3.7 Write property test for URL format consistency
+
+  - **Property 8: Cross-file-type URL consistency**
+  - **Validates: Requirements 2.4**
+
+- [ ] 4. Implement thumbnail handler service
+
+  - Create service for thumbnail generation and management
+  - Add support for multiple image formats
+  - Implement fallback strategies for thumbnail failures
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 5.1 Create TextPreview component
-
-  - Implement component with useEffect for fetching
-  - Add state for content, loading, error
-  - Fetch text content from URL
-  - Handle fetch errors with try-catch
-  - Render content in pre element with whiteSpace: pre-wrap
-  - Add overflow: auto for scrolling
-  - Render loading spinner during fetch
-  - Render error display on failure
-  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
-
-- [ ]\* 5.2 Write property test for text preview
-
-  - **Property 11: Text content fetching and display**
-  - **Property 12: Text loading indicator**
-  - **Property 13: Text error handling**
-  - **Property 14: Text formatting preservation**
-  - **Property 15: Text scrolling**
-  - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
-
-- [ ] 6. Create zoom controls component
-
-  - Implement ZoomControls with zoom in/out/reset buttons
-  - Handle zoom state management
-  - Add keyboard shortcut support
-  - _Requirements: 6.1, 6.2, 6.3, 6.4_
-
-- [ ] 6.1 Create ZoomControls component
-
-  - Create component with zoom in, zoom out, reset buttons
-  - Accept scale, onZoomIn, onZoomOut, onReset props
-  - Display current zoom percentage
-  - Add icons for buttons
-  - Style buttons appropriately
-  - _Requirements: 6.1_
-
-- [ ]\* 6.2 Write property test for zoom controls
-
-  - **Property 25: Zoom controls rendering**
-  - **Property 26: Zoom in increases scale**
-  - **Property 27: Zoom out decreases scale**
-  - **Property 28: Zoom reset restores default**
-  - **Validates: Requirements 6.1, 6.2, 6.3, 6.4**
-
-- [ ] 7. Implement keyboard navigation hook
-
-  - Create useKeyboardNavigation hook
-  - Support arrow keys, zoom keys, ESC key
-  - Prevent default browser behavior
-  - _Requirements: 11.1, 11.2, 11.3, 11.4_
-
-- [ ] 7.1 Create useKeyboardNavigation hook
-
-  - Accept onNext, onPrevious, onZoomIn, onZoomOut, onClose, enabled options
-  - Add keydown event listener
-  - Handle ArrowRight/ArrowDown for next
-  - Handle ArrowLeft/ArrowUp for previous
-  - Handle +/= for zoom in
-  - Handle -/\_ for zoom out
-  - Handle Escape for close
-  - Call preventDefault on all handled keys
-  - Cleanup event listener on unmount
-  - _Requirements: 11.1, 11.2, 11.3, 11.4_
-
-- [ ]\* 7.2 Write property test for keyboard navigation
-
-  - **Property 47: Arrow key page navigation**
-  - **Property 23: ESC key modal close**
-  - **Property 48: Keyboard zoom controls**
-  - **Property 49: Keyboard event prevention**
-  - **Validates: Requirements 11.1, 11.2, 11.3, 11.4**
-
-- [ ] 8. Implement preview cache hook
-
-  - Create caching mechanism for preview content
-  - Implement cache with TTL
-  - Add cache invalidation logic
-  - _Requirements: 12.5_
-
-- [ ] 8.1 Create PreviewCache class and hook
-
-  - Implement PreviewCache class with Map storage
-  - Add set() and get() methods with timestamp checking
-  - Set default maxAge to 5 minutes
-  - Implement clear() method
-  - Create usePreviewCache hook
-  - Check cache before fetching
-  - Store fetched data in cache
-  - _Requirements: 12.5_
-
-- [ ]\* 8.2 Write property test for caching
-
-  - **Property 53: Preview content caching**
-  - **Validates: Requirements 12.5**
-
-- [ ] 9. Create file preview modal component
-
-  - Implement full-screen modal with preview content
-  - Add header with metadata and controls
-  - Handle open/close with keyboard and click-outside
-  - Prevent background scrolling
-  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
-
-- [ ] 9.1 Create ModalHeader component
-
-  - Display filename, file size, file type, upload date
-  - Add close button
-  - Add download button (conditional)
-  - Style header appropriately
-  - _Requirements: 5.2, 13.1, 13.2, 13.4, 13.5_
-
-- [ ]\* 9.2 Write property test for metadata display
-
-  - **Property 54: Filename display**
-  - **Property 55: File size display**
-  - **Property 57: File type display**
-  - **Property 58: Upload date display**
-  - **Validates: Requirements 13.1, 13.2, 13.4, 13.5**
-
-- [ ] 9.3 Create FilePreviewModal component
-
-  - Implement modal with backdrop and content container
-  - Add state for scale and isOpen
-  - Set body overflow to hidden on mount
-  - Restore body overflow on unmount
-  - Add ESC key listener for close
-  - Handle backdrop click for close
-  - Stop propagation on content click
-  - Render ModalHeader with metadata
-  - Render appropriate preview component based on fileType
-  - Render ZoomControls (conditional)
-  - Render UnsupportedFileMessage for unsupported types
-  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+- [x] 4.1 Implement ThumbnailHandlerService
 
-- [ ]\* 9.4 Write property test for modal behavior
+  - Create ThumbnailHandlerService class implementing IThumbnailHandlerService
+  - Implement generateThumbnail method using sharp library
+  - Support common image formats (JPEG, PNG, WebP, GIF)
+  - Add thumbnail size configuration (width, height, quality)
+  - Implement aspect ratio preservation logic
+  - _Requirements: 3.1, 3.4_
 
-  - **Property 20: Modal full-screen display**
-  - **Property 21: Modal controls presence**
-  - **Property 22: Click-outside modal close**
-  - **Property 23: ESC key modal close**
-  - **Property 24: Background scroll prevention**
-  - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
-
-- [ ] 9.5 Implement download functionality
-
-  - Add handleDownload function to modal
-  - Fetch file as blob
-  - Create blob URL and download link
-  - Trigger download with original filename
-  - Revoke blob URL after download
-  - Handle download errors
-  - _Requirements: 7.1, 7.2, 7.3_
-
-- [ ]\* 9.6 Write property test for download
+- [ ]\* 4.2 Write property test for thumbnail generation
 
-  - **Property 29: Download triggers file download**
-  - **Property 30: Download filename preservation**
-  - **Property 31: Download error handling**
-  - **Validates: Requirements 7.1, 7.2, 7.3**
+  - **Property 9: Thumbnail generation fallback**
+  - **Validates: Requirements 3.2**
 
-- [ ] 10. Create file thumbnail component
+- [ ]\* 4.3 Write property test for aspect ratio preservation
 
-  - Implement thumbnail with lazy loading
-  - Support PDF, image, and text file thumbnails
-  - Add click handler to open modal
-  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 12.2_
+  - **Property 11: Aspect ratio preservation**
+  - **Validates: Requirements 3.4**
 
-- [ ] 10.1 Create FileThumbnail component
-
-  - Implement component with ref for intersection observer
-  - Add state for isInView
-  - Set up IntersectionObserver in useEffect
-  - Render ThumbnailPlaceholder when not in view
-  - Render appropriate thumbnail based on fileType when in view
-  - Apply maxSize to container style
-  - Add onClick handler
-  - Cleanup observer on unmount
-  - _Requirements: 9.4, 9.5, 12.2_
+- [x] 4.4 Implement thumbnail caching and retrieval
 
-- [ ]\* 10.2 Write property test for lazy loading
+  - Add getThumbnail method with cache-first strategy
+  - Implement cacheThumbnail method using file system or S3
+  - Add thumbnail metadata storage for quick lookups
+  - Implement cache invalidation for updated source files
+  - _Requirements: 3.1, 4.1_
 
-  - **Property 52: Lazy loading thumbnails**
-  - **Property 42: Thumbnail size constraints**
-  - **Property 41: Thumbnail click opens modal**
-  - **Validates: Requirements 9.4, 9.5, 12.2**
-
-- [ ] 10.3 Create PDFThumbnail component
+- [ ]\* 4.5 Write property test for thumbnail caching
 
-  - Use react-pdf Document and Page
-  - Render only first page (pageNumber=1)
-  - Use small scale for thumbnail
-  - Handle loading and error states
-  - _Requirements: 9.1, 12.1_
+  - **Property 13: Caching effectiveness**
+  - **Validates: Requirements 4.1**
 
-- [ ]\* 10.4 Write property test for PDF thumbnail
+- [-] 4.6 Implement thumbnail fallback strategies
 
-  - **Property 38: PDF thumbnail rendering**
-  - **Property 51: Single page rendering for PDFs**
-  - **Validates: Requirements 9.1, 12.1**
+  - Add fallback to original file when thumbnail generation fails
+  - Implement error recovery for unsupported formats
+  - Add placeholder image for completely failed cases
+  - Ensure appropriate Content-Type headers for all responses
+  - _Requirements: 3.2, 3.3, 3.5_
 
-- [ ] 10.5 Create ImageThumbnail component
+- [ ]\* 4.7 Write property test for fallback strategies
 
-  - Render img element with thumbnail size
-  - Handle loading and error states
-  - Apply object-fit: cover for thumbnails
-  - _Requirements: 9.2_
+  - **Property 10: Original file fallback**
+  - **Validates: Requirements 3.3**
 
-- [ ]\* 10.6 Write property test for image thumbnail
-
-  - **Property 39: Image thumbnail rendering**
-  - **Validates: Requirements 9.2**
+- [ ]\* 4.8 Write property test for Content-Type headers
 
-- [ ] 10.7 Create FileIcon component
+  - **Property 12: Content-Type header consistency**
+  - **Validates: Requirements 3.5**
 
-  - Render appropriate icon based on file type
-  - Support text, unknown, and other file types
-  - Use Material-UI icons or custom SVG
-  - _Requirements: 9.3_
+- [ ] 5. Create preview controller for HTTP endpoints
 
-- [ ]\* 10.8 Write property test for file icon
+  - Implement REST endpoints for serving previews and thumbnails
+  - Add security validation and permission checking
+  - Implement efficient streaming for both S3 and local files
+  - _Requirements: 3.2, 3.3, 3.4, 4.2, 4.3, 7.1, 7.4_
 
-  - **Property 40: Text file icon rendering**
-  - **Validates: Requirements 9.3**
+- [ ] 5.1 Create PreviewController
 
-- [ ] 11. Create main FilePreview component
+  - Create PreviewController class with servePreview and serveThumbnail methods
+  - Add GET /api/preview/:mediaKey endpoint for full previews
+  - Add GET /api/thumbnail/:mediaKey endpoint for thumbnails
+  - Implement mediaKey parsing and validation
+  - Add company ID extraction from authentication context
+  - _Requirements: 3.2, 3.3_
 
-  - Implement main entry point component
-  - Support thumbnail, inline, and modal modes
-  - Integrate all sub-components
-  - _Requirements: 4.1, 4.3_
+- [ ]\* 5.2 Write property test for endpoint routing
 
-- [ ] 11.1 Create FilePreview component
+  - **Property 18: Automatic storage detection**
+  - **Validates: Requirements 5.1**
 
-  - Accept all FilePreviewProps
-  - Call detectFileType to determine file type
-  - Render FileThumbnail when mode is 'thumbnail'
-  - Render FilePreviewModal when mode is 'modal'
-  - Render FilePreviewInline when mode is 'inline'
-  - Pass appropriate props to sub-components
-  - _Requirements: 4.1, 4.3_
+- [ ] 5.3 Implement security validation in controller
 
-- [ ]\* 11.2 Write property test for main component
+  - Add validatePermissions method checking user access to media
+  - Implement path sanitization to prevent directory traversal
+  - Add security headers (X-Content-Type-Options, X-Frame-Options)
+  - Implement rate limiting for preview requests
+  - _Requirements: 7.1, 7.3, 7.4_
 
-  - **Property 16: Single component for all file types**
-  - **Property 18: Configuration props acceptance**
-  - **Validates: Requirements 4.1, 4.3**
+- [ ]\* 5.4 Write property test for security validation
 
-- [ ] 11.3 Create FilePreviewInline component
+  - **Property 30: Path sanitization**
+  - **Validates: Requirements 7.3**
 
-  - Render preview content without modal wrapper
-  - Support zoom controls (conditional)
-  - Render appropriate preview based on fileType
-  - _Requirements: 4.1_
+- [ ]\* 5.5 Write property test for security headers
 
-- [ ] 12. Implement error boundary and error display
+  - **Property 31: Security header inclusion**
+  - **Validates: Requirements 7.4**
 
-  - Create PreviewErrorBoundary component
-  - Create ErrorDisplay component
-  - Add retry functionality
-  - _Requirements: 8.1, 8.2, 8.3, 14.1_
+- [ ] 5.6 Implement efficient file streaming
 
-- [ ] 12.1 Create ErrorDisplay component
+  - Add streaming support for S3 files using StorageDriver
+  - Implement efficient local file streaming with proper headers
+  - Add compression support for appropriate file types
+  - Implement concurrent request handling without degradation
+  - _Requirements: 4.2, 4.3, 4.4, 4.5_
 
-  - Display error message based on error type
-  - Show retry button
-  - Show download button for unsupported/corrupted files
-  - Style error display appropriately
-  - _Requirements: 8.2, 8.3, 8.4_
+- [ ]\* 5.7 Write property test for S3 streaming
 
-- [ ]\* 12.2 Write property test for error display
+  - **Property 14: S3 streaming efficiency**
+  - **Validates: Requirements 4.2**
 
-  - **Property 34: Error message display**
-  - **Property 35: Retry action provision**
-  - **Property 36: Unsupported file handling**
-  - **Property 37: Network error messages**
-  - **Validates: Requirements 8.2, 8.3, 8.4, 8.5**
+- [ ]\* 5.8 Write property test for local streaming
 
-- [ ] 12.3 Create PreviewErrorBoundary component
+  - **Property 15: Local streaming efficiency**
+  - **Validates: Requirements 4.3**
 
-  - Extend React.Component with error boundary methods
-  - Implement getDerivedStateFromError
-  - Implement componentDidCatch
-  - Render ErrorDisplay on error
-  - Call onError callback
-  - Log errors to console
-  - _Requirements: 14.1, 14.5_
+- [ ]\* 5.9 Write property test for concurrent access
 
-- [ ]\* 12.4 Write property test for error boundary
+  - **Property 17: Concurrent access handling**
+  - **Validates: Requirements 4.5**
 
-  - **Property 59: React-pdf error catching**
-  - **Property 62: Error logging**
-  - **Validates: Requirements 14.1, 14.5**
+- [ ] 5.10 Add comprehensive error handling to controller
 
-- [ ] 13. Add loading states and placeholders
+  - Implement handlePreviewError method with standardized responses
+  - Add detailed error logging for debugging
+  - Implement circuit breaker pattern for external storage
+  - Add health metrics collection and reporting
+  - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - Create LoadingSpinner component
-  - Create LoadingPlaceholder component
-  - Create ThumbnailPlaceholder component
-  - _Requirements: 8.1_
+- [ ]\* 5.11 Write property test for error handling
 
-- [ ] 13.1 Create loading components
+  - **Property 26: Standardized error responses**
+  - **Validates: Requirements 6.4**
 
-  - Implement LoadingSpinner with spinner animation
-  - Implement LoadingPlaceholder with skeleton UI
-  - Implement ThumbnailPlaceholder with gray box
-  - Implement BrokenImagePlaceholder with icon
-  - Style all placeholders appropriately
-  - _Requirements: 8.1_
+- [ ]\* 5.12 Write property test for circuit breaker
 
-- [ ]\* 13.2 Write property test for loading states
+  - **Property 25: Circuit breaker functionality**
+  - **Validates: Requirements 6.3**
 
-  - **Property 33: Loading state display**
+- [ ] 6. Update existing MediaController to use preview system
+
+  - Refactor existing media serving logic to use new preview system
+  - Maintain backward compatibility with existing URLs
+  - Add THUMBNAIL_FIX resolution
+  - _Requirements: 8.1, 8.3, 8.4_
+
+- [ ] 6.1 Refactor MediaController.serve method
+
+  - Update serve method to use StorageDetectionService
+  - Replace direct filesystem/S3 access with PreviewURLGeneratorService
+  - Maintain existing /public/media/\* URL pattern for compatibility
+  - Add logging to track usage of new vs old code paths
+  - _Requirements: 8.1, 8.3_
+
+- [ ]\* 6.2 Write property test for backward compatibility
+
+  - **Property 33: Backward compatibility preservation**
   - **Validates: Requirements 8.1**
 
-- [ ] 14. Integrate with s3-media-storage URLs
+- [ ] 6.3 Integrate thumbnail handling into MediaController
 
-  - Ensure component works with both local and S3 URLs
-  - Test with BACKEND_URL/public/<key> format
-  - Test with absolute S3 URLs
-  - _Requirements: 4.4, 7.4, 10.1, 10.2, 10.3, 10.4_
+  - Add thumbnail serving capability to existing endpoints
+  - Implement automatic thumbnail generation for images
+  - Add thumbnail URL generation for API responses
+  - Ensure THUMBNAIL_FIX issues are resolved
+  - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 14.1 Test URL handling
+- [ ]\* 6.4 Write property test for thumbnail integration
 
-  - Test component with local URLs (relative paths)
-  - Test component with S3 URLs (absolute https URLs)
-  - Test component with BACKEND_URL/public/<key> format
-  - Verify download works with both URL types
-  - Verify preview works with both URL types
-  - _Requirements: 4.4, 7.4, 10.1, 10.2, 10.3, 10.4_
+  - **Property 9: Thumbnail generation fallback**
+  - **Validates: Requirements 3.2**
 
-- [ ]\* 14.2 Write property test for storage compatibility
+- [ ] 6.5 Add legacy file support
 
-  - **Property 19: Storage backend compatibility**
-  - **Property 32: Download storage compatibility**
-  - **Property 43: Media URL format compliance**
-  - **Property 44: S3 URL handling**
-  - **Property 45: Local URL handling**
-  - **Property 46: Storage backend resilience**
-  - **Validates: Requirements 4.4, 7.4, 10.1, 10.2, 10.3, 10.4**
+  - Implement graceful handling of files without preview metadata
+  - Add migration support for existing media files
+  - Ensure legacy media keys work with new system
+  - Add backward compatibility for old thumbnail formats
+  - _Requirements: 8.2, 8.4, 8.5_
 
-- [ ] 15. Checkpoint - Ensure all tests pass
+- [ ]\* 6.6 Write property test for legacy support
+
+  - **Property 36: Legacy file handling**
+  - **Validates: Requirements 8.4**
+
+- [ ] 7. Create unified frontend preview component
+
+  - Build React component that abstracts storage complexity
+  - Add loading states and error handling
+  - Implement accessibility features
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+
+- [ ] 7.1 Create MediaPreviewComponent
+
+  - Create React component in frontend/src/components/MediaPreview/
+  - Add props for fileId, companyId, size, fallbackComponent
+  - Implement automatic storage detection through API calls
+  - Add support for thumbnail, medium, and full preview sizes
+  - _Requirements: 5.1, 5.4_
+
+- [ ]\* 7.2 Write property test for component props
+
+  - **Property 21: Size support completeness**
+  - **Validates: Requirements 5.4**
+
+- [ ] 7.3 Implement loading states and error handling
+
+  - Add loading spinner during preview retrieval
+  - Implement error placeholder for failed loads
+  - Add retry mechanism for transient failures
+  - Provide onLoadStart, onLoadComplete, onError callbacks
+  - _Requirements: 5.2, 5.3_
+
+- [ ]\* 7.4 Write property test for loading states
+
+  - **Property 19: Loading state consistency**
+  - **Validates: Requirements 5.2**
+
+- [ ]\* 7.5 Write property test for error placeholders
+
+  - **Property 20: Error placeholder display**
+  - **Validates: Requirements 5.3**
+
+- [ ] 7.6 Add accessibility features
+
+  - Implement proper alt text for images
+  - Add ARIA labels for screen readers
+  - Ensure keyboard navigation support
+  - Add focus management for modal previews
+  - _Requirements: 5.5_
+
+- [ ]\* 7.7 Write property test for accessibility
+
+  - **Property 22: Accessibility compliance**
+  - **Validates: Requirements 5.5**
+
+- [ ] 7.8 Create preview component variants
+
+  - Create ThumbnailPreview component for small previews
+  - Create FullPreview component for modal displays
+  - Create MediaGallery component for multiple previews
+  - Add responsive design for different screen sizes
+  - _Requirements: 5.4_
+
+- [ ] 8. Update existing frontend components to use new preview system
+
+  - Refactor MessagesList component to use MediaPreviewComponent
+  - Update ModalImageCors to use new preview URLs
+  - Fix thumbnail display issues across the application
+  - _Requirements: 8.1, 8.3, 8.4_
+
+- [ ] 8.1 Refactor MessagesList component
+
+  - Replace direct mediaUrl usage with MediaPreviewComponent
+  - Update thumbnail rendering to use new thumbnail system
+  - Maintain existing styling and layout
+  - Add proper error handling for deleted media
+  - _Requirements: 8.1, 8.3_
+
+- [ ]\* 8.2 Write property test for component integration
+
+  - **Property 33: Backward compatibility preservation**
+  - **Validates: Requirements 8.1**
+
+- [ ] 8.3 Update ModalImageCors component
+
+  - Integrate with new preview URL generation
+  - Add support for different preview sizes
+  - Implement proper error handling for missing files
+  - Maintain existing modal functionality
+  - _Requirements: 8.1, 8.4_
+
+- [ ] 8.4 Fix thumbnail display across application
+
+  - Update all components that display thumbnails
+  - Ensure consistent thumbnail sizing and quality
+  - Fix THUMBNAIL_FIX issues in chat messages
+  - Add proper loading states for thumbnail generation
+  - _Requirements: 3.1, 3.2, 3.3_
+
+- [ ]\* 8.5 Write property test for thumbnail fixes
+
+  - **Property 9: Thumbnail generation fallback**
+  - **Validates: Requirements 3.2**
+
+- [ ] 9. Add audit logging and monitoring
+
+  - Implement comprehensive logging for preview access
+  - Add health metrics and monitoring
+  - Create audit trail for security compliance
+  - _Requirements: 6.5, 7.5_
+
+- [ ] 9.1 Implement audit logging service
+
+  - Create AuditLogService for preview access logging
+  - Log all preview and thumbnail requests with user context
+  - Add structured logging with correlation IDs
+  - Implement log rotation and retention policies
+  - _Requirements: 7.5_
+
+- [ ]\* 9.2 Write property test for audit logging
+
+  - **Property 32: Access audit logging**
+  - **Validates: Requirements 7.5**
+
+- [ ] 9.3 Add health metrics and monitoring
+
+  - Implement metrics collection for preview system performance
+  - Add monitoring for cache hit rates and response times
+  - Create health check endpoints for preview services
+  - Add alerting for system failures and degradation
+  - _Requirements: 6.5_
+
+- [ ]\* 9.4 Write property test for health metrics
+
+  - **Property 27: Health metrics collection**
+  - **Validates: Requirements 6.5**
+
+- [ ] 10. Checkpoint - Ensure all tests pass
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 16. Integrate with Message components
+- [ ] 11. Create migration utility for existing media
 
-  - Update MessagesList to use FilePreview for thumbnails
-  - Update MessageItem to use FilePreview modal
-  - Replace existing media display logic
-  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+  - Build utility to migrate existing media to new preview system
+  - Generate thumbnails for existing images
+  - Update database records with preview metadata
+  - _Requirements: 8.5_
 
-- [ ] 16.1 Update MessagesList component
+- [ ] 11.1 Create MediaPreviewMigrationService
 
-  - Import FilePreview component
-  - Replace existing media rendering with FilePreview in thumbnail mode
-  - Add state for modal open/close
-  - Add click handler to open modal
-  - Render FilePreview in modal mode when modal is open
-  - Pass mediaUrl, filename, fileSize, uploadDate to FilePreview
-  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+  - Create service to migrate existing media files
+  - Scan all existing Message records with mediaUrl
+  - Generate thumbnails for images that don't have them
+  - Update database with preview metadata
+  - Add progress reporting and error handling
+  - _Requirements: 8.5_
 
-- [ ] 16.2 Update MessageItem component
+- [ ]\* 11.2 Write property test for migration completeness
 
-  - Ensure FilePreview is used for all media types
-  - Remove old media display logic
-  - Test with PDF, image, and text files
-  - _Requirements: 9.1, 9.2, 9.3_
+  - **Property 37: Migration support**
+  - **Validates: Requirements 8.5**
 
-- [ ] 17. Add keyboard shortcuts help
+- [ ] 11.3 Create migration CLI command
 
-  - Create KeyboardShortcutsHelp component
-  - Display shortcuts in tooltip or help dialog
-  - Add help button to modal
-  - _Requirements: 11.5_
+  - Add CLI command to run media preview migration
+  - Support batch processing to avoid memory issues
+  - Add dry-run mode for testing migration
+  - Implement resume capability for interrupted migrations
+  - _Requirements: 8.5_
 
-- [ ] 17.1 Create KeyboardShortcutsHelp component
+- [ ] 12. Add configuration and environment setup
 
-  - List all keyboard shortcuts (arrows, +/-, ESC)
-  - Style as tooltip or small dialog
-  - Add help icon button to modal header
-  - Show/hide on button click
-  - _Requirements: 11.5_
-
-- [ ]\* 17.2 Write property test for shortcuts help
-
-  - **Property 50: Keyboard shortcuts help**
-  - **Validates: Requirements 11.5**
-
-- [ ] 18. Add PDF page count display
-
-  - Update PDFPreview to show page count
-  - Display in modal header for PDFs
-  - _Requirements: 13.3_
-
-- [ ] 18.1 Display PDF page count
-
-  - Pass numPages from PDFPreview to parent
-  - Display in ModalHeader when fileType is 'pdf'
-  - Format as "Page X of Y"
-  - _Requirements: 13.3_
-
-- [ ]\* 18.2 Write property test for page count
-
-  - **Property 56: PDF page count display**
-  - **Validates: Requirements 13.3**
-
-- [ ] 19. Add styling and CSS
-
-  - Create CSS modules for all components
-  - Ensure responsive design
-  - Add animations for loading and transitions
+  - Add configuration options for preview system
+  - Update environment variables documentation
+  - Add deployment configuration
   - _Requirements: All_
 
-- [ ] 19.1 Create component styles
+- [ ] 12.1 Add preview system configuration
 
-  - Create FilePreview.module.css
-  - Create FilePreviewModal.module.css
-  - Create PDFPreview.module.css
-  - Create ImagePreview.module.css
-  - Create TextPreview.module.css
-  - Create FileThumbnail.module.css
-  - Create ZoomControls.module.css
-  - Add responsive breakpoints
-  - Add loading animations
-  - Add transition effects
-  - Ensure WCAG AA contrast ratios
+  - Add preview system settings to company settings
+  - Configure thumbnail generation parameters (size, quality)
+  - Add cache configuration options
+  - Implement preview system enable/disable toggle
   - _Requirements: All_
 
-- [ ] 20. Add accessibility features
+- [ ] 12.2 Update environment documentation
 
-  - Add ARIA labels to all controls
-  - Add ARIA live regions for loading/error states
-  - Ensure proper focus management
-  - Test with screen readers
+  - Document new environment variables for preview system
+  - Add configuration examples for different deployment scenarios
+  - Create troubleshooting guide for common issues
+  - Document performance tuning recommendations
   - _Requirements: All_
 
-- [ ] 20.1 Implement accessibility
-
-  - Add aria-label to all buttons
-  - Add role="dialog" to modal
-  - Add aria-modal="true" to modal
-  - Add aria-live="polite" to loading/error states
-  - Implement focus trap in modal
-  - Set initial focus to close button on modal open
-  - Restore focus to trigger element on modal close
-  - Add alt text to images
-  - Add aria-describedby for error messages
-  - _Requirements: All_
-
-- [ ] 21. Final checkpoint - Ensure all tests pass
+- [ ] 13. Final checkpoint - Ensure all tests pass
 
   - Ensure all tests pass, ask the user if questions arise.
-
-- [ ] 22. Documentation and examples
-
-  - Create component documentation
-  - Add usage examples
-  - Document props and APIs
-  - Create Storybook stories
-  - _Requirements: All_
-
-- [ ] 22.1 Create documentation
-
-  - Document FilePreview component API
-  - Document all props and their types
-  - Add usage examples for thumbnail, inline, and modal modes
-  - Document keyboard shortcuts
-  - Document integration with s3-media-storage
-  - Add troubleshooting guide
-  - Document browser compatibility
-  - _Requirements: All_
-
-- [ ] 22.2 Create Storybook stories
-
-  - Create story for PDF preview
-  - Create story for image preview
-  - Create story for text preview
-  - Create story for thumbnail mode
-  - Create story for modal mode
-  - Create story for error states
-  - Create story for loading states
-  - _Requirements: All_
 
 ## Notes
 
 - Each task should be completed and tested before moving to the next
 - Property-based tests should run a minimum of 100 iterations
-- All components should be wrapped in PreviewErrorBoundary
-- Ensure proper cleanup of event listeners and observers
-- Test with various file sizes and types
-- Verify integration with both local and S3 storage from s3-media-storage spec
-- Maintain accessibility throughout implementation
-- Follow React best practices and hooks guidelines
+- All preview operations should include proper error handling and logging
+- Security is critical - validate all inputs and sanitize file paths
+- Maintain backward compatibility throughout implementation
+- Test with multiple companies to ensure proper multi-tenant isolation
+- Focus on resolving THUMBNAIL_FIX issues early in the implementation
+- Integration with existing s3-media-storage module should reuse configuration

@@ -2,197 +2,112 @@
 
 ## Introduction
 
-This document specifies the requirements for implementing a unified file preview system for PDF, image, and text files in the Ticketz application. The system will provide a reusable preview component that can be used throughout the application wherever media files need to be displayed. This feature explicitly builds upon and integrates with the **s3-media-storage** spec (#[[file:.kiro/specs/s3-media-storage/requirements.md]]), ensuring seamless preview functionality regardless of whether files are stored locally or in S3-compatible storage.
-
-The preview system will use react-pdf library for PDF rendering, native browser capabilities for images, and text rendering for plain text files, providing a consistent user experience across all file types.
+The file-preview feature provides a centralized system for generating and displaying file previews (primarily images and thumbnails) with seamless integration between S3 and local storage systems. This feature addresses the critical THUMBNAIL_FIX issue by implementing a robust, unified approach to preview URL generation and display that works consistently across different storage backends.
 
 ## Glossary
 
-- **File Preview Component**: A reusable React component that renders file content inline
-- **Preview Modal**: A full-screen or dialog view for displaying file previews
-- **Media File**: Any file uploaded or received through the system (PDF, images, text documents)
-- **Storage Backend**: The underlying storage system (local or S3) as defined in s3-media-storage spec
-- **Media URL**: The URL pointing to a media file, following the format defined in s3-media-storage
-- **PDF Document**: Portable Document Format files (.pdf)
-- **Image File**: Raster or vector image files (.jpg, .png, .gif, .webp, .svg)
-- **Text File**: Plain text documents (.txt, .log, .md, .csv)
-- **Page Navigation**: Controls for navigating between pages in multi-page documents
-- **Zoom Controls**: UI elements for adjusting preview scale
-- **Loading State**: Visual feedback while file content is being fetched and rendered
-- **Error State**: Visual feedback when file preview fails
-- **Thumbnail Preview**: Small preview representation of file content
-- **Full Preview**: Expanded view of file content with full controls
+- **File_Preview_System**: The centralized system responsible for generating, serving, and displaying file previews
+- **Storage_Detection_Service**: Service that determines whether files are stored locally or in S3
+- **Preview_URL_Generator**: Component that creates appropriate URLs for file previews based on storage location
+- **Thumbnail_Handler**: Component responsible for processing and serving thumbnail images
+- **Media_Preview_Component**: Frontend component that displays file previews to users
+- **Storage_Fallback_Mechanism**: System that attempts local storage first, then falls back to S3
+- **THUMBNAIL_FIX**: The critical issue involving inconsistent thumbnail display and URL generation
 
 ## Requirements
 
 ### Requirement 1
 
-**User Story:** As a user, I want to preview PDF files inline, so that I can view document content without downloading files.
+**User Story:** As a system administrator, I want the file preview system to automatically detect storage location, so that previews work consistently regardless of whether files are stored locally or in S3.
 
 #### Acceptance Criteria
 
-1. WHEN a PDF file URL is provided THEN the system SHALL render the PDF using react-pdf library
-2. WHEN a multi-page PDF is displayed THEN the system SHALL show page navigation controls
-3. WHEN navigating between pages THEN the system SHALL update the display to show the selected page
-4. WHEN a PDF is loading THEN the system SHALL display a loading indicator
-5. WHEN a PDF fails to load THEN the system SHALL display an error message with retry option
+1. WHEN the File_Preview_System processes a file request, THE Storage_Detection_Service SHALL determine if the file exists in local storage or S3
+2. WHEN a file exists in both local and S3 storage, THE Storage_Detection_Service SHALL prioritize local storage access
+3. WHEN storage detection fails, THE File_Preview_System SHALL return a graceful error response without exposing internal system details
+4. WHEN the storage location is determined, THE File_Preview_System SHALL cache the result for subsequent requests within the same session
+5. THE Storage_Detection_Service SHALL validate file existence before confirming storage location
 
 ### Requirement 2
 
-**User Story:** As a user, I want to preview image files inline, so that I can view images without opening them in a new tab.
+**User Story:** As a user, I want file previews to display correctly with proper URLs, so that I can view images and thumbnails without broken links or missing content.
 
 #### Acceptance Criteria
 
-1. WHEN an image file URL is provided THEN the system SHALL render the image using native browser capabilities
-2. WHEN an image is loading THEN the system SHALL display a loading placeholder
-3. WHEN an image fails to load THEN the system SHALL display a broken image placeholder
-4. WHEN an image is displayed THEN the system SHALL maintain aspect ratio
-5. WHERE zoom is enabled, WHEN a user zooms an image THEN the system SHALL scale the image appropriately
+1. WHEN a file is stored in S3, THE Preview_URL_Generator SHALL create URLs using the S3 endpoint format
+2. WHEN a file is stored locally, THE Preview_URL_Generator SHALL create URLs using the application host format
+3. WHEN generating preview URLs, THE File_Preview_System SHALL include proper authentication tokens for secure access
+4. THE Preview_URL_Generator SHALL maintain consistent URL format patterns across all file types
+5. WHEN a preview URL is generated, THE File_Preview_System SHALL validate the URL format before returning it to the client
 
 ### Requirement 3
 
-**User Story:** As a user, I want to preview text files inline, so that I can read text content without downloading files.
+**User Story:** As a developer, I want the thumbnail system to work reliably, so that the THUMBNAIL_FIX issue is permanently resolved without requiring additional patches.
 
 #### Acceptance Criteria
 
-1. WHEN a text file URL is provided THEN the system SHALL fetch and display the text content
-2. WHEN text content is loading THEN the system SHALL display a loading indicator
-3. WHEN text content fails to load THEN the system SHALL display an error message
-4. WHEN displaying text content THEN the system SHALL preserve formatting and line breaks
-5. WHEN text content exceeds display area THEN the system SHALL provide scrolling
+1. WHEN processing thumbnail requests, THE Thumbnail_Handler SHALL support both original images and generated thumbnails
+2. WHEN a thumbnail does not exist, THE Thumbnail_Handler SHALL generate one from the original file if possible
+3. WHEN thumbnail generation fails, THE Thumbnail_Handler SHALL serve the original file as fallback
+4. THE Thumbnail_Handler SHALL maintain aspect ratios during thumbnail generation
+5. WHEN serving thumbnails, THE File_Preview_System SHALL set appropriate Content-Type headers based on file format
 
 ### Requirement 4
 
-**User Story:** As a developer, I want a reusable preview component, so that I can display file previews consistently throughout the application.
+**User Story:** As a user, I want file previews to load quickly and efficiently, so that I can access media content without delays or performance issues.
 
 #### Acceptance Criteria
 
-1. THE system SHALL provide a single FilePreview component that handles all supported file types
-2. WHEN the component receives a file URL THEN the system SHALL automatically detect the file type
-3. WHEN the component is used THEN the system SHALL accept configuration props for size, zoom, and controls
-4. THE component SHALL work with both local and S3-stored files as defined in s3-media-storage spec
-5. THE component SHALL be framework-agnostic in its API design
+1. THE File_Preview_System SHALL implement caching mechanisms for frequently accessed previews
+2. WHEN serving files from S3, THE File_Preview_System SHALL stream content directly without storing locally
+3. WHEN serving files from local storage, THE File_Preview_System SHALL use efficient file streaming
+4. THE File_Preview_System SHALL compress preview images when appropriate to reduce bandwidth usage
+5. WHEN multiple preview requests occur simultaneously, THE File_Preview_System SHALL handle concurrent access without degradation
 
 ### Requirement 5
 
-**User Story:** As a user, I want to open previews in a modal dialog, so that I can view files in a larger format without leaving the current page.
+**User Story:** As a frontend developer, I want a unified preview component, so that I can display file previews consistently across the application without handling storage-specific logic.
 
 #### Acceptance Criteria
 
-1. WHEN a preview modal is opened THEN the system SHALL display the file in a full-screen or large dialog
-2. WHEN the modal is displayed THEN the system SHALL show close, download, and navigation controls
-3. WHEN the user clicks outside the modal THEN the system SHALL close the preview
-4. WHEN the user presses ESC key THEN the system SHALL close the preview
-5. WHEN the modal is open THEN the system SHALL prevent background scrolling
+1. THE Media_Preview_Component SHALL accept a file identifier and automatically handle storage detection
+2. WHEN displaying previews, THE Media_Preview_Component SHALL show loading states during content retrieval
+3. WHEN preview loading fails, THE Media_Preview_Component SHALL display appropriate error placeholders
+4. THE Media_Preview_Component SHALL support different preview sizes (thumbnail, medium, full)
+5. WHEN previews are displayed, THE Media_Preview_Component SHALL provide accessibility attributes for screen readers
 
 ### Requirement 6
 
-**User Story:** As a user, I want zoom controls for previews, so that I can adjust the view to see details or get an overview.
+**User Story:** As a system administrator, I want comprehensive error handling for preview operations, so that preview failures do not impact overall system stability.
 
 #### Acceptance Criteria
 
-1. WHEN zoom controls are enabled THEN the system SHALL display zoom in, zoom out, and reset buttons
-2. WHEN zoom in is clicked THEN the system SHALL increase the scale by 25%
-3. WHEN zoom out is clicked THEN the system SHALL decrease the scale by 25%
-4. WHEN reset is clicked THEN the system SHALL restore the default scale
-5. WHEN zooming THEN the system SHALL maintain the center point of the visible area
+1. WHEN storage access fails, THE File_Preview_System SHALL log detailed error information for debugging
+2. WHEN preview generation encounters errors, THE File_Preview_System SHALL attempt fallback strategies before failing
+3. THE File_Preview_System SHALL implement circuit breaker patterns for external storage access
+4. WHEN errors occur, THE File_Preview_System SHALL return standardized error responses with appropriate HTTP status codes
+5. THE File_Preview_System SHALL monitor and report preview system health metrics
 
 ### Requirement 7
 
-**User Story:** As a user, I want to download files from the preview, so that I can save files locally for offline access.
+**User Story:** As a security administrator, I want file preview access to be properly secured, so that unauthorized users cannot access private media content.
 
 #### Acceptance Criteria
 
-1. WHEN a download button is displayed THEN the system SHALL trigger file download on click
-2. WHEN downloading THEN the system SHALL preserve the original filename
-3. WHEN download fails THEN the system SHALL display an error message
-4. THE system SHALL work with both local and S3-stored files as defined in s3-media-storage spec
-5. WHERE S3 signed URLs are available, the system SHALL use them for downloads
+1. THE File_Preview_System SHALL validate user permissions before serving any preview content
+2. WHEN generating signed URLs for S3 content, THE File_Preview_System SHALL set appropriate expiration times
+3. THE File_Preview_System SHALL sanitize file paths to prevent directory traversal attacks
+4. WHEN serving previews, THE File_Preview_System SHALL include security headers to prevent content injection
+5. THE File_Preview_System SHALL log all preview access attempts for security auditing
 
 ### Requirement 8
 
-**User Story:** As a developer, I want the preview component to handle loading and error states, so that users receive appropriate feedback during file operations.
+**User Story:** As a system integrator, I want the preview system to integrate seamlessly with existing media storage, so that current functionality remains unaffected while gaining preview capabilities.
 
 #### Acceptance Criteria
 
-1. WHEN a file is being fetched THEN the system SHALL display a loading spinner or skeleton
-2. WHEN a file fails to load THEN the system SHALL display a user-friendly error message
-3. WHEN an error occurs THEN the system SHALL provide a retry action
-4. WHEN a file type is unsupported THEN the system SHALL display a message with download option
-5. WHEN network errors occur THEN the system SHALL display appropriate error messages
-
-### Requirement 9
-
-**User Story:** As a user viewing messages, I want to see file previews inline in the message list, so that I can quickly identify file content without opening each file.
-
-#### Acceptance Criteria
-
-1. WHEN a message contains a PDF file THEN the system SHALL display a thumbnail preview of the first page
-2. WHEN a message contains an image THEN the system SHALL display a thumbnail of the image
-3. WHEN a message contains a text file THEN the system SHALL display a text file icon
-4. WHEN a thumbnail is clicked THEN the system SHALL open the full preview modal
-5. WHEN thumbnails are displayed THEN the system SHALL limit their size to maintain message list performance
-
-### Requirement 10
-
-**User Story:** As a developer, I want the preview component to integrate with the existing storage system, so that it works seamlessly with both local and S3 storage.
-
-#### Acceptance Criteria
-
-1. WHEN fetching file content THEN the system SHALL use the media URLs as defined in s3-media-storage spec
-2. WHEN files are stored in S3 THEN the system SHALL handle S3 URLs correctly
-3. WHEN files are stored locally THEN the system SHALL handle local URLs correctly
-4. WHEN the storage backend changes THEN the preview component SHALL continue working without modification
-5. THE system SHALL respect the hybrid mode defined in s3-media-storage spec
-
-### Requirement 11
-
-**User Story:** As a user, I want keyboard navigation for previews, so that I can efficiently navigate through documents without using the mouse.
-
-#### Acceptance Criteria
-
-1. WHEN viewing a multi-page PDF THEN the system SHALL support arrow keys for page navigation
-2. WHEN the preview modal is open THEN the system SHALL support ESC key to close
-3. WHEN zoom controls are available THEN the system SHALL support + and - keys for zooming
-4. WHEN keyboard shortcuts are used THEN the system SHALL prevent default browser behavior
-5. THE system SHALL display keyboard shortcuts in a help tooltip
-
-### Requirement 12
-
-**User Story:** As a system administrator, I want the preview system to be performant, so that it doesn't negatively impact application performance.
-
-#### Acceptance Criteria
-
-1. WHEN loading PDF files THEN the system SHALL only render visible pages
-2. WHEN displaying thumbnails THEN the system SHALL lazy-load preview content
-3. WHEN multiple previews are on screen THEN the system SHALL limit concurrent rendering
-4. WHEN large files are previewed THEN the system SHALL implement progressive loading
-5. THE system SHALL cache rendered content to avoid redundant processing
-
-### Requirement 13
-
-**User Story:** As a user, I want to see file metadata in previews, so that I can understand file properties without downloading.
-
-#### Acceptance Criteria
-
-1. WHEN a preview is displayed THEN the system SHALL show the filename
-2. WHEN a preview is displayed THEN the system SHALL show the file size
-3. WHEN a PDF is displayed THEN the system SHALL show the total page count
-4. WHEN a preview is displayed THEN the system SHALL show the file type
-5. WHERE available, the system SHALL display the upload date
-
-### Requirement 14
-
-**User Story:** As a developer, I want comprehensive error handling, so that preview failures don't break the application.
-
-#### Acceptance Criteria
-
-1. WHEN react-pdf fails to load THEN the system SHALL catch the error and display a fallback
-2. WHEN CORS errors occur THEN the system SHALL display an appropriate message
-3. WHEN file format is corrupted THEN the system SHALL display an error with download option
-4. WHEN memory limits are exceeded THEN the system SHALL display a warning and offer download
-5. THE system SHALL log all preview errors for debugging
-
-## Summary
-
-This requirements document establishes the foundation for a comprehensive file preview system that integrates seamlessly with the existing s3-media-storage infrastructure. The implementation will provide a reusable, performant, and user-friendly preview experience for PDF, image, and text files across the entire application. The design prioritizes consistency, accessibility, and maintainability while ensuring compatibility with both local and S3-compatible storage backends.
+1. THE File_Preview_System SHALL maintain backward compatibility with existing media URLs
+2. WHEN integrating with the s3-media-storage module, THE File_Preview_System SHALL reuse existing storage configuration
+3. THE File_Preview_System SHALL preserve existing media key formats and naming conventions
+4. WHEN processing legacy media files, THE File_Preview_System SHALL handle files without preview metadata gracefully
+5. THE File_Preview_System SHALL support migration of existing media to include preview capabilities

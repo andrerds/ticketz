@@ -766,7 +766,7 @@ const MessagesList = ({
     setSelectedMessageData(data);
   };
 
-  const handleCloseMessageOptionsMenu = (e) => {
+  const handleCloseMessageOptionsMenu = () => {
     setAnchorEl(null);
   };
 

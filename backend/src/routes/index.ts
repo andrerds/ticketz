@@ -17,6 +17,7 @@ import mediaManagementRoutes from "./mediaManagementRoutes";
 import mediaMigrationRoutes from "./mediaMigrationRoutes";
 import messageRoutes from "./messageRoutes";
 import planRoutes from "./planRoutes";
+import previewRoutes from "./previewRoutes";
 import pwaRoutes from "./pwaRoutes";
 import queueOptionRoutes from "./queueOptionRoutes";
 import queueRoutes from "./queueRoutes";
@@ -72,5 +73,6 @@ routes.use(i18nRoutes);
 routes.use(wavoipRoutes);
 routes.use(mediaManagementRoutes);
 routes.use(mediaMigrationRoutes);
+routes.use(previewRoutes);
 
 export default routes;
