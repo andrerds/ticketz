@@ -12,34 +12,40 @@ export interface MediaStats {
   byLocation: Record<string, { count: number; size: number }>;
 }
 
-const getFileSize = async (
-  mediaUrl: string,
-  storageLocation: "local" | "s3"
-): Promise<number> => {
-  if (storageLocation === "local") {
-    try {
-      const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");
-      const fullPath = path.join(getPublicPath(), mediaKey);
-      const stats = await fs.stat(fullPath);
-      return stats.size;
-    } catch (error) {
-      logger.warn({ error, mediaUrl }, "Failed to get file size");
-      return 0;
-    }
+const detectStorageLocation = async (
+  mediaUrl: string
+): Promise<"local" | "s3"> => {
+  if (/^https?:\/\//.test(mediaUrl)) {
+    return "s3";
   }
-  return 0;
+
+  try {
+    const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");
+    const fullPath = path.join(getPublicPath(), mediaKey);
+    await fs.access(fullPath);
+    return "local";
+  } catch {
+    return "s3";
+  }
 };
 
 export const GetMediaStatsService = async (
   companyId: number
 ): Promise<MediaStats> => {
+  logger.info({ companyId }, "[MEDIA-STATS] Calculating media statistics");
+
   const messages = await Message.findAll({
     where: {
       companyId,
       mediaUrl: { [Op.ne]: null }
     },
-    attributes: ["mediaType", "mediaUrl", "createdAt"]
+    attributes: ["mediaType", "mediaUrl", "fileSize", "createdAt"]
   });
+
+  logger.info(
+    { companyId, messageCount: messages.length },
+    "[MEDIA-STATS] Messages retrieved from database"
+  );
 
   const stats: MediaStats = {
     totalFiles: messages.length,
@@ -48,20 +54,29 @@ export const GetMediaStatsService = async (
     byLocation: { local: { count: 0, size: 0 }, s3: { count: 0, size: 0 } }
   };
 
-  const fileSizePromises = messages.map(async msg => {
+  const locationPromises = messages.map(async msg => {
     const mediaUrl = msg.getDataValue("mediaUrl");
     if (!mediaUrl) return null;
 
-    const isAbsoluteUrl = mediaUrl.match(/^https?:\/\//);
-    const location: "local" | "s3" = isAbsoluteUrl ? "s3" : "local";
+    const location = await detectStorageLocation(mediaUrl);
     const type = msg.mediaType || "unknown";
+    const fileSize = parseInt(msg.getDataValue("fileSize") || "0", 10);
 
-    const fileSize = await getFileSize(mediaUrl, location);
+    logger.debug(
+      {
+        messageId: msg.id,
+        mediaUrl,
+        fileSize,
+        type,
+        location
+      },
+      "[MEDIA-STATS] Processing media file"
+    );
 
     return { type, location, fileSize };
   });
 
-  const results = await Promise.all(fileSizePromises);
+  const results = await Promise.all(locationPromises);
 
   results.forEach(result => {
     if (!result) return;
@@ -78,6 +93,17 @@ export const GetMediaStatsService = async (
     stats.byLocation[location].size += fileSize;
     stats.totalSize += fileSize;
   });
+
+  logger.info(
+    {
+      companyId,
+      totalFiles: stats.totalFiles,
+      totalSize: stats.totalSize,
+      byType: stats.byType,
+      byLocation: stats.byLocation
+    },
+    "[MEDIA-STATS] Statistics calculated successfully"
+  );
 
   return stats;
 };

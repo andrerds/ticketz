@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as fc from "fast-check";
-import saveMediaToFile from "../saveMediaFile";
-import GetStorageConfigService from "../../services/StorageServices/GetStorageConfigService";
-import { StorageDriverFactory } from "../../infrastructure/storage/StorageDriverFactory";
-import { StorageConfig } from "../../domain/storage/StorageConfig";
 import { IStorageDriver } from "../../domain/storage/IStorageDriver";
+import { StorageConfig } from "../../domain/storage/StorageConfig";
+import { StorageDriverFactory } from "../../infrastructure/storage/StorageDriverFactory";
 import Ticket from "../../models/Ticket";
+import GetStorageConfigService from "../../services/StorageServices/GetStorageConfigService";
+import saveMediaToFile from "../saveMediaFile";
 
 jest.mock("../../services/StorageServices/GetStorageConfigService");
 jest.mock("../../infrastructure/storage/StorageDriverFactory");
@@ -29,7 +29,8 @@ describe("saveMediaToFile", () => {
       read: jest.fn(),
       exists: jest.fn(),
       delete: jest.fn(),
-      getSignedUrl: jest.fn()
+      getSignedUrl: jest.fn(),
+      getFileSize: jest.fn()
     };
 
     mockStorageDriverFactory.createDriver = jest

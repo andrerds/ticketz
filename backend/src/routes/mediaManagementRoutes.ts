@@ -39,4 +39,13 @@ mediaManagementRoutes.post(
   MediaManagementController.bulkRemove
 );
 
+// Development-only S3 debug endpoint
+mediaManagementRoutes.get(
+  "/media/s3-debug",
+  isAuth,
+  isAdmin,
+  isCompliant,
+  MediaManagementController.debugS3
+);
+
 export default mediaManagementRoutes;

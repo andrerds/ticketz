@@ -1,14 +1,14 @@
-import * as fc from "fast-check";
-import { S3StorageDriver } from "../S3StorageDriver";
-import { S3Config } from "../../../domain/storage/StorageConfig";
 import {
-  S3Client,
-  PutObjectCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
-  DeleteObjectCommand
+  PutObjectCommand,
+  S3Client
 } from "@aws-sdk/client-s3";
+import * as fc from "fast-check";
 import { Readable } from "stream";
+import { S3Config } from "../../../domain/storage/StorageConfig";
+import { S3StorageDriver } from "../S3StorageDriver";
 
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
@@ -166,5 +166,40 @@ describe("S3StorageDriver", () => {
     await expect(driver.exists("test/file.jpg")).rejects.toThrow(
       "Network error"
     );
+  });
+
+  it("should get file size from S3", async () => {
+    const expectedSize = 1024;
+    mockS3Client.send.mockResolvedValueOnce({
+      ContentLength: expectedSize
+    });
+
+    const fileSize = await driver.getFileSize("test/file.jpg");
+
+    expect(fileSize).toBe(expectedSize);
+    expect(mockS3Client.send).toHaveBeenCalledTimes(1);
+    expect(mockS3Client.send.mock.calls[0][0]).toBeInstanceOf(
+      HeadObjectCommand
+    );
+  });
+
+  it("should return 0 when file size cannot be determined", async () => {
+    const error: any = new Error("Not Found");
+    error.name = "NotFound";
+    mockS3Client.send.mockRejectedValueOnce(error);
+
+    const fileSize = await driver.getFileSize("nonexistent/file.jpg");
+
+    expect(fileSize).toBe(0);
+  });
+
+  it("should return 0 when ContentLength is undefined", async () => {
+    mockS3Client.send.mockResolvedValueOnce({
+      ContentLength: undefined
+    });
+
+    const fileSize = await driver.getFileSize("test/file.jpg");
+
+    expect(fileSize).toBe(0);
   });
 });

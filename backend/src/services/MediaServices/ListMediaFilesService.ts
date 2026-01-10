@@ -31,22 +31,25 @@ const extractFileName = (mediaUrl: string): string => {
   return parts[parts.length - 1];
 };
 
-const getFileSize = async (
+const detectStorageLocation = async (
   mediaUrl: string,
-  storageLocation: "local" | "s3"
-): Promise<number> => {
-  if (storageLocation === "local") {
-    try {
-      const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");
-      const fullPath = path.join(getPublicPath(), mediaKey);
-      const stats = await fs.stat(fullPath);
-      return stats.size;
-    } catch (error) {
-      logger.warn({ error, mediaUrl }, "Failed to get file size");
-      return 0;
-    }
+  companyId: number
+): Promise<"local" | "s3"> => {
+  // If URL is absolute (starts with http:// or https://), it's definitely S3
+  if (/^https?:\/\//.test(mediaUrl)) {
+    return "s3";
   }
-  return 0;
+
+  // Check if file exists locally
+  try {
+    const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");
+    const fullPath = path.join(getPublicPath(), mediaKey);
+    await fs.access(fullPath);
+    return "local";
+  } catch {
+    // File doesn't exist locally, so it must be in S3
+    return "s3";
+  }
 };
 
 export const ListMediaFilesService = async (
@@ -72,22 +75,30 @@ export const ListMediaFilesService = async (
     whereClause.createdAt[Op.lte] = filters.endDate;
   }
 
+  logger.info(
+    { companyId, filters },
+    "[MEDIA-LIST] Fetching media files from database"
+  );
+
   const messages = await Message.findAll({
     where: whereClause,
     order: [["createdAt", "DESC"]]
   });
 
+  logger.info(
+    { companyId, messageCount: messages.length },
+    "[MEDIA-LIST] Messages retrieved from database"
+  );
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const mediaFiles = await Promise.all(
-    messages.map(msg => {
+    messages.map(async msg => {
       const mediaUrl = msg.getDataValue("mediaUrl");
       if (!mediaUrl) return null;
 
-      const storageLocation: "local" | "s3" = /^https?:/.test(mediaUrl)
-        ? "s3"
-        : "local";
+      const storageLocation = await detectStorageLocation(mediaUrl, companyId);
 
       if (
         filters?.storageLocation &&
@@ -96,24 +107,48 @@ export const ListMediaFilesService = async (
         return null;
       }
 
-      return (async (): Promise<MediaFileInfo> => {
-        const fileSize = await getFileSize(mediaUrl, storageLocation);
+      // Use fileSize from database, fallback to 0 for legacy records
+      const fileSize = msg.fileSize || 0;
 
-        return {
-          id: msg.id,
-          fileName: extractFileName(mediaUrl),
-          fileSize,
-          uploadDate: msg.createdAt,
-          fileType: msg.mediaType || "unknown",
-          storageLocation,
+      logger.debug(
+        {
           messageId: msg.id,
           mediaUrl,
-          isDeleted: msg.isDeleted,
-          canDelete: msg.createdAt < thirtyDaysAgo
-        };
-      })();
+          fileSize,
+          storageLocation,
+          hasFileSize: !!msg.fileSize
+        },
+        "[MEDIA-LIST] Processing media file"
+      );
+
+      return {
+        id: msg.id,
+        fileName: extractFileName(mediaUrl),
+        fileSize,
+        uploadDate: msg.createdAt,
+        fileType: msg.mediaType || "unknown",
+        storageLocation,
+        messageId: msg.id,
+        mediaUrl,
+        isDeleted: msg.isDeleted,
+        canDelete: msg.createdAt < thirtyDaysAgo
+      };
     })
   );
 
-  return mediaFiles.filter((file): file is MediaFileInfo => file !== null);
+  const filteredFiles = mediaFiles.filter(
+    (file): file is MediaFileInfo => file !== null
+  );
+
+  logger.info(
+    {
+      companyId,
+      totalFiles: filteredFiles.length,
+      filesWithSize: filteredFiles.filter(f => f.fileSize > 0).length,
+      legacyFiles: filteredFiles.filter(f => f.fileSize === 0).length
+    },
+    "[MEDIA-LIST] Media files processed successfully"
+  );
+
+  return filteredFiles;
 };

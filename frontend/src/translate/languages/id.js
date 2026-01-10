@@ -19,7 +19,7 @@ const messages = {
         company: "Perusahaan",
         connection: "Koneksi",
         queue: "Antrian",
-        contact: "Kontak"
+        contact: "Kontak",
       },
       signup: {
         title: "Daftar",
@@ -78,9 +78,11 @@ const messages = {
         },
         confirmationModal: {
           deleteTitle: "Hapus",
-          deleteMessage: "Apakah Anda yakin? Tindakan ini tidak bisa dibatalkan.",
+          deleteMessage:
+            "Apakah Anda yakin? Tindakan ini tidak bisa dibatalkan.",
           disconnectTitle: "Putuskan Koneksi",
-          disconnectMessage: "Apakah Anda yakin? Anda perlu memindai Kode QR lagi.",
+          disconnectMessage:
+            "Apakah Anda yakin? Anda perlu memindai Kode QR lagi.",
         },
         buttons: {
           add: "Tambah WhatsApp",
@@ -93,18 +95,21 @@ const messages = {
         toolTips: {
           disconnected: {
             title: "Gagal memulai sesi WhatsApp",
-            content: "Pastikan ponsel Anda terhubung ke internet dan coba lagi, atau minta Kode QR baru.",
+            content:
+              "Pastikan ponsel Anda terhubung ke internet dan coba lagi, atau minta Kode QR baru.",
           },
           qrcode: {
             title: "Menunggu pemindaian Kode QR",
-            content: "Klik tombol 'KODE QR' dan pindai Kode QR dengan ponsel Anda untuk memulai sesi.",
+            content:
+              "Klik tombol 'KODE QR' dan pindai Kode QR dengan ponsel Anda untuk memulai sesi.",
           },
           connected: {
             title: "Koneksi berhasil!",
           },
           timeout: {
             title: "Koneksi ke ponsel telah terputus",
-            content: "Pastikan ponsel Anda terhubung ke internet dan WhatsApp terbuka, atau klik 'Putuskan' untuk mendapatkan Kode QR baru.",
+            content:
+              "Pastikan ponsel Anda terhubung ke internet dan WhatsApp terbuka, atau klik 'Putuskan' untuk mendapatkan Kode QR baru.",
           },
           refresh: "Muat ulang",
           disconnect: "Putuskan",
@@ -116,8 +121,7 @@ const messages = {
           name: "Nama",
           status: "Status",
           lastUpdate: "Pembaruan Terakhir",
-          default:
-            "Default",
+          default: "Default",
           actions: "Aksi",
           session: "Sesi",
         },
@@ -132,8 +136,7 @@ const messages = {
         },
         form: {
           name: "Nama",
-          default:
-            "Default",
+          default: "Default",
         },
         buttons: {
           okAdd: "Tambah",
@@ -154,8 +157,10 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Hapus",
           importTitlte: "Impor Kontak",
-          deleteMessage: "Apakah Anda yakin ingin menghapus kontak ini? Semua interaksi terkait akan hilang.",
-          importMessage: "Apakah Anda ingin mengimpor semua kontak dari ponsel?",
+          deleteMessage:
+            "Apakah Anda yakin ingin menghapus kontak ini? Semua interaksi terkait akan hilang.",
+          importMessage:
+            "Apakah Anda ingin mengimpor semua kontak dari ponsel?",
         },
         buttons: {
           import: "Impor Kontak",
@@ -300,7 +305,7 @@ const messages = {
       uploads: {
         titles: {
           titleUploadMsgDragDrop: "SERET DAN LETAKKAN FILE DI KOLOM DI BAWAH",
-          titleFileList: "Daftar file(s)"
+          titleFileList: "Daftar file(s)",
         },
       },
       todolist: {
@@ -331,16 +336,16 @@ const messages = {
         },
         tabs: {
           open: {
-            title: "Buka"
+            title: "Buka",
           },
           closed: {
-            title: "Tutup"
+            title: "Tutup",
           },
           groups: {
-            title: "Grup"
+            title: "Grup",
           },
           search: {
-            title: "Cari"
+            title: "Cari",
           },
         },
         search: {
@@ -365,7 +370,8 @@ const messages = {
         pendingHeader: "Tertunda",
         assignedHeader: "Ditugaskan",
         noTicketsTitle: "Tidak ada apa-apa di sini!",
-        noTicketsMessage: "Tidak ada tiket yang ditemukan dengan status ini atau istilah pencarian",
+        noTicketsMessage:
+          "Tidak ada tiket yang ditemukan dengan status ini atau istilah pencarian",
         buttons: {
           accept: "Terima",
         },
@@ -403,11 +409,12 @@ const messages = {
           management: "Management",
           kanban: "Kanban",
           tasks: "Tugas",
+          mediaManagement: "Manajemen Media",
         },
         appBar: {
           i18n: {
             language: "Indonesian",
-            language_short: "ID"
+            language_short: "ID",
           },
           user: {
             profile: "Profile",
@@ -417,6 +424,50 @@ const messages = {
             about: "About",
             logout: "Keluar",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Manajemen Media",
+        stats: {
+          title: "Statistik Penyimpanan",
+          totalFiles: "Total File",
+          totalSize: "Ukuran Total",
+          byLocation: "Berdasarkan Lokasi",
+        },
+        filters: {
+          startDate: "Tanggal Mulai",
+          endDate: "Tanggal Akhir",
+          fileType: "Jenis File",
+          location: "Lokasi",
+          all: "Semua",
+        },
+        buttons: {
+          filter: "Filter",
+          deleteSelected: "Hapus yang Dipilih",
+          cancel: "Batal",
+          confirm: "Konfirmasi",
+        },
+        table: {
+          fileName: "Nama File",
+          fileSize: "Ukuran",
+          uploadDate: "Tanggal Upload",
+          fileType: "Jenis",
+          location: "Lokasi",
+          actions: "Aksi",
+        },
+        messages: {
+          deleteSuccess: "Media berhasil dihapus",
+          bulkDeleteSuccess: "File media berhasil dihapus",
+          protected: "Dilindungi (kurang dari 30 hari)",
+          mediaDeleted: {
+            text: "Media dihapus secara manual",
+            tooltip: "Media ini dihapus secara manual oleh administrator",
+          },
+        },
+        confirmDialog: {
+          title: "Konfirmasi Penghapusan",
+          message:
+            "Apakah Anda yakin ingin menghapus media ini? Tindakan ini tidak dapat dibatalkan.",
         },
       },
       messagesAPI: {
@@ -451,8 +502,8 @@ const messages = {
         searchPlaceholder: "Cari",
         subMenus: {
           list: "Panel",
-          tags: "Jalur"
-        }
+          tags: "Jalur",
+        },
       },
       tagsKanban: {
         title: "Jalur",
@@ -561,7 +612,8 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Hapus",
           deleteMessage: "Tindakan ini tidak dapat dibatalkan.",
-          importMessage: "Apakah Anda ingin mengimpor kontak dari spreadsheet ini?",
+          importMessage:
+            "Apakah Anda ingin mengimpor kontak dari spreadsheet ini?",
           importTitlte: "Impor",
         },
         toasts: {
@@ -690,7 +742,8 @@ const messages = {
         },
         confirmationModal: {
           deleteTitle: "Hapus",
-          deleteMessage: "Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan! Tiket dari antrian ini akan tetap ada tetapi tidak akan lagi ditugaskan ke antrian mana pun.",
+          deleteMessage:
+            "Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan! Tiket dari antrian ini akan tetap ada tetapi tidak akan lagi ditugaskan ke antrian mana pun.",
         },
       },
       queueSelect: {
@@ -712,7 +765,8 @@ const messages = {
         },
         confirmationModal: {
           deleteTitle: "Hapus",
-          deleteMessage: "Semua data pengguna akan hilang. Tiket terbuka dari pengguna ini akan dipindahkan ke antrian.",
+          deleteMessage:
+            "Semua data pengguna akan hilang. Tiket terbuka dari pengguna ini akan dipindahkan ke antrian.",
         },
       },
       helps: {
@@ -724,20 +778,23 @@ const messages = {
         buttonclose: "Tutup",
         title: "Tentang ticketz",
         abouttitle: "Asal dan peningkatan",
-        aboutdetail: "ticketz berasal secara tidak langsung dari proyek Whaticket dengan peningkatan yang dibagikan oleh para pengembang sistem EquipeChat melalui saluran VemFazer di YouTube, kemudian ditingkatkan oleh Claudemir Todo Bom",
+        aboutdetail:
+          "ticketz berasal secara tidak langsung dari proyek Whaticket dengan peningkatan yang dibagikan oleh para pengembang sistem EquipeChat melalui saluran VemFazer di YouTube, kemudian ditingkatkan oleh Claudemir Todo Bom",
         aboutauthorsite: "Situs penulis",
         aboutwhaticketsite: "Situs Komunitas Whaticket di Github",
         aboutvemfazersite: "Situs saluran Vem Fazer di Github",
         licenseheading: "Lisensi Sumber Terbuka",
-        licensedetail: "ticketz dilisensikan di bawah GNU Affero General Public License versi 3, yang berarti bahwa setiap pengguna yang memiliki akses ke aplikasi ini berhak untuk mendapatkan akses ke kode sumbernya. Informasi lebih lanjut di tautan berikut:",
+        licensedetail:
+          "ticketz dilisensikan di bawah GNU Affero General Public License versi 3, yang berarti bahwa setiap pengguna yang memiliki akses ke aplikasi ini berhak untuk mendapatkan akses ke kode sumbernya. Informasi lebih lanjut di tautan berikut:",
         licensefulltext: "Teks lengkap lisensi",
-        licensesourcecode: "Kode sumber Ticketz"
+        licensesourcecode: "Kode sumber Ticketz",
       },
       schedules: {
         title: "Jadwal",
         confirmationModal: {
           deleteTitle: "Hapus",
-          deleteMessage: "Apakah Anda yakin ingin menghapus kampanye ini? Tindakan ini tidak dapat dibatalkan.",
+          deleteMessage:
+            "Apakah Anda yakin ingin menghapus kampanye ini? Tindakan ini tidak dapat dibatalkan.",
         },
         table: {
           contact: "Kontak",
@@ -881,33 +938,33 @@ const messages = {
         FileDownloadLimit: {
           title: "Batas unduhan file (MB)",
         },
-        "messageVisibility": {
-          "title": "Visibilitas Pesan",
-          "options": {
-            "respectMessageQueue": "Hormati Antrian Pesan",
-            "respectTicketQueue": "Hormati Antrian Tiket"
-          }
+        messageVisibility: {
+          title: "Visibilitas Pesan",
+          options: {
+            respectMessageQueue: "Hormati Antrian Pesan",
+            respectTicketQueue: "Hormati Antrian Tiket",
+          },
         },
-        "keepQueueAndUser": {
-          "title_id": "Simpan antrian dan pengguna pada tiket tertutup",
-          "options": {
+        keepQueueAndUser: {
+          title_id: "Simpan antrian dan pengguna pada tiket tertutup",
+          options: {
             enabled: "Diaktifkan",
             disabled: "Dinonaktifkan",
-          }
+          },
         },
         GracePeriod: {
           title: "Periode penundaan langganan berakhir (hari)",
         },
-        "ticketAcceptedMessage": {
-          "title": "Pesan Tiket Diterima",
-          "placeholder": "Masukkan pesan tiket diterima di sini"
+        ticketAcceptedMessage: {
+          title: "Pesan Tiket Diterima",
+          placeholder: "Masukkan pesan tiket diterima di sini",
         },
-        "transferMessage": {
-          "title": "Pesan Transfer",
-          "placeholder": "Masukkan pesan transfer di sini"
+        transferMessage: {
+          title: "Pesan Transfer",
+          placeholder: "Masukkan pesan transfer di sini",
         },
-        "mustacheVariables": {
-          "title": "Variabel yang tersedia:"
+        mustacheVariables: {
+          title: "Variabel yang tersedia:",
         },
         WelcomeGreeting: {
           greetings: "halo",
@@ -952,7 +1009,8 @@ const messages = {
       },
       messagesInput: {
         placeholderOpen: "Ketik pesan",
-        placeholderClosed: "Buka kembali atau terima tiket ini untuk mengirim pesan.",
+        placeholderClosed:
+          "Buka kembali atau terima tiket ini untuk mengirim pesan.",
         signMessage: "Tandatangani",
         replying: "Membalas",
         editing: "Mengedit",
@@ -981,7 +1039,8 @@ const messages = {
         },
         confirmationModal: {
           title: "Hapus tiket kontak",
-          message: "Perhatian! Semua pesan yang terkait dengan tiket akan hilang.",
+          message:
+            "Perhatian! Semua pesan yang terkait dengan tiket akan hilang.",
         },
         buttons: {
           delete: "Hapus",
@@ -1007,7 +1066,7 @@ const messages = {
       },
       messageHistoryModal: {
         close: "Tutup",
-        title: "Riwayat edit pesan"
+        title: "Riwayat edit pesan",
       },
       presence: {
         unavailable: "Tidak tersedia",
@@ -1049,19 +1108,26 @@ const messages = {
         ERR_FORBIDDEN: "Akses ditolak. Periksa izin Anda.",
         ERR_CHECK_NUMBER: "Nomor ini tidak terdaftar di WhatsApp.",
         ERR_NO_OTHER_WHATSAPP: "Harus ada setidaknya satu WhatsApp default.",
-        ERR_NO_DEF_WAPP_FOUND: "Tidak ada WhatsApp default yang ditemukan. Periksa halaman koneksi.",
-        ERR_WAPP_NOT_INITIALIZED: "Sesi WhatsApp ini belum diinisialisasi. Periksa halaman koneksi.",
-        ERR_WAPP_CHECK_CONTACT: "Tidak dapat memeriksa kontak WhatsApp. Periksa halaman koneksi.",
+        ERR_NO_DEF_WAPP_FOUND:
+          "Tidak ada WhatsApp default yang ditemukan. Periksa halaman koneksi.",
+        ERR_WAPP_NOT_INITIALIZED:
+          "Sesi WhatsApp ini belum diinisialisasi. Periksa halaman koneksi.",
+        ERR_WAPP_CHECK_CONTACT:
+          "Tidak dapat memeriksa kontak WhatsApp. Periksa halaman koneksi.",
         ERR_WAPP_INVALID_CONTACT: "Ini bukan nomor WhatsApp yang valid.",
-        ERR_WAPP_DOWNLOAD_MEDIA: "Tidak dapat mengunduh media dari WhatsApp. Periksa halaman koneksi.",
+        ERR_WAPP_DOWNLOAD_MEDIA:
+          "Tidak dapat mengunduh media dari WhatsApp. Periksa halaman koneksi.",
         ERR_INVALID_CREDENTIALS: "Kesalahan autentikasi. Silakan coba lagi.",
-        ERR_SENDING_WAPP_MSG: "Kesalahan mengirim pesan WhatsApp. Periksa halaman koneksi.",
+        ERR_SENDING_WAPP_MSG:
+          "Kesalahan mengirim pesan WhatsApp. Periksa halaman koneksi.",
         ERR_DELETE_WAPP_MSG: "Tidak dapat menghapus pesan WhatsApp.",
         ERR_EDITING_WAPP_MSG: "Tidak dapat mengedit pesan WhatsApp.",
         ERR_OTHER_OPEN_TICKET: "Sudah ada tiket terbuka untuk kontak ini.",
         ERR_SESSION_EXPIRED: "Sesi berakhir. Silakan masuk.",
-        ERR_USER_CREATION_DISABLED: "Pembuatan pengguna telah dinonaktifkan oleh administrator.",
-        ERR_NO_PERMISSION: "Anda tidak memiliki izin untuk mengakses sumber daya ini.",
+        ERR_USER_CREATION_DISABLED:
+          "Pembuatan pengguna telah dinonaktifkan oleh administrator.",
+        ERR_NO_PERMISSION:
+          "Anda tidak memiliki izin untuk mengakses sumber daya ini.",
         ERR_DUPLICATED_CONTACT: "Kontak dengan nomor ini sudah ada.",
         ERR_NO_SETTING_FOUND: "Tidak ada pengaturan ditemukan dengan ID ini.",
         ERR_NO_CONTACT_FOUND: "Tidak ada kontak ditemukan dengan ID ini.",
@@ -1070,14 +1136,18 @@ const messages = {
         ERR_NO_WAPP_FOUND: "Tidak ada WhatsApp ditemukan dengan ID ini.",
         ERR_CREATING_MESSAGE: "Kesalahan membuat pesan dalam basis data.",
         ERR_CREATING_TICKET: "Kesalahan membuat tiket dalam basis data.",
-        ERR_FETCH_WAPP_MSG: "Kesalahan mengambil pesan dari WhatsApp, mungkin terlalu lama.",
-        ERR_QUEUE_COLOR_ALREADY_EXISTS: "Warna ini sudah digunakan, pilih yang lain.",
-        ERR_WAPP_GREETING_REQUIRED: "Pesan sambutan wajib jika ada lebih dari satu antrian.",
+        ERR_FETCH_WAPP_MSG:
+          "Kesalahan mengambil pesan dari WhatsApp, mungkin terlalu lama.",
+        ERR_QUEUE_COLOR_ALREADY_EXISTS:
+          "Warna ini sudah digunakan, pilih yang lain.",
+        ERR_WAPP_GREETING_REQUIRED:
+          "Pesan sambutan wajib jika ada lebih dari satu antrian.",
       },
       ticketz: {
         registration: {
           header: "Daftar di basis pengguna Ticketz",
-          description: "Isi kolom di bawah ini untuk mendaftar di basis pengguna Ticketz dan menerima berita tentang proyek.",
+          description:
+            "Isi kolom di bawah ini untuk mendaftar di basis pengguna Ticketz dan menerima berita tentang proyek.",
           name: "Nama",
           country: "Negara",
           phoneNumber: "Nomor Telepon",
@@ -1089,12 +1159,10 @@ const messages = {
           recurringbrl: "Donasi berulang dalam BRL",
           paypaltitle: "Kartu Kredit",
           international: "Donasi dalam USD",
-        }
+        },
       },
     },
   },
 };
 
-export {
-  messages
-};
+export { messages };

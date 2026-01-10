@@ -1,20 +1,24 @@
-import { WAMessage, AnyMediaMessageContent, AnyMessageContent } from "libzapitu-rf";
-import fs from "fs";
-import { exec } from "child_process";
-import path from "path";
 import ffmpegPath from "@ffmpeg-installer/ffmpeg";
-import mime from "mime-types";
+import { exec } from "child_process";
+import fs from "fs";
 import iconv from "iconv-lite";
+import {
+  AnyMediaMessageContent,
+  AnyMessageContent,
+  WAMessage
+} from "libzapitu-rf";
+import mime from "mime-types";
+import path from "path";
 import { Readable } from "stream";
 import AppError from "../../errors/AppError";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
-import Ticket from "../../models/Ticket";
-import { verifyMediaMessage, verifyMessage } from "./wbotMessageListener";
 import CheckSettings from "../../helpers/CheckSettings";
+import GetTicketWbot from "../../helpers/GetTicketWbot";
 import saveMediaToFile from "../../helpers/saveMediaFile";
-import { getJidOf } from "./getJidOf";
-import { logger } from "../../utils/logger";
 import { URLCharEncoder } from "../../helpers/URLCharEncoder";
+import Ticket from "../../models/Ticket";
+import { logger } from "../../utils/logger";
+import { getJidOf } from "./getJidOf";
+import { verifyMediaMessage, verifyMessage } from "./wbotMessageListener";
 
 interface Request {
   media: Express.Multer.File;
@@ -27,6 +31,7 @@ export type MediaInfo = {
   mediaUrl: string;
   mimetype: string;
   filename: string;
+  fileSize: number;
 };
 
 const publicFolder = __dirname.endsWith("/dist")
@@ -177,7 +182,7 @@ export const SendWhatsAppMedia = async ({
 
     // convert multer file to Readable
     const readableFile = fs.createReadStream(pathMedia);
-    const savedPath = await saveMediaToFile(
+    const savedResult = await saveMediaToFile(
       {
         data: readableFile,
         mimetype: media.mimetype,
@@ -188,15 +193,16 @@ export const SendWhatsAppMedia = async ({
     readableFile.destroy();
 
     const mediaInfo = {
-      mediaUrl: savedPath,
+      mediaUrl: savedResult.mediaPath,
       mimetype: media.mimetype,
-      filename: fileName || media.originalname
+      filename: fileName || media.originalname,
+      fileSize: savedResult?.fileSize || 0
     };
 
     if (media.size > fileLimit * 1024 * 1024) {
-      const fileUrl = savedPath.startsWith("http")
-        ? savedPath
-        : `${process.env.BACKEND_URL}/public/${savedPath}`;
+      const fileUrl = savedResult.mediaPath.startsWith("http")
+        ? savedResult.mediaPath
+        : `${process.env.BACKEND_URL}/public/${savedResult.mediaPath}`;
       return SendWhatsAppMessage(ticket, {
         text: `📎 *${fileName}*\n\n🔗 ${URLCharEncoder(fileUrl)}`
       });

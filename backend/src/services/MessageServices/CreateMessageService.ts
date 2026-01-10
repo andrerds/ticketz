@@ -17,6 +17,7 @@ interface MessageData {
   mediaType?: string;
   mediaUrl?: string;
   thumbnailUrl?: string;
+  fileSize?: number;
   ack?: number;
   queueId?: number;
   channel?: string;
@@ -115,7 +116,7 @@ const CreateMessageService = async ({
   if (!skipWebsocket) {
     websocketCreateMessage(message);
   }
-  
+
   io.to(`company-${companyId}-mainchannel`).emit(
     `company-${companyId}-contact`,
     {

@@ -1,8 +1,8 @@
 import * as fc from "fast-check";
-import { LocalStorageDriver } from "../LocalStorageDriver";
 import fs from "fs";
 import path from "path";
 import { getPublicPath } from "../../../helpers/GetPublicPath";
+import { LocalStorageDriver } from "../LocalStorageDriver";
 
 describe("LocalStorageDriver", () => {
   let driver: LocalStorageDriver;
@@ -96,5 +96,22 @@ describe("LocalStorageDriver", () => {
   it("should return null for getSignedUrl", async () => {
     const url = await driver.getSignedUrl("any/key", 3600);
     expect(url).toBeNull();
+  });
+
+  it("should get file size from local storage", async () => {
+    const mediaKey = "test-media/size-test.txt";
+    const testData = "Hello, World!";
+    const buffer = Buffer.from(testData);
+
+    await driver.write(mediaKey, buffer, "text/plain");
+
+    const fileSize = await driver.getFileSize(mediaKey);
+
+    expect(fileSize).toBe(buffer.length);
+  });
+
+  it("should return 0 when file does not exist for getFileSize", async () => {
+    const fileSize = await driver.getFileSize("test-media/nonexistent.txt");
+    expect(fileSize).toBe(0);
   });
 });

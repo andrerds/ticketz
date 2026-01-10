@@ -112,7 +112,7 @@ const messages = {
           last7days: "Últimos 7 días",
           last14days: "Últimos 14 días",
           last30days: "Últimos 30 días",
-          last90days: "Últimos 90 días"
+          last90days: "Últimos 90 días",
         },
         date: {
           start: "Fecha de inicio",
@@ -291,7 +291,7 @@ const messages = {
           add: "Agregar usuario",
           edit: "Editar usuario",
         },
-        listItems:{
+        listItems: {
           adminProfile: "Administrador",
           userProfile: "Usuario",
         },
@@ -352,11 +352,12 @@ const messages = {
       },
       uploads: {
         titles: {
-          titleUploadMsgDragDrop: "ARRASTRA Y SUELTA ARCHIVOS EN EL CAMPO ABAJO",
-          titleFileList: "Lista de archivo(s)"
+          titleUploadMsgDragDrop:
+            "ARRASTRA Y SUELTA ARCHIVOS EN EL CAMPO ABAJO",
+          titleFileList: "Lista de archivo(s)",
         },
       },
-       todolist: {
+      todolist: {
         title: "Lista de tareas",
         form: {
           name: "Nombre de la tarea",
@@ -449,11 +450,12 @@ const messages = {
           management: "Gerencia",
           kanban: "Kanban",
           tasks: "Tareas",
+          mediaManagement: "Gestión de Medios",
         },
         appBar: {
           i18n: {
             language: "Español",
-            language_short: "ES"
+            language_short: "ES",
           },
           user: {
             profile: "Perfil",
@@ -462,6 +464,51 @@ const messages = {
             language: "Seleccionar idioma",
             logout: "Cerrar sesión",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Gestión de Medios",
+        stats: {
+          title: "Estadísticas de Almacenamiento",
+          totalFiles: "Total de Archivos",
+          totalSize: "Tamaño Total",
+          byLocation: "Por Ubicación",
+        },
+        filters: {
+          startDate: "Fecha Inicial",
+          endDate: "Fecha Final",
+          fileType: "Tipo de Archivo",
+          location: "Ubicación",
+          all: "Todos",
+        },
+        buttons: {
+          filter: "Filtrar",
+          deleteSelected: "Eliminar Seleccionados",
+          cancel: "Cancelar",
+          confirm: "Confirmar",
+        },
+        table: {
+          fileName: "Nombre del Archivo",
+          fileSize: "Tamaño",
+          uploadDate: "Fecha de Carga",
+          fileType: "Tipo",
+          location: "Ubicación",
+          actions: "Acciones",
+        },
+        messages: {
+          deleteSuccess: "Medio eliminado con éxito",
+          bulkDeleteSuccess: "Medios eliminados con éxito",
+          protected: "Protegido (menos de 30 días)",
+          mediaDeleted: {
+            text: "Medio eliminado manualmente",
+            tooltip:
+              "Este medio fue eliminado manualmente por el administrador",
+          },
+        },
+        confirmDialog: {
+          title: "Confirmar Eliminación",
+          message:
+            "¿Está seguro de que desea eliminar este medio? Esta acción no se puede deshacer.",
         },
       },
       messagesAPI: {
@@ -576,7 +623,8 @@ const messages = {
         confirmationModal: {
           deleteTitle: "Eliminar",
           deleteMessage: "Esta acción no se puede deshacer.",
-          importMessage: "¿Desea importar los contactos de esta hoja de cálculo?",
+          importMessage:
+            "¿Desea importar los contactos de esta hoja de cálculo?",
           importTitlte: "Importar",
         },
         toasts: {
@@ -749,14 +797,16 @@ const messages = {
         buttonclose: "Cerrar",
         title: "Acerca de ticketz",
         abouttitle: "Origen y Mejoras",
-        aboutdetail: "El ticketz es derivado indirecto del proyecto Whaticket con mejoras compartidas por los desarrolladores del sistema EquipeChat a través del canal VemFazer en YouTube, posteriormente mejorado por Claudemir Todo Bom.",
+        aboutdetail:
+          "El ticketz es derivado indirecto del proyecto Whaticket con mejoras compartidas por los desarrolladores del sistema EquipeChat a través del canal VemFazer en YouTube, posteriormente mejorado por Claudemir Todo Bom.",
         aboutauthorsite: "Sitio del autor",
         aboutwhaticketsite: "Sitio de la Comunidad Whaticket en Github",
         aboutvemfazersite: "Sitio del canal Vem Fazer en Github",
         licenseheading: "Licencia de Código Abierto",
-        licensedetail: "El ticketz está licenciado bajo la Licencia Pública General Affero de GNU versión 3, lo que significa que cualquier usuario que tenga acceso a esta aplicación tiene derecho a obtener acceso al código fuente. Más información en los siguientes enlaces:",
+        licensedetail:
+          "El ticketz está licenciado bajo la Licencia Pública General Affero de GNU versión 3, lo que significa que cualquier usuario que tenga acceso a esta aplicación tiene derecho a obtener acceso al código fuente. Más información en los siguientes enlaces:",
         licensefulltext: "Texto completo de la licencia",
-        licensesourcecode: "Código fuente de ticketz"
+        licensesourcecode: "Código fuente de ticketz",
       },
       schedules: {
         title: "Agendamentos",
@@ -825,7 +875,8 @@ const messages = {
         success: "Configuraciones guardadas exitosamente.",
         copiedToClipboard: "Copiado al portapapeles",
         title: "Configuraciones",
-        chatbotTicketTimeout: "Tiempo de espera del ticket del chatbot (minutos)",
+        chatbotTicketTimeout:
+          "Tiempo de espera del ticket del chatbot (minutos)",
         chatbotTicketTimeoutAction: "Acción después del tiempo de espera",
         settings: {
           userCreation: {
@@ -920,33 +971,33 @@ const messages = {
         FileDownloadLimit: {
           title: "Límite de descarga de archivos (MB)",
         },
-        "messageVisibility": {
-          "title": "Visibilidad del mensaje",
-          "options": {
-            "respectMessageQueue": "Respetar fila de mensajes",
-            "respectTicketQueue": "Respetar fila de tickets"
-          }
+        messageVisibility: {
+          title: "Visibilidad del mensaje",
+          options: {
+            respectMessageQueue: "Respetar fila de mensajes",
+            respectTicketQueue: "Respetar fila de tickets",
+          },
         },
-        "removeQueueAndUser": {
-          "title": "Mantener fila y usuario en ticket cerrado",
-          "options": {
+        removeQueueAndUser: {
+          title: "Mantener fila y usuario en ticket cerrado",
+          options: {
             enabled: "Activado",
             disabled: "Desactivado",
-          }
+          },
         },
         GracePeriod: {
           title: "Período de gracia después del vencimiento (días)",
         },
-        "ticketAcceptedMessage": {
-          "title": "Mensaje de ticket aceptado",
-          "placeholder": "Ingrese su mensaje de ticket aceptado aquí"
+        ticketAcceptedMessage: {
+          title: "Mensaje de ticket aceptado",
+          placeholder: "Ingrese su mensaje de ticket aceptado aquí",
         },
-        "transferMessage": {
-          "title": "Mensaje de transferencia",
-          "placeholder": "Ingrese su mensaje de transferencia aquí"
+        transferMessage: {
+          title: "Mensaje de transferencia",
+          placeholder: "Ingrese su mensaje de transferencia aquí",
         },
-        "mustacheVariables": {
-          "title": "Variables disponibles:",
+        mustacheVariables: {
+          title: "Variables disponibles:",
         },
         WelcomeGreeting: {
           greetings: "hola",
@@ -1069,7 +1120,7 @@ const messages = {
       },
       messageHistoryModal: {
         close: "Cerrar",
-        title: "Historial de edición del mensaje"
+        title: "Historial de edición del mensaje",
       },
       presence: {
         unavailable: "Indisponible",
@@ -1115,14 +1166,18 @@ const messages = {
         localNumber: "Número de teléfono",
       },
       frontendErrors: {
-        ERR_CONFIG_ERROR: "Error de configuración. Por favor, contacte al soporte.",
-        ERR_CLOCK_OUT_OF_SYNC: "Reloj fuera de sincronización. Por favor, verifique la configuración de fecha y hora de su dispositivo.",
-        ERR_BACKEND_UNREACHABLE: "Backend inalcanzable. Por favor, intente nuevamente más tarde.",
+        ERR_CONFIG_ERROR:
+          "Error de configuración. Por favor, contacte al soporte.",
+        ERR_CLOCK_OUT_OF_SYNC:
+          "Reloj fuera de sincronización. Por favor, verifique la configuración de fecha y hora de su dispositivo.",
+        ERR_BACKEND_UNREACHABLE:
+          "Backend inalcanzable. Por favor, intente nuevamente más tarde.",
       },
       backendErrors: {
         ERR_FORBIDDEN: "No tienes permisos para acceder a este recurso.",
         ERR_CHECK_NUMBER: "No se pudo verificar el número de WhatsApp.",
-        ERR_NO_OTHER_WHATSAPP: "Debe haber al menos un WhatsApp predeterminado.",
+        ERR_NO_OTHER_WHATSAPP:
+          "Debe haber al menos un WhatsApp predeterminado.",
         ERR_NO_DEF_WAPP_FOUND:
           "No se encontró ningún WhatsApp predeterminado. Verifique la página de conexiones.",
         ERR_WAPP_NOT_INITIALIZED:
@@ -1144,7 +1199,8 @@ const messages = {
           "La creación de usuarios está deshabilitada por el administrador.",
         ERR_NO_PERMISSION: "No tiene permisos para acceder a este recurso.",
         ERR_DUPLICATED_CONTACT: "Ya existe un contacto con este número.",
-        ERR_NO_SETTING_FOUND: "No se encontró ninguna configuración con este ID.",
+        ERR_NO_SETTING_FOUND:
+          "No se encontró ninguna configuración con este ID.",
         ERR_NO_CONTACT_FOUND: "No se encontró ningún contacto con este ID.",
         ERR_NO_TICKET_FOUND: "No se encontró ningún ticket con este ID.",
         ERR_NO_USER_FOUND: "No se encontró ningún usuario con este ID.",
@@ -1163,13 +1219,16 @@ const messages = {
       },
       wavoipModal: {
         title: "Ingrese el token de su conexión en Wavoip",
-        instructions: "Accediendo a la siguiente dirección puede crear una cuenta con 50 llamadas gratuitas para prueba",
-        coupon: "¡Al contratar el servicio use el cupón TICKETZ para ganar un descuento!",
+        instructions:
+          "Accediendo a la siguiente dirección puede crear una cuenta con 50 llamadas gratuitas para prueba",
+        coupon:
+          "¡Al contratar el servicio use el cupón TICKETZ para ganar un descuento!",
       },
       ticketz: {
         registration: {
           header: "Regístrate en la base de usuarios de Ticketz",
-          description: "Complete los campos a continuación para registrarse en la base de usuarios de Ticketz y recibir noticias sobre el proyecto.",
+          description:
+            "Complete los campos a continuación para registrarse en la base de usuarios de Ticketz y recibir noticias sobre el proyecto.",
           name: "Nombre",
           country: "País",
           phoneNumber: "Whatsapp Teléfono",
@@ -1181,7 +1240,7 @@ const messages = {
           recurringbrl: "Donaciones recurrentes en BRL",
           paypaltitle: "Tarjeta de crédito",
           international: "Donaciones en USD",
-        }
+        },
       },
     },
   },

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AppError from "../errors/AppError";
 import { BulkDeleteMediaFilesService } from "../services/MediaServices/BulkDeleteMediaFilesService";
+import { DebugS3Service } from "../services/MediaServices/DebugS3Service";
 import { DeleteMediaFileService } from "../services/MediaServices/DeleteMediaFileService";
 import { GetMediaStatsService } from "../services/MediaServices/GetMediaStatsService";
 import {
@@ -83,4 +84,15 @@ export const bulkRemove = async (
   const results = await BulkDeleteMediaFilesService(requests);
 
   return res.status(200).json(results);
+};
+
+export const debugS3 = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+
+  const debugInfo = await DebugS3Service(companyId);
+
+  return res.status(200).json(debugInfo);
 };

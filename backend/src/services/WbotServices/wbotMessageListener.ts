@@ -1,74 +1,74 @@
-import path from "path";
 import * as Sentry from "@sentry/node";
-import { isNil, head, keys } from "lodash";
+import { head, isNil, keys } from "lodash";
+import path from "path";
 
+import { Mutex } from "async-mutex";
 import {
-  WASocket,
   downloadContentFromMessage,
   extractMessageContent,
   getContentType,
   jidNormalizedUser,
   MessageUpsertType,
   proto,
-  WAMessage,
-  WAMessageUpdate,
-  WAMessageStubType,
   WAGenericMediaMessage,
-  WALocationMessage
+  WALocationMessage,
+  WAMessage,
+  WAMessageStubType,
+  WAMessageUpdate,
+  WASocket
 } from "libzapitu-rf";
-import { Mutex } from "async-mutex";
-import { Op } from "sequelize";
 import moment from "moment";
+import { Op } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { Transform } from "stream";
 import { Throttle } from "stream-throttle";
-import { Sequelize } from "sequelize-typescript";
 import Contact from "../../models/Contact";
-import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
 import OldMessage from "../../models/OldMessage";
+import Ticket from "../../models/Ticket";
 
-import { getIO } from "../../libs/socket";
-import CreateMessageService, {
-  websocketCreateMessage
-} from "../MessageServices/CreateMessageService";
-import { logger } from "../../utils/logger";
-import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
-import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
-import UpdateTicketService, {
-  UpdateTicketData
-} from "../TicketServices/UpdateTicketService";
+import { checkCompanyCompliant } from "../../helpers/CheckCompanyCompliant";
+import CheckSettings, { GetCompanySetting } from "../../helpers/CheckSettings";
+import { debounce } from "../../helpers/Debounce";
+import { getPublicPath } from "../../helpers/GetPublicPath";
+import GetTicketWbot from "../../helpers/GetTicketWbot";
+import { makeRandomId } from "../../helpers/MakeRandomId";
 import formatBody from "../../helpers/Mustache";
-import TicketTraking from "../../models/TicketTraking";
-import UserRating from "../../models/UserRating";
-import SendWhatsAppMessage from "./SendWhatsAppMessage";
+import { parseToMilliseconds } from "../../helpers/parseToMilliseconds";
+import { randomValue } from "../../helpers/randomValue";
+import saveMediaToFile from "../../helpers/saveMediaFile";
+import { SimpleObjectCache } from "../../helpers/simpleObjectCache";
+import { transcriber } from "../../helpers/transcriber";
+import { getIO } from "../../libs/socket";
+import { Session } from "../../libs/wbot";
+import Campaign from "../../models/Campaign";
+import CampaignShipping from "../../models/CampaignShipping";
 import Queue from "../../models/Queue";
 import QueueOption from "../../models/QueueOption";
+import Setting from "../../models/Setting";
+import TicketTraking from "../../models/TicketTraking";
+import User from "../../models/User";
+import UserRating from "../../models/UserRating";
+import Whatsapp from "../../models/Whatsapp";
+import WhatsappLidMap from "../../models/WhatsappLidMap";
+import { campaignQueue } from "../../queues/campaign";
+import { logger } from "../../utils/logger";
 import VerifyCurrentSchedule, {
   ScheduleResult
 } from "../CompanyService/VerifyCurrentSchedule";
-import Campaign from "../../models/Campaign";
-import CampaignShipping from "../../models/CampaignShipping";
-import { campaignQueue } from "../../queues/campaign";
-import User from "../../models/User";
-import Setting from "../../models/Setting";
-import { debounce } from "../../helpers/Debounce";
-import { getMessageFileOptions, MediaInfo } from "./SendWhatsAppMedia";
-import { makeRandomId } from "../../helpers/MakeRandomId";
-import CheckSettings, { GetCompanySetting } from "../../helpers/CheckSettings";
-import Whatsapp from "../../models/Whatsapp";
-import { SimpleObjectCache } from "../../helpers/simpleObjectCache";
-import { getPublicPath } from "../../helpers/GetPublicPath";
-import { Session } from "../../libs/wbot";
-import { checkCompanyCompliant } from "../../helpers/CheckCompanyCompliant";
-import { transcriber } from "../../helpers/transcriber";
-import { parseToMilliseconds } from "../../helpers/parseToMilliseconds";
-import { randomValue } from "../../helpers/randomValue";
-import { getJidOf } from "./getJidOf";
-import { verifyContact } from "./verifyContact";
-import GetTicketWbot from "../../helpers/GetTicketWbot";
-import saveMediaToFile from "../../helpers/saveMediaFile";
+import CreateMessageService, {
+  websocketCreateMessage
+} from "../MessageServices/CreateMessageService";
+import FindOrCreateTicketService from "../TicketServices/FindOrCreateTicketService";
+import UpdateTicketService, {
+  UpdateTicketData
+} from "../TicketServices/UpdateTicketService";
 import { _t } from "../TranslationServices/i18nService";
-import WhatsappLidMap from "../../models/WhatsappLidMap";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
+import { getJidOf } from "./getJidOf";
+import { getMessageFileOptions, MediaInfo } from "./SendWhatsAppMedia";
+import SendWhatsAppMessage from "./SendWhatsAppMessage";
+import { verifyContact } from "./verifyContact";
 
 export interface ImessageUpsert {
   messages: proto.IWebMessageInfo[];
@@ -571,15 +571,42 @@ const storeQuotedMessage = async (
     messageMedia && (await downloadMedia(quotedMsg, wbot, ticket, fromMe));
 
   let mediaUrl = null;
+  let mediaFileSize = null;
   if (media) {
+    logger.info(
+      {
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+        mimetype: media.mimetype,
+        filename: media.filename
+      },
+      "[MESSAGE-LISTENER] Saving quoted message media"
+    );
     // eslint-disable-next-line no-use-before-define
-    mediaUrl = await saveMediaToFile(media, ticket);
+    const mediaResult = await saveMediaToFile(media, ticket);
+    mediaUrl = mediaResult.mediaPath;
+    mediaFileSize = mediaResult.fileSize;
+    logger.info(
+      { ticketId: ticket.id, mediaUrl, fileSize: mediaFileSize },
+      "[MESSAGE-LISTENER] Quoted message media saved"
+    );
   }
 
   let thumbnailUrl = null;
+  let thumbnailFileSize = null;
   if (thumbnailMedia) {
+    logger.info(
+      { ticketId: ticket.id, companyId: ticket.companyId },
+      "[MESSAGE-LISTENER] Saving quoted message thumbnail"
+    );
     // eslint-disable-next-line no-use-before-define
-    thumbnailUrl = await saveMediaToFile(thumbnailMedia, ticket);
+    const thumbnailResult = await saveMediaToFile(thumbnailMedia, ticket);
+    thumbnailUrl = thumbnailResult.mediaPath;
+    thumbnailFileSize = thumbnailResult.fileSize;
+    logger.info(
+      { ticketId: ticket.id, thumbnailUrl, fileSize: thumbnailFileSize },
+      "[MESSAGE-LISTENER] Quoted message thumbnail saved"
+    );
   }
 
   const mediaType = media?.mimetype.split("/")[0];
@@ -592,6 +619,7 @@ const storeQuotedMessage = async (
     mediaType,
     mediaUrl,
     thumbnailUrl,
+    fileSize: mediaFileSize,
     read: true,
     dataJson: JSON.stringify(quotedMsg)
   };
@@ -695,13 +723,57 @@ export const verifyMediaMessage = async (
   }
 
   let mediaUrl = mediaInfo?.mediaUrl || null;
+  let mediaFileSize = null; // MediaInfo doesn't have fileSize, only calculated files do
   if (media) {
-    mediaUrl = await saveMediaToFile(media, ticket);
+    logger.info(
+      {
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+        mimetype: media.mimetype,
+        filename: media.filename,
+        messageId: msg.key?.id
+      },
+      "[MESSAGE-LISTENER] Saving received message media"
+    );
+    const mediaResult = await saveMediaToFile(media, ticket);
+    mediaUrl = mediaResult.mediaPath;
+    mediaFileSize = mediaResult.fileSize;
+    logger.info(
+      {
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+        mediaUrl,
+        fileSize: mediaFileSize,
+        messageId: msg.key?.id
+      },
+      "[MESSAGE-LISTENER] Received message media saved"
+    );
   }
 
   let thumbnailUrl = null;
+  let thumbnailFileSize = null;
   if (thumbnailMedia) {
-    thumbnailUrl = await saveMediaToFile(thumbnailMedia, ticket);
+    logger.info(
+      {
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+        messageId: msg.key?.id
+      },
+      "[MESSAGE-LISTENER] Saving received message thumbnail"
+    );
+    const thumbnailResult = await saveMediaToFile(thumbnailMedia, ticket);
+    thumbnailUrl = thumbnailResult.mediaPath;
+    thumbnailFileSize = thumbnailResult.fileSize;
+    logger.info(
+      {
+        ticketId: ticket.id,
+        companyId: ticket.companyId,
+        thumbnailUrl,
+        fileSize: thumbnailFileSize,
+        messageId: msg.key?.id
+      },
+      "[MESSAGE-LISTENER] Received message thumbnail saved"
+    );
   }
 
   const mimetype = mediaInfo?.mimetype || media?.mimetype || "";
@@ -757,6 +829,7 @@ export const verifyMediaMessage = async (
     mediaUrl,
     mediaType,
     thumbnailUrl,
+    fileSize: mediaFileSize,
     quotedMsgId: quotedMsg?.id,
     ack: msg.status || 0,
     remoteJid: msg.key.remoteJid,
@@ -2100,4 +2173,4 @@ const wbotMessageListener = async (
   }
 };
 
-export { wbotMessageListener, handleMessage };
+export { handleMessage, wbotMessageListener };

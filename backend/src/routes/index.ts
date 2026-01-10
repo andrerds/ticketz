@@ -14,6 +14,7 @@ import helpRoutes from "./helpRoutes";
 import i18nRoutes from "./i18nRoutes";
 import invoiceRoutes from "./invoicesRoutes";
 import mediaManagementRoutes from "./mediaManagementRoutes";
+import mediaMigrationRoutes from "./mediaMigrationRoutes";
 import messageRoutes from "./messageRoutes";
 import planRoutes from "./planRoutes";
 import pwaRoutes from "./pwaRoutes";
@@ -70,5 +71,6 @@ routes.use(ticketzOSSRoutes);
 routes.use(i18nRoutes);
 routes.use(wavoipRoutes);
 routes.use(mediaManagementRoutes);
+routes.use(mediaMigrationRoutes);
 
 export default routes;

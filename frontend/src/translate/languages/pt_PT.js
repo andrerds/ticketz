@@ -111,8 +111,7 @@ const messages = {
           deleteTitle: "Eliminar",
           deleteMessage: "Tem a certeza? Esta ação não pode ser revertida.",
           disconnectTitle: "Desconectar",
-          disconnectMessage:
-            "Tem a certeza? Terá de ler o QR Code novamente.",
+          disconnectMessage: "Tem a certeza? Terá de ler o QR Code novamente.",
           closetTickets: "Fechar todos os atendimentos abertos desta conexão",
         },
         buttons: {
@@ -264,7 +263,7 @@ const messages = {
           add: "Adicionar utilizador",
           edit: "Editar utilizador",
         },
-        listItems:{
+        listItems: {
           adminProfile: "Administrador",
           userProfile: "Usuário",
         },
@@ -279,7 +278,7 @@ const messages = {
           okEdit: "Salvar",
           cancel: "Cancelar",
         },
-        
+
         success: "Utilizador salvo com sucesso.",
       },
       scheduleModal: {
@@ -424,7 +423,8 @@ const messages = {
           logout: "Sair",
           management: "Gestão",
           kanban: "Kanban",
-          tasks: "Tarefas"
+          tasks: "Tarefas",
+          mediaManagement: "Gestão de Multimédia",
         },
         appBar: {
           i18n: {
@@ -439,6 +439,51 @@ const messages = {
             about: "Sobre",
             logout: "Sair",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Gestão de Multimédia",
+        stats: {
+          title: "Estatísticas de Armazenamento",
+          totalFiles: "Total de Ficheiros",
+          totalSize: "Tamanho Total",
+          byLocation: "Por Localização",
+        },
+        filters: {
+          startDate: "Data Inicial",
+          endDate: "Data Final",
+          fileType: "Tipo de Ficheiro",
+          location: "Localização",
+          all: "Todos",
+        },
+        buttons: {
+          filter: "Filtrar",
+          deleteSelected: "Eliminar Selecionados",
+          cancel: "Cancelar",
+          confirm: "Confirmar",
+        },
+        table: {
+          fileName: "Nome do Ficheiro",
+          fileSize: "Tamanho",
+          uploadDate: "Data de Carregamento",
+          fileType: "Tipo",
+          location: "Localização",
+          actions: "Ações",
+        },
+        messages: {
+          deleteSuccess: "Multimédia eliminado com sucesso",
+          bulkDeleteSuccess: "Ficheiros multimédia eliminados com sucesso",
+          protected: "Protegido (menos de 30 dias)",
+          mediaDeleted: {
+            text: "Multimédia removido manualmente",
+            tooltip:
+              "Este multimédia foi removido manualmente pelo administrador",
+          },
+        },
+        confirmDialog: {
+          title: "Confirmar Eliminação",
+          message:
+            "Tem a certeza de que deseja eliminar este multimédia? Esta ação não pode ser revertida.",
         },
       },
       messagesAPI: {
@@ -726,12 +771,14 @@ const messages = {
         buttonclose: "Fechar",
         title: "Sobre o ticketz",
         abouttitle: "Origem e melhorias",
-        aboutdetail: "O ticketz é derivado indireto do projeto Whaticket com melhorias compartilhadas pelos desenvolvedores do sistema EquipeChat através do canal VemFazer no YouTube, posteriormente melhoradas por Claudemir Todo Bom",
+        aboutdetail:
+          "O ticketz é derivado indireto do projeto Whaticket com melhorias compartilhadas pelos desenvolvedores do sistema EquipeChat através do canal VemFazer no YouTube, posteriormente melhoradas por Claudemir Todo Bom",
         aboutauthorsite: "Site do autor",
         aboutwhaticketsite: "Site do Whaticket Community no Github",
         aboutvemfazersite: "Site do canal Vem Fazer no Github",
         licenseheading: "Licença em Código Aberto",
-        licensedetail: "O ticketz está licenciado sob a GNU Affero General Public License versão 3, isso significa que qualquer utilizador que tiver acesso a esta aplicação tem o direito de obter acesso ao código fonte. Mais informações nos links abaixo:",
+        licensedetail:
+          "O ticketz está licenciado sob a GNU Affero General Public License versão 3, isso significa que qualquer utilizador que tiver acesso a esta aplicação tem o direito de obter acesso ao código fonte. Mais informações nos links abaixo:",
         licensefulltext: "Texto completo da licença",
         licensesourcecode: "Código fonte do ticketz",
       },
@@ -897,16 +944,16 @@ const messages = {
         GracePeriod: {
           title: "Carência após vencimento (dias)",
         },
-        "ticketAcceptedMessage": {
-          "title": "Mensagem de ticket aceito",
-          "placeholder": "Digite sua mensagem de ticket aceito aqui"
+        ticketAcceptedMessage: {
+          title: "Mensagem de ticket aceito",
+          placeholder: "Digite sua mensagem de ticket aceito aqui",
         },
-        "transferMessage": {
-          "title": "Mensagem de transferência",
-          "placeholder": "Digite sua mensagem de transferência aqui"
+        transferMessage: {
+          title: "Mensagem de transferência",
+          placeholder: "Digite sua mensagem de transferência aqui",
         },
-        "mustacheVariables": {
-          "title": "Variáveis disponíveis:"
+        mustacheVariables: {
+          title: "Variáveis disponíveis:",
         },
         WelcomeGreeting: {
           greetings: "Olá",
@@ -943,7 +990,7 @@ const messages = {
             resolve: "Resolver",
             reopen: "Reabrir",
             accept: "Aceitar",
-            call: "Chamar"
+            call: "Chamar",
           },
         },
       },
@@ -1047,13 +1094,17 @@ const messages = {
         localNumber: "Telefone",
       },
       frontendErrors: {
-        ERR_CONFIG_ERROR: "Erro de configuração. Por favor, contacte o suporte.",
-        ERR_CLOCK_OUT_OF_SYNC: "Relógio fora de sincronização. Verifique as configurações de data e hora do seu dispositivo.",
-        ERR_BACKEND_UNREACHABLE: "Backend inacessível. Por favor, tente novamente mais tarde.",
+        ERR_CONFIG_ERROR:
+          "Erro de configuração. Por favor, contacte o suporte.",
+        ERR_CLOCK_OUT_OF_SYNC:
+          "Relógio fora de sincronização. Verifique as configurações de data e hora do seu dispositivo.",
+        ERR_BACKEND_UNREACHABLE:
+          "Backend inacessível. Por favor, tente novamente mais tarde.",
       },
       backendErrors: {
         ERR_UNAUTHORIZED: "Não autorizado. Por favor, faça o login novamente.",
-        ERR_FORBIDDEN: "Acesso negado. Você não tem permissão para acessar este recurso.",
+        ERR_FORBIDDEN:
+          "Acesso negado. Você não tem permissão para acessar este recurso.",
         ERR_CHECK_NUMBER: "Número não encontrado no Whatsapp.",
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
@@ -1098,7 +1149,8 @@ const messages = {
       ticketz: {
         registration: {
           header: "Registe-se na base de utilizadores do Ticketz",
-          description: "Preencha os campos abaixo para se registar na base de utilizadores do Ticketz e receber novidades sobre o projeto.",
+          description:
+            "Preencha os campos abaixo para se registar na base de utilizadores do Ticketz e receber novidades sobre o projeto.",
           name: "Nome",
           country: "País",
           phoneNumber: "Número de WhatsApp",

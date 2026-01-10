@@ -8,4 +8,5 @@ export interface IStorageDriver {
   exists(key: string): Promise<boolean>;
   delete(key: string): Promise<void>;
   getSignedUrl(key: string, expiresIn: number): Promise<string | null>;
+  getFileSize(key: string): Promise<number>;
 }

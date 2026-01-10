@@ -20,7 +20,7 @@ const messages = {
         user: "Utilisateur",
         connection: "Connexion",
         queue: "File d'attente",
-        contact: "Contact"
+        contact: "Contact",
       },
       signup: {
         title: "S'inscrire",
@@ -154,7 +154,8 @@ const messages = {
           importTitlte: "Importer des contacts",
           deleteMessage:
             "Êtes-vous sûr de vouloir supprimer ce contact ? Toutes les interventions associées seront perdues.",
-          importMessage: "Voulez-vous importer tous les contacts du téléphone ?",
+          importMessage:
+            "Voulez-vous importer tous les contacts du téléphone ?",
         },
         buttons: {
           import: "Importer des Contacts",
@@ -205,7 +206,7 @@ const messages = {
           transferMessage: "Message de transfert",
           token: "Jeton",
         },
-         toasts: {
+        toasts: {
           saved: "File d'attente enregistrée avec succès",
         },
         buttons: {
@@ -291,11 +292,12 @@ const messages = {
       },
       uploads: {
         titles: {
-          titleUploadMsgDragDrop: "GLISSEZ ET DÉPOSEZ LES FICHIERS DANS LE CHAMP CI-DESSOUS",
+          titleUploadMsgDragDrop:
+            "GLISSEZ ET DÉPOSEZ LES FICHIERS DANS LE CHAMP CI-DESSOUS",
           titleFileList: "Liste des fichiers",
         },
       },
-       todolist: {
+      todolist: {
         title: "Liste des tâches",
         form: {
           name: "Nom de la tâche",
@@ -388,6 +390,7 @@ const messages = {
           management: "Gestion",
           kanban: "Kanban",
           tasks: "Tâches",
+          mediaManagement: "Gestion des Médias",
         },
         appBar: {
           i18n: {
@@ -402,6 +405,51 @@ const messages = {
             about: "À propos",
             logout: "Déconnexion",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Gestion des Médias",
+        stats: {
+          title: "Statistiques de Stockage",
+          totalFiles: "Total de Fichiers",
+          totalSize: "Taille Totale",
+          byLocation: "Par Emplacement",
+        },
+        filters: {
+          startDate: "Date de Début",
+          endDate: "Date de Fin",
+          fileType: "Type de Fichier",
+          location: "Emplacement",
+          all: "Tous",
+        },
+        buttons: {
+          filter: "Filtrer",
+          deleteSelected: "Supprimer la Sélection",
+          cancel: "Annuler",
+          confirm: "Confirmer",
+        },
+        table: {
+          fileName: "Nom du Fichier",
+          fileSize: "Taille",
+          uploadDate: "Date de Téléchargement",
+          fileType: "Type",
+          location: "Emplacement",
+          actions: "Actions",
+        },
+        messages: {
+          deleteSuccess: "Média supprimé avec succès",
+          bulkDeleteSuccess: "Fichiers médias supprimés avec succès",
+          protected: "Protégé (moins de 30 jours)",
+          mediaDeleted: {
+            text: "Média supprimé manuellement",
+            tooltip:
+              "Ce média a été supprimé manuellement par l'administrateur",
+          },
+        },
+        confirmDialog: {
+          title: "Confirmer la Suppression",
+          message:
+            "Êtes-vous sûr de vouloir supprimer ce média ? Cette action ne peut pas être annulée.",
         },
       },
       messagesAPI: {
@@ -684,19 +732,22 @@ const messages = {
         buttonclose: "Fermer",
         title: "À propos de ticketz",
         abouttitle: "Origine et améliorations",
-        aboutdetail: "Le ticketz est dérivé indirectement du projet Whaticket avec des améliorations partagées par les développeurs du système EquipeChat via la chaîne VemFazer sur YouTube, puis améliorées par Claudemir Todo Bom",
+        aboutdetail:
+          "Le ticketz est dérivé indirectement du projet Whaticket avec des améliorations partagées par les développeurs du système EquipeChat via la chaîne VemFazer sur YouTube, puis améliorées par Claudemir Todo Bom",
         aboutauthorsite: "Site de l'auteur",
         aboutwhaticketsite: "Site de la communauté Whaticket sur Github",
         aboutvemfazersite: "Site de la chaîne Vem Fazer sur Github",
         licenseheading: "Licence Open Source",
-        licensedetail: "Le ticketz est sous licence GNU Affero General Public License version 3, ce qui signifie que tout utilisateur ayant accès à cette application a le droit d'accéder au code source. Plus d'informations dans les liens ci-dessous :",
+        licensedetail:
+          "Le ticketz est sous licence GNU Affero General Public License version 3, ce qui signifie que tout utilisateur ayant accès à cette application a le droit d'accéder au code source. Plus d'informations dans les liens ci-dessous :",
         licensefulltext: "Texte complet de la licence",
         licensesourcecode: "Code source de ticketz",
       },
       schedules: {
         title: "Planifications",
         confirmationModal: {
-          deleteTitle: "Êtes-vous sûr de vouloir supprimer cette Planification ?",
+          deleteTitle:
+            "Êtes-vous sûr de vouloir supprimer cette Planification ?",
           deleteMessage: "Cette action est irréversible.",
         },
         table: {
@@ -845,7 +896,8 @@ const messages = {
           },
         },
         keepQueueAndUser: {
-          title: "Maintenir la file d'attente et l'utilisateur dans le ticket fermé",
+          title:
+            "Maintenir la file d'attente et l'utilisateur dans le ticket fermé",
           options: {
             enabled: "Activé",
             disabled: "Désactivé",
@@ -915,7 +967,8 @@ const messages = {
         appointmentsModal: {
           title: "Observations du Contact",
           textarea: "Observation",
-          placeholder: "Insérez ici les informations que vous souhaitez enregistrer",
+          placeholder:
+            "Insérez ici les informations que vous souhaitez enregistrer",
         },
         confirmationModal: {
           title: "Supprimer le ticket du contact",
@@ -973,18 +1026,23 @@ const messages = {
             dias7: "7 Jours",
             dias90: "90 Jours",
           },
-          readreceipts: "Pour mettre à jour la confidentialité des accusés de lecture",
-          profile: "Pour mettre à jour la confidentialité de la photo de profil",
+          readreceipts:
+            "Pour mettre à jour la confidentialité des accusés de lecture",
+          profile:
+            "Pour mettre à jour la confidentialité de la photo de profil",
           status: "Pour mettre à jour la confidentialité des statuts",
           online: "Pour mettre à jour la confidentialité en ligne",
           last: "Pour mettre à jour la confidentialité du Dernier Vu",
-          groupadd: "Pour mettre à jour la confidentialité de l'ajout aux groupes",
-          calladd: "Pour mettre à jour la confidentialité de l'ajout aux appels",
+          groupadd:
+            "Pour mettre à jour la confidentialité de l'ajout aux groupes",
+          calladd:
+            "Pour mettre à jour la confidentialité de l'ajout aux appels",
           disappearing: "Pour mettre à jour le Mode Disparition par Défaut",
         },
       },
       backendErrors: {
-        ERR_NO_OTHER_WHATSAPP: "Il doit y avoir au moins un WhatsApp par défaut.",
+        ERR_NO_OTHER_WHATSAPP:
+          "Il doit y avoir au moins un WhatsApp par défaut.",
         ERR_NO_DEF_WAPP_FOUND:
           "Aucun WhatsApp par défaut trouvé. Vérifiez la page des connexions.",
         ERR_WAPP_NOT_INITIALIZED:
@@ -1004,15 +1062,18 @@ const messages = {
         ERR_SESSION_EXPIRED: "Session expirée. Veuillez vous reconnecter.",
         ERR_USER_CREATION_DISABLED:
           "La création d'utilisateur a été désactivée par l'administrateur.",
-        ERR_NO_PERMISSION: "Vous n'avez pas la permission d'accéder à cette fonctionnalité.",
+        ERR_NO_PERMISSION:
+          "Vous n'avez pas la permission d'accéder à cette fonctionnalité.",
         ERR_DUPLICATED_CONTACT: "Il existe déjà un contact avec ce numéro.",
         ERR_NO_SETTING_FOUND: "Aucun paramètre trouvé avec cet ID.",
         ERR_NO_CONTACT_FOUND: "Aucun contact trouvé avec cet ID.",
         ERR_NO_TICKET_FOUND: "Aucun ticket trouvé avec cet ID.",
         ERR_NO_USER_FOUND: "Aucun utilisateur trouvé avec cet ID.",
         ERR_NO_WAPP_FOUND: "Aucun WhatsApp trouvé avec cet ID.",
-        ERR_CREATING_MESSAGE: "Erreur lors de la création du message dans la base de données.",
-        ERR_CREATING_TICKET: "Erreur lors de la création du ticket dans la base de données.",
+        ERR_CREATING_MESSAGE:
+          "Erreur lors de la création du message dans la base de données.",
+        ERR_CREATING_TICKET:
+          "Erreur lors de la création du ticket dans la base de données.",
         ERR_FETCH_WAPP_MSG:
           "Erreur lors de la récupération du message sur WhatsApp, il est peut-être trop ancien.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
@@ -1023,7 +1084,8 @@ const messages = {
       ticketz: {
         registration: {
           header: "Inscrivez-vous à la base d'utilisateurs de Ticketz",
-          description: "Remplissez les champs ci-dessous pour vous inscrire à la base d'utilisateurs de Ticketz et recevoir des nouvelles sur le projet.",
+          description:
+            "Remplissez les champs ci-dessous pour vous inscrire à la base d'utilisateurs de Ticketz et recevoir des nouvelles sur le projet.",
           name: "Nom",
           country: "Pays",
           phoneNumber: "Numéro WhatsApp",

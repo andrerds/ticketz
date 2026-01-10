@@ -1,15 +1,15 @@
-import { AnyMessageContent, proto } from "libzapitu-rf";
 import fs from "fs";
-import mime from "mime-types";
 import iconv from "iconv-lite";
+import { AnyMessageContent, proto } from "libzapitu-rf";
+import mime from "mime-types";
+import Message from "../models/Message";
+import OutOfTicketMessage from "../models/OutOfTicketMessages";
 import Whatsapp from "../models/Whatsapp";
-import GetWhatsappWbot from "./GetWhatsappWbot";
 import { getMessageFileOptions } from "../services/WbotServices/SendWhatsAppMedia";
 import { handleMessage } from "../services/WbotServices/wbotMessageListener";
-import Message from "../models/Message";
 import CheckSettings from "./CheckSettings";
+import GetWhatsappWbot from "./GetWhatsappWbot";
 import saveMediaToFile from "./saveMediaFile";
-import OutOfTicketMessage from "../models/OutOfTicketMessages";
 
 export type MessageData = {
   number: string;
@@ -56,17 +56,16 @@ export const SendMessage = async (
         } catch (error) {
           console.error("Error converting filename to UTF-8:", error);
         }
-        let fileUrl = encodeURI(
-          await saveMediaToFile(
-            {
-              data: fs.readFileSync(messageData.mediaPath),
-              mimetype:
-                mime.lookup(originalFilename) || "application/octet-stream",
-              filename: messageData.mediaPath.split("/").pop() || "file.bin"
-            },
-            whatsapp.companyId
-          )
+        const savedResult = await saveMediaToFile(
+          {
+            data: fs.readFileSync(messageData.mediaPath),
+            mimetype:
+              mime.lookup(originalFilename) || "application/octet-stream",
+            filename: messageData.mediaPath.split("/").pop() || "file.bin"
+          },
+          whatsapp.companyId
         );
+        let fileUrl = encodeURI(savedResult.mediaPath);
         if (!fileUrl.startsWith("http")) {
           fileUrl = `${process.env.BACKEND_URL}/public/${fileUrl}`;
         }

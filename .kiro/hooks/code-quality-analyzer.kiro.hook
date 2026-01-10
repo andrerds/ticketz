@@ -4,16 +4,12 @@
   "description": "Monitors source code file changes and analyzes them for potential improvements including code smells, design patterns, best practices, readability, maintainability, and performance optimizations while maintaining existing functionality",
   "version": "1",
   "when": {
-    "type": "fileEdited",
-    "patterns": [
-      "**/*.ts",
-      "**/*.js",
-      "**/*.tsx",
-      "**/*.jsx"
-    ]
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",
     "prompt": "Analyze the modified code in the changed files for potential improvements. Focus on:\n\n1. **Code Smells**: Identify any code smells such as long methods, duplicate code, large classes, long parameter lists, or inappropriate intimacy between classes.\n\n2. **Design Patterns**: Suggest appropriate design patterns that could improve the code structure and maintainability.\n\n3. **SOLID Principles**: Verify adherence to SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion) and suggest improvements.\n\n4. **Clean Code Standards**: Check for clear naming conventions, proper function/method sizes, appropriate abstraction levels, and self-documenting code.\n\n5. **Best Practices**: Identify violations of best practices including:\n   - Domain-Driven Design (DDD) principles\n   - Clean Architecture layer separation\n   - Proper error handling and validation\n   - Security concerns (input validation, authorization, data exposure)\n\n6. **Readability & Maintainability**: Suggest improvements for:\n   - Variable, function, and class naming\n   - Code organization and structure\n   - Reducing complexity and cognitive load\n   - Eliminating magic numbers and strings\n\n7. **Performance Optimizations**: Identify potential performance issues such as:\n   - Inefficient algorithms or data structures\n   - Unnecessary computations or database queries\n   - Memory leaks or resource management issues\n\nFor each issue found, provide:\n- Clear description of the problem\n- Why it matters (impact on code quality)\n- Specific, actionable refactoring suggestion\n- Code example if helpful\n\nPrioritize suggestions by impact and keep changes minimal. Do NOT suggest breaking changes unless critical. Maintain existing functionality."
-  }
+  },
+  "workspaceFolderName": "ticketz",
+  "shortName": "code-quality-analyzer"
 }

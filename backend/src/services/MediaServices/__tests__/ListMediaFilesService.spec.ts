@@ -1,14 +1,34 @@
 import * as fc from "fast-check";
+import { StorageConfig } from "../../../domain/storage/StorageConfig";
+import { StorageDriverFactory } from "../../../infrastructure/storage/StorageDriverFactory";
 import Message from "../../../models/Message";
+import GetStorageConfigService from "../../StorageServices/GetStorageConfigService";
 import { ListMediaFilesService } from "../ListMediaFilesService";
 
 jest.mock("../../../models/Message");
+jest.mock("../../StorageServices/GetStorageConfigService");
+jest.mock("../../../infrastructure/storage/StorageDriverFactory");
 jest.mock("../../../helpers/GetPublicPath", () => ({
   getPublicPath: () => "/tmp/test-public"
 }));
 jest.mock("fs/promises");
 
 describe("ListMediaFilesService", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock storage config service
+    const mockConfig = new StorageConfig(1, "local", undefined, undefined);
+    (GetStorageConfigService as jest.Mock).mockResolvedValue(mockConfig);
+
+    // Mock storage driver
+    const mockDriver = {
+      getFileSize: jest.fn().mockResolvedValue(1024)
+    };
+    (StorageDriverFactory.createDriver as jest.Mock).mockResolvedValue(
+      mockDriver
+    );
+  });
   describe("Property 28: Media grouping by date and type", () => {
     /**
      * Feature: s3-media-storage, Property 28: Media grouping by date and type

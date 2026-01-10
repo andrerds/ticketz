@@ -1,11 +1,11 @@
 import { FileContents } from "@flystorage/file-storage";
 import mime from "mime-types";
-import { logger } from "../utils/logger";
-import { makeRandomId } from "./MakeRandomId";
+import { StorageDriverFactory } from "../infrastructure/storage/StorageDriverFactory";
 import Ticket from "../models/Ticket";
 import GetStorageConfigService from "../services/StorageServices/GetStorageConfigService";
-import { StorageDriverFactory } from "../infrastructure/storage/StorageDriverFactory";
 import OptimizeImageService from "../services/StorageServices/OptimizeImageService";
+import { logger } from "../utils/logger";
+import { makeRandomId } from "./MakeRandomId";
 
 async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -45,7 +45,7 @@ export default async function saveMediaToFile(
     filename: string;
   },
   destination: Ticket | number
-): Promise<string> {
+): Promise<{ mediaPath: string; fileSize: number }> {
   if (!media || !media.data || !media.mimetype || !destination) {
     logger.error("saveMediaToFile: Invalid media or destination provided");
     throw new Error("Invalid media or destination provided");
@@ -75,13 +75,69 @@ export default async function saveMediaToFile(
 
   const mediaPath = `${relativePath}/${media.filename}`;
 
+  logger.info(
+    {
+      companyId,
+      contactId,
+      ticketId,
+      mediaPath,
+      mimetype: media.mimetype,
+      filename: media.filename
+    },
+    "[MEDIA-STORAGE] Starting media file save operation"
+  );
+  let finalFileSize;
   try {
+    logger.info(
+      { companyId },
+      "[MEDIA-STORAGE] Retrieving storage configuration"
+    );
     const storageConfig = await GetStorageConfigService({ companyId });
+
+    logger.info(
+      {
+        companyId,
+        driver: storageConfig.driver,
+        hasS3Config: !!storageConfig.s3Config,
+        hasImageOptimization: !!storageConfig.imageOptimization,
+        s3Endpoint: storageConfig.s3Config?.endpoint,
+        s3Bucket: storageConfig.s3Config?.bucket,
+        s3Region: storageConfig.s3Config?.region,
+        s3Prefix: storageConfig.s3Config?.prefix
+      },
+      "[MEDIA-STORAGE] Storage configuration retrieved"
+    );
+
+    logger.info(
+      { companyId, driver: storageConfig.driver },
+      "[MEDIA-STORAGE] Creating storage driver"
+    );
     const driver = await StorageDriverFactory.createDriver(storageConfig);
 
+    logger.info(
+      { companyId, mimetype: media.mimetype },
+      "[MEDIA-STORAGE] Converting media data to buffer"
+    );
     let dataBuffer = await convertToBuffer(media.data);
+    const originalSize = dataBuffer.length;
+    const fileSize = originalSize; // Calculate fileSize once from buffer
+
+    logger.info(
+      { companyId, originalSize, fileSize },
+      "[MEDIA-STORAGE] Media data converted to buffer"
+    );
 
     if (storageConfig.imageOptimization) {
+      logger.info(
+        {
+          companyId,
+          mimetype: media.mimetype,
+          originalSize,
+          config: storageConfig.imageOptimization
+        },
+        "[MEDIA-STORAGE] Starting image optimization"
+      );
+
       const optimizationResult = await OptimizeImageService({
         data: dataBuffer,
         mimetype: media.mimetype,
@@ -89,21 +145,59 @@ export default async function saveMediaToFile(
       });
 
       dataBuffer = optimizationResult.data;
+
+      logger.info(
+        {
+          companyId,
+          originalSize,
+          optimizedSize: dataBuffer.length,
+          reduction: originalSize - dataBuffer.length,
+          finalFileSize: dataBuffer.length
+        },
+        "[MEDIA-STORAGE] Image optimization completed"
+      );
+
+      // Update fileSize after optimization
+      finalFileSize = dataBuffer.length;
     }
+    finalFileSize = fileSize; // Initialize with original size
+
+    logger.info(
+      {
+        companyId,
+        mediaPath,
+        driver: storageConfig.driver,
+        size: dataBuffer.length,
+        mimetype: media.mimetype
+      },
+      "[MEDIA-STORAGE] Writing file to storage"
+    );
 
     await driver.write(mediaPath, dataBuffer, media.mimetype);
 
     logger.info(
-      { companyId, mediaPath, driver: storageConfig.driver },
-      "Media file saved successfully"
+      {
+        companyId,
+        mediaPath,
+        driver: storageConfig.driver,
+        size: dataBuffer.length,
+        fileSize: finalFileSize
+      },
+      "[MEDIA-STORAGE] Media file saved successfully"
     );
   } catch (error) {
     logger.error(
-      { error: error.message, companyId, mediaPath },
-      "Failed to save media file"
+      {
+        error: error.message,
+        errorStack: error.stack,
+        companyId,
+        mediaPath,
+        mimetype: media.mimetype
+      },
+      "[MEDIA-STORAGE] Failed to save media file"
     );
     throw new Error(`Failed to save media file: ${error.message}`);
   }
 
-  return mediaPath;
+  return { mediaPath, fileSize: finalFileSize };
 }

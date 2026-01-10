@@ -334,7 +334,79 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Ensure proper permissions (admin only)
   - _Requirements: 8.1_
 
-- [ ] 9. Implement media management features
+- [x] 9. Fix media file size and URL issues
+
+  - Fix file size calculation for S3 files (currently returns 0)
+  - Ensure media URLs are complete with BACKEND_URL prefix
+  - Add S3 file size retrieval using HeadObjectCommand
+  - _Requirements: 11.2_
+
+- [x] 9.1 Fix S3 file size calculation in ListMediaFilesService
+
+  - Update getFileSize function to query S3 for file size when storageLocation is 's3'
+  - Use GetStorageConfigService to get S3 configuration
+  - Use S3StorageDriver or direct S3Client with HeadObjectCommand to get file metadata
+  - Handle errors gracefully and return 0 if file size cannot be determined
+  - _Requirements: 11.2_
+
+- [x] 9.4 CRITICAL FIX: Add fileSize field to Message model (Architecture Fix)
+
+  - Create database migration to add fileSize BIGINT column to Messages table
+  - Update Message model to include fileSize property with validation
+  - Ensure fileSize is nullable for existing records
+  - Add index on fileSize for performance queries
+  - _Requirements: 11.2, Performance, DDD Compliance_
+
+- [x] 9.5 Update saveMediaToFile to calculate and return fileSize
+
+  - Modify saveMediaToFile helper to calculate fileSize from buffer
+  - Return both mediaPath and fileSize from the function
+  - Ensure fileSize is calculated once during upload process
+  - Add logging for fileSize calculation
+  - _Requirements: 11.2, Performance_
+
+- [x] 9.6 Update message creation to persist fileSize
+
+  - Modify wbotMessageListener to capture fileSize from saveMediaToFile
+  - Update CreateMessageService to accept and persist fileSize
+  - Ensure fileSize is saved in messageData for both media and thumbnail
+  - Add validation that fileSize is positive number
+  - _Requirements: 11.2, Data Consistency_
+
+- [x] 9.7 Remove dynamic fileSize calculation from ListMediaFilesService
+
+  - Remove getFileSize function that performs I/O operations
+  - Update ListMediaFilesService to read fileSize directly from Message model
+  - Improve API performance by eliminating S3/filesystem calls
+  - Add fallback to 0 for legacy records without fileSize
+  - _Requirements: 11.2, Performance, Clean Architecture_
+
+- [x] 9.8 Create migration script for existing media files
+
+  - Create service to calculate fileSize for existing Message records
+  - Implement batch processing to avoid memory issues
+  - Add progress reporting and error handling
+  - Create CLI command or admin endpoint to trigger migration
+  - Handle both local and S3 files during migration
+  - _Requirements: 11.2, Data Migration_
+
+- [x] 9.2 Add S3 test endpoint for development debugging
+
+  - Create GET /api/media/s3-debug endpoint (development only)
+  - List all files in the S3 bucket with their metadata (size, lastModified, etc.)
+  - Only show endpoint when NODE_ENV is 'development' or 'dev'
+  - Add proper error handling for S3 connectivity issues
+  - _Requirements: Development debugging_
+
+- [x] 9.3 Add development debug button to Media Management UI
+
+  - Add "Debug S3 Files" button to MediaManagement page
+  - Only show button when in development environment
+  - Button calls the S3 debug endpoint and displays results in a modal
+  - Show file count, total size, and list of files with metadata
+  - _Requirements: Development debugging_
+
+- [x] 10. Implement media management features
 
   - Create media management page with file listing
   - Implement filtering by date, type, location
@@ -343,7 +415,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add storage statistics
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 11.10_
 
-- [x] 9.1 Create media management services
+- [x] 10.1 Create media management services
 
   - Implement ListMediaFilesService with filtering
   - Implement GetMediaStatsService for storage statistics
@@ -351,44 +423,44 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Implement BulkDeleteMediaFilesService
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.9_
 
-- [x] 9.2 Write property test for media grouping
+- [x] 10.2 Write property test for media grouping
 
   - **Property 28: Media grouping by date and type**
   - **Validates: Requirements 11.1**
 
-- [x] 9.3 Write property test for media information completeness
+- [x] 10.3 Write property test for media information completeness
 
   - **Property 29: Media information completeness**
   - **Validates: Requirements 11.2**
 
-- [x] 9.4 Write property test for age-based deletion
+- [x] 10.4 Write property test for age-based deletion
 
   - **Property 30: Age-based deletion permission**
   - **Property 31: Recent file protection**
   - **Validates: Requirements 11.3, 11.4**
 
-- [x] 9.5 Write property test for deleted media marking
+- [x] 10.5 Write property test for deleted media marking
 
   - **Property 32: Deleted media marking**
   - **Validates: Requirements 11.5**
 
-- [ ] 9.6 Write property test for media filtering
+- [x]\* 10.6 Write property test for media filtering
 
   - **Property 34: Media filtering**
   - **Validates: Requirements 11.7**
 
-- [ ] 9.7 Write property test for bulk deletion
+- [x]\* 10.7 Write property test for bulk deletion
 
   - **Property 35: Bulk deletion processing**
   - **Property 36: Deletion error resilience**
   - **Validates: Requirements 11.8, 11.9**
 
-- [ ] 9.8 Write property test for storage statistics
+- [x]\* 10.8 Write property test for storage statistics
 
   - **Property 37: Storage usage statistics**
   - **Validates: Requirements 11.10**
 
-- [x] 9.2 Create media management API endpoints
+- [x] 10.9 Create media management API endpoints
 
   - Add GET /api/media endpoint with query params for filters
   - Add GET /api/media/stats endpoint
@@ -397,7 +469,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add proper authentication and authorization
   - _Requirements: 11.1, 11.2, 11.3, 11.9_
 
-- [x] 9.3 Create MediaManagement page component
+- [x] 10.10 Create MediaManagement page component
 
   - Create new page in frontend/src/pages/MediaManagement/
   - Add MediaFilters component (date range, type, location)
@@ -408,25 +480,25 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add DeleteConfirmationDialog
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.8_
 
-- [x] 9.4 Implement deleted media placeholder
+- [x] 10.11 Implement deleted media placeholder
 
   - Update Message display components to check isDeleted flag
   - Show placeholder image/text when media is deleted
   - Add tooltip explaining media was manually removed
   - _Requirements: 11.5, 11.6_
 
-- [x] 9.5 Write property test for placeholder display
+- [x] 10.12 Write property test for placeholder display
 
   - **Property 33: Deleted media placeholder**
   - **Validates: Requirements 11.6**
 
-- [x] 9.5 Add media management to navigation
+- [x] 10.13 Add media management to navigation
 
   - Add "Media Management" menu item to admin navigation
   - Ensure proper permissions (admin only)
   - _Requirements: 11.1_
 
-- [ ] 10. Implement migration utility
+- [ ] 11. Implement migration utility
 
   - Create service to migrate local files to S3
   - Preserve media keys during migration
@@ -435,7 +507,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add error resilience
   - _Requirements: 4.5, 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 10.1 Create MigrateMediaService
+- [ ] 11.1 Create MigrateMediaService
 
   - Create service with migrateCompanyMedia() method
   - Enumerate all local media files for company
@@ -446,27 +518,27 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Return migration report
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 10.2 Write property test for migration key preservation
+- [x]\* 11.2 Write property test for migration key preservation
 
   - **Property 17: Migration key preservation**
   - **Validates: Requirements 4.5, 9.2**
 
-- [ ] 10.3 Write property test for migration completeness
+- [x]\* 11.3 Write property test for migration completeness
 
   - **Property 24: Migration completeness**
   - **Validates: Requirements 9.1**
 
-- [ ] 10.4 Write property test for migration cleanup
+- [x]\* 11.4 Write property test for migration cleanup
 
   - **Property 25: Migration optional cleanup**
   - **Validates: Requirements 9.3**
 
-- [ ] 10.5 Write property test for migration error resilience
+- [x]\* 11.5 Write property test for migration error resilience
 
   - **Property 26: Migration error resilience**
   - **Validates: Requirements 9.4**
 
-- [ ] 10.2 Create migration API endpoint
+- [ ] 11.6 Create migration API endpoint
 
   - Add POST /api/media/migrate endpoint
   - Accept companyId and deleteLocal flag
@@ -474,7 +546,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add proper authentication (super admin only)
   - _Requirements: 9.1, 9.3_
 
-- [ ] 10.3 Create migration UI component
+- [ ] 11.7 Create migration UI component
 
   - Add migration section to StorageSettings
   - Show current storage usage (local vs S3)
@@ -484,14 +556,14 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add checkbox for "Delete local files after migration"
   - _Requirements: 9.1, 9.3, 9.5_
 
-- [ ] 11. Add audit logging
+- [ ] 12. Add audit logging
 
   - Implement logging for credential access
   - Log storage configuration changes
   - Log media deletions
   - _Requirements: 6.5_
 
-- [ ] 11.1 Implement audit logging service
+- [ ] 12.1 Implement audit logging service
 
   - Create AuditLogService with log() method
   - Log credential access events
@@ -500,23 +572,23 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Include userId, companyId, action, timestamp
   - _Requirements: 6.5_
 
-- [ ] 11.2 Write property test for audit logging
+- [x]\* 12.2 Write property test for audit logging
 
   - **Property 21: Audit logging**
   - **Validates: Requirements 6.5**
 
-- [ ] 11.2 Integrate audit logging
+- [ ] 12.3 Integrate audit logging
 
   - Add logging to GetStorageConfigService
   - Add logging to UpdateStorageConfigService
   - Add logging to DeleteMediaFileService
   - _Requirements: 6.5_
 
-- [ ] 12. Final checkpoint - Ensure all tests pass
+- [ ] 13. Final checkpoint - Ensure all tests pass
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 13. Documentation and deployment preparation
+- [ ] 14. Documentation and deployment preparation
 
   - Create migration guide
   - Document S3 bucket setup
@@ -525,7 +597,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Create rollback procedure
   - _Requirements: All_
 
-- [ ] 13.1 Create deployment documentation
+- [ ] 14.1 Create deployment documentation
 
   - Document STORAGE_CREDENTIALS_KEY generation
   - Document S3 bucket creation and configuration
@@ -535,7 +607,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Document rollback procedure
   - _Requirements: All_
 
-- [ ] 13.2 Add inline code documentation
+- [ ] 14.2 Add inline code documentation
   - Add JSDoc comments to all public interfaces
   - Document error codes and their meanings
   - Add usage examples in comments

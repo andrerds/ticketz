@@ -1,22 +1,22 @@
 import {
-  Table,
+  BelongsTo,
   Column,
   CreatedAt,
-  UpdatedAt,
-  Model,
   DataType,
-  PrimaryKey,
   Default,
-  BelongsTo,
   ForeignKey,
-  HasMany
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
-import Contact from "./Contact";
-import Ticket from "./Ticket";
-import Company from "./Company";
-import Queue from "./Queue";
-import OldMessage from "./OldMessage";
 import { URLCharEncoder } from "../helpers/URLCharEncoder";
+import Company from "./Company";
+import Contact from "./Contact";
+import OldMessage from "./OldMessage";
+import Queue from "./Queue";
+import Ticket from "./Ticket";
 
 @Table
 class Message extends Model {
@@ -75,6 +75,9 @@ class Message extends Model {
 
   @Column
   mediaType: string;
+
+  @Column(DataType.BIGINT)
+  fileSize: number;
 
   @Default(false)
   @Column

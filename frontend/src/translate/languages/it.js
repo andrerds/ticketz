@@ -20,7 +20,7 @@ const messages = {
         user: "Utente",
         connection: "Connessione",
         queue: "Coda",
-        contact: "Contatto"
+        contact: "Contatto",
       },
       signup: {
         title: "Registrati",
@@ -123,7 +123,6 @@ const messages = {
       },
       internalChat: {
         title: "Chat Interno",
-
       },
       whatsappModal: {
         title: {
@@ -296,7 +295,7 @@ const messages = {
           titleFileList: "Lista dei file",
         },
       },
-       todolist: {
+      todolist: {
         title: "Elenco attività",
         form: {
           name: "Nome attività",
@@ -389,6 +388,7 @@ const messages = {
           management: "Gestione",
           kanban: "Kanban",
           tasks: "Compiti",
+          mediaManagement: "Gestione Media",
         },
         appBar: {
           i18n: {
@@ -403,6 +403,51 @@ const messages = {
             about: "Informazioni",
             logout: "Esci",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Gestione Media",
+        stats: {
+          title: "Statistiche di Archiviazione",
+          totalFiles: "File Totali",
+          totalSize: "Dimensione Totale",
+          byLocation: "Per Posizione",
+        },
+        filters: {
+          startDate: "Data Inizio",
+          endDate: "Data Fine",
+          fileType: "Tipo di File",
+          location: "Posizione",
+          all: "Tutti",
+        },
+        buttons: {
+          filter: "Filtra",
+          deleteSelected: "Elimina Selezionati",
+          cancel: "Annulla",
+          confirm: "Conferma",
+        },
+        table: {
+          fileName: "Nome File",
+          fileSize: "Dimensione",
+          uploadDate: "Data di Caricamento",
+          fileType: "Tipo",
+          location: "Posizione",
+          actions: "Azioni",
+        },
+        messages: {
+          deleteSuccess: "Media eliminato con successo",
+          bulkDeleteSuccess: "File media eliminati con successo",
+          protected: "Protetto (meno di 30 giorni)",
+          mediaDeleted: {
+            text: "Media rimosso manualmente",
+            tooltip:
+              "Questo media è stato rimosso manualmente dall'amministratore",
+          },
+        },
+        confirmDialog: {
+          title: "Conferma Eliminazione",
+          message:
+            "Sei sicuro di voler eliminare questo media? Questa azione non può essere annullata.",
         },
       },
       messagesAPI: {
@@ -685,12 +730,14 @@ const messages = {
         buttonclose: "Chiudi",
         title: "Informazioni su ticketz",
         abouttitle: "Origine e miglioramenti",
-        aboutdetail: "Il ticketz è derivato indirettamente dal progetto Whaticket con miglioramenti condivisi dagli sviluppatori del sistema EquipeChat attraverso il canale VemFazer su YouTube, successivamente migliorati da Claudemir Todo Bom",
+        aboutdetail:
+          "Il ticketz è derivato indirettamente dal progetto Whaticket con miglioramenti condivisi dagli sviluppatori del sistema EquipeChat attraverso il canale VemFazer su YouTube, successivamente migliorati da Claudemir Todo Bom",
         aboutauthorsite: "Sito dell'autore",
         aboutwhaticketsite: "Sito della comunità Whaticket su Github",
         aboutvemfazersite: "Sito del canale Vem Fazer su Github",
         licenseheading: "Licenza Open Source",
-        licensedetail: "Il ticketz è concesso in licenza sotto la GNU Affero General Public License versione 3, il che significa che qualsiasi utente che ha accesso a questa applicazione ha il diritto di ottenere l'accesso al codice sorgente. Maggiori informazioni nei link sottostanti:",
+        licensedetail:
+          "Il ticketz è concesso in licenza sotto la GNU Affero General Public License versione 3, il che significa che qualsiasi utente che ha accesso a questa applicazione ha il diritto di ottenere l'accesso al codice sorgente. Maggiori informazioni nei link sottostanti:",
         licensefulltext: "Testo completo della licenza",
         licensesourcecode: "Codice sorgente di ticketz",
       },
@@ -1003,8 +1050,10 @@ const messages = {
         ERR_SENDING_WAPP_MSG:
           "Errore nell'invio del messaggio di WhatsApp. Controlla la pagina delle connessioni.",
         ERR_DELETE_WAPP_MSG: "Impossibile eliminare il messaggio di WhatsApp.",
-        ERR_EDITING_WAPP_MSG: "Impossibile modificare il messaggio di WhatsApp.",
-        ERR_OTHER_OPEN_TICKET: "Esiste già un ticket aperto per questo contatto.",
+        ERR_EDITING_WAPP_MSG:
+          "Impossibile modificare il messaggio di WhatsApp.",
+        ERR_OTHER_OPEN_TICKET:
+          "Esiste già un ticket aperto per questo contatto.",
         ERR_SESSION_EXPIRED: "Sessione scaduta. Per favore, accedi di nuovo.",
         ERR_USER_CREATION_DISABLED:
           "La creazione dell'utente è stata disabilitata dall'amministratore.",
@@ -1015,7 +1064,8 @@ const messages = {
         ERR_NO_TICKET_FOUND: "Nessun ticket trovato con questo ID.",
         ERR_NO_USER_FOUND: "Nessun utente trovato con questo ID.",
         ERR_NO_WAPP_FOUND: "Nessun WhatsApp trovato con questo ID.",
-        ERR_CREATING_MESSAGE: "Errore nella creazione del messaggio nel database.",
+        ERR_CREATING_MESSAGE:
+          "Errore nella creazione del messaggio nel database.",
         ERR_CREATING_TICKET: "Errore nella creazione del ticket nel database.",
         ERR_FETCH_WAPP_MSG:
           "Errore nel recupero del messaggio su WhatsApp, potrebbe essere troppo vecchio.",
@@ -1027,7 +1077,8 @@ const messages = {
       ticketz: {
         registration: {
           header: "Registrati nella base utenti di Ticketz",
-          description: "Compila i campi sottostanti per registrarti nella base utenti di Ticketz e ricevere aggiornamenti sul progetto.",
+          description:
+            "Compila i campi sottostanti per registrarti nella base utenti di Ticketz e ricevere aggiornamenti sul progetto.",
           name: "Nome",
           country: "Paese",
           phoneNumber: "Numero di WhatsApp",
