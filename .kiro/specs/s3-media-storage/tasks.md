@@ -276,12 +276,12 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Log optimization results (original size vs optimized size)
   - _Requirements: 5.1, 5.2_
 
-- [-] 7.2 Write property test for image-only optimization
+- [x] 7.2 Write property test for image-only optimization
 
   - **Property 18: Image-only optimization**
   - **Validates: Requirements 5.1**
 
-- [ ] 7.3 Write property test for size-based optimization
+- [x] 7.3 Write property test for size-based optimization
 
   - **Property 19: Size-based optimization**
   - **Validates: Requirements 5.2**
