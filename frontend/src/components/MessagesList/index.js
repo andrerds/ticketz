@@ -1,52 +1,57 @@
-import React, { useState, useEffect, useReducer, useRef, useContext } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
-import { isSameDay, parseISO, format } from "date-fns";
 import clsx from "clsx";
+import { format, isSameDay, parseISO } from "date-fns";
 
-import { green, blue } from "@material-ui/core/colors";
 import {
   Avatar,
   Button,
   CircularProgress,
-  Divider,
   IconButton,
   makeStyles,
   Tooltip,
   Typography,
 } from "@material-ui/core";
+import { blue, green } from "@material-ui/core/colors";
 
 import {
   AccessTime,
   Block,
-  Warning,
+  Description,
   Done,
   DoneAll,
   ExpandMore,
-  GetApp,
   Facebook,
-  Instagram,
-  Description,
   Forward,
+  GetApp,
+  Instagram,
   Launch,
+  LocationOn,
   Reply,
-  LocationOn
+  Warning,
 } from "@material-ui/icons";
 
 import WhatsMarked from "react-whatsmarked";
-import ModalImageCors from "../ModalImageCors";
-import MessageOptionsMenu from "../MessageOptionsMenu";
-import whatsBackground from "../../assets/wa-background.png";
 import whatsBackgroundDark from "../../assets/wa-background-dark.png";
+import whatsBackground from "../../assets/wa-background.png";
+import MessageOptionsMenu from "../MessageOptionsMenu";
+import ModalImageCors from "../ModalImageCors";
 
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import { SocketContext } from "../../context/Socket/SocketContext";
-import { i18n } from "../../translate/i18n";
-import vCard from "vcard-parser";
-import { generateColor } from "../../helpers/colorGenerator";
-import { getInitials } from "../../helpers/getInitials";
-import { downloadFile } from "../../helpers/downloadFile";
 import { Mutex } from "async-mutex";
+import vCard from "vcard-parser";
+import { SocketContext } from "../../context/Socket/SocketContext";
+import toastError from "../../errors/toastError";
+import { generateColor } from "../../helpers/colorGenerator";
+import { downloadFile } from "../../helpers/downloadFile";
+import { getInitials } from "../../helpers/getInitials";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 
 const loadPageMutex = new Mutex();
 
@@ -64,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     },
     marginBottom: 5,
   },
-  
+
   messagesListWrapper: {
     overflow: "hidden",
     position: "relative",
@@ -77,7 +82,10 @@ const useStyles = makeStyles((theme) => ({
   },
 
   messagesList: {
-    backgroundImage: theme.mode === 'light' ? `url(${whatsBackground})` : `url(${whatsBackgroundDark})`,
+    backgroundImage:
+      theme.mode === "light"
+        ? `url(${whatsBackground})`
+        : `url(${whatsBackgroundDark})`,
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
@@ -111,8 +119,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     whiteSpace: "pre-wrap",
-    backgroundColor: theme.mode === 'light' ? "#ffffff" : "#024481",
-    color: theme.mode === 'light' ? "#303030" : "#ffffff",
+    backgroundColor: theme.mode === "light" ? "#ffffff" : "#024481",
+    color: theme.mode === "light" ? "#303030" : "#ffffff",
     alignSelf: "flex-start",
     borderTopLeftRadius: 0,
     borderTopRightRadius: 8,
@@ -122,14 +130,15 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: 5,
     paddingTop: 5,
     paddingBottom: 0,
-    boxShadow: theme.mode === 'light' ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
-    transition: 'background-color 0.5s ease-in-out',
+    boxShadow:
+      theme.mode === "light" ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
+    transition: "background-color 0.5s ease-in-out",
   },
 
   quotedContainerLeft: {
     margin: "-3px -80px 6px -6px",
     overflow: "hidden",
-    backgroundColor: theme.mode === 'light' ? "#f0f0f0" : "#1c2134",
+    backgroundColor: theme.mode === "light" ? "#f0f0f0" : "#1c2134",
     borderRadius: "7.5px",
     display: "flex",
     position: "relative",
@@ -172,8 +181,8 @@ const useStyles = makeStyles((theme) => ({
       right: 0,
     },
     whiteSpace: "pre-wrap",
-    backgroundColor: theme.mode === 'light' ? "#dcf8c6" : "#005c4b",
-    color: theme.mode === 'light' ? "#303030" : "#ffffff",
+    backgroundColor: theme.mode === "light" ? "#dcf8c6" : "#005c4b",
+    color: theme.mode === "light" ? "#303030" : "#ffffff",
     alignSelf: "flex-end",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
@@ -183,14 +192,15 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: 5,
     paddingTop: 5,
     paddingBottom: 0,
-    boxShadow: theme.mode === 'light' ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
-    transition: 'background-color 0.5s ease-in-out',
+    boxShadow:
+      theme.mode === "light" ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
+    transition: "background-color 0.5s ease-in-out",
   },
 
   quotedContainerRight: {
     margin: "-3px -80px 6px -6px",
     overflowY: "hidden",
-    backgroundColor: theme.mode === 'light' ? "#cfe9ba" : "#075e54",
+    backgroundColor: theme.mode === "light" ? "#cfe9ba" : "#075e54",
     borderRadius: "7.5px",
     display: "flex",
     position: "relative",
@@ -225,16 +235,16 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 500,
     cursor: "pointer",
   },
-  
+
   forwardedMessage: {
     display: "flex",
-    color: theme.mode === 'light' ? "#999" : "#d0d0d0",
+    color: theme.mode === "light" ? "#999" : "#d0d0d0",
     fontSize: 11,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
 
   forwardedIcon: {
-    color: theme.mode === 'light' ? "#999" : "#d0d0d0",
+    color: theme.mode === "light" ? "#999" : "#d0d0d0",
     fontSize: 15,
     verticalAlign: "middle",
     marginLeft: 4,
@@ -244,11 +254,11 @@ const useStyles = makeStyles((theme) => ({
     overflowWrap: "break-word",
     padding: "3px 80px 6px 6px",
   },
-  
+
   messageLocation: {
-    display: 'flex',
+    display: "flex",
     padding: 5,
-    cursor: 'pointer',
+    cursor: "pointer",
   },
 
   messageLocationText: {
@@ -258,7 +268,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "auto",
     marginBottom: "auto",
   },
-  
+
   textContentItemDeleted: {
     fontStyle: "italic",
     color: "rgba(0, 0, 0, 0.36)",
@@ -272,8 +282,8 @@ const useStyles = makeStyles((theme) => ({
   },
   messageMediaDeleted: {
     filter: "grayscale(1)",
-    opacity: 0.4
-  },  
+    opacity: 0.4,
+  },
 
   messageVideo: {
     width: 250,
@@ -294,18 +304,19 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     bottom: 0,
     right: 5,
-    color: theme.mode === 'light' ? "#999" : "#d0d0d0"
+    color: theme.mode === "light" ? "#999" : "#d0d0d0",
   },
 
   timestampStickerLeft: {
-    backgroundColor: theme.mode === 'light' ? "#ffffff" : "#024481",
+    backgroundColor: theme.mode === "light" ? "#ffffff" : "#024481",
     borderRadius: 8,
     padding: 5,
-    boxShadow: theme.mode === 'light' ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000"
+    boxShadow:
+      theme.mode === "light" ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
   },
 
   timestampStickerRight: {
-    backgroundColor: theme.mode === 'light' ? "#dcf8c6" : "#128c7e",
+    backgroundColor: theme.mode === "light" ? "#dcf8c6" : "#128c7e",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     borderBottomLeftRadius: 8,
@@ -314,7 +325,8 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: 5,
     paddingTop: 5,
     paddingBottom: 0,
-    boxShadow: theme.mode === 'light' ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000"
+    boxShadow:
+      theme.mode === "light" ? "0 1px 1px #b3b3b3" : "0 1px 1px #000000",
   },
 
   dailyTimestamp: {
@@ -362,63 +374,63 @@ const useStyles = makeStyles((theme) => ({
     padding: 10,
   },
   imageLocation: {
-    position: 'relative',
-    color: 'red',
+    position: "relative",
+    color: "red",
     width: 100,
     height: 100,
-    borderRadius: 5
+    borderRadius: 5,
   },
 
-  '@global': {
-    '@keyframes wave': {
-      '0%, 60%, 100%': {
-        transform: 'initial',
+  "@global": {
+    "@keyframes wave": {
+      "0%, 60%, 100%": {
+        transform: "initial",
       },
-      '30%': {
-        transform: 'translateY(-15px)',
+      "30%": {
+        transform: "translateY(-15px)",
       },
     },
-    '@keyframes quiet': {
-      '25%': {
-        transform: 'scaleY(.6)'
+    "@keyframes quiet": {
+      "25%": {
+        transform: "scaleY(.6)",
       },
-      '50%': {
-        transform: 'scaleY(.4)',
+      "50%": {
+        transform: "scaleY(.4)",
       },
-      '75%': {
-        transform: 'scaleY(.8)',
-      }
+      "75%": {
+        transform: "scaleY(.8)",
+      },
     },
-    '@keyframes normal': {
-      '25%': {
-        transform: 'scaleY(.1)'
+    "@keyframes normal": {
+      "25%": {
+        transform: "scaleY(.1)",
       },
-      '50%': {
-        transform: 'scaleY(.4)',
+      "50%": {
+        transform: "scaleY(.4)",
       },
-      '75%': {
-        transform: 'scaleY(.6)',
-      }
+      "75%": {
+        transform: "scaleY(.6)",
+      },
     },
-    '@keyframes loud': {
-      '25%': {
-        transform: 'scaleY(1)'
+    "@keyframes loud": {
+      "25%": {
+        transform: "scaleY(1)",
       },
-      '50%': {
-        transform: 'scaleY(.4)',
+      "50%": {
+        transform: "scaleY(.4)",
       },
-      '75%': {
-        transform: 'scaleY(1.2)',
-      }
+      "75%": {
+        transform: "scaleY(1.2)",
+      },
     },
   },
   wave: {
-    position: 'relative',
-    textAlign: 'center',
+    position: "relative",
+    textAlign: "center",
     height: "30px",
     marginTop: "10px",
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    marginLeft: "auto",
+    marginRight: "auto",
   },
   dot: {
     display: "inline-block",
@@ -426,19 +438,19 @@ const useStyles = makeStyles((theme) => ({
     height: "7px",
     borderRadius: "50%",
     marginRight: "3px",
-    background: theme.mode === 'light' ? "#303030" : "#ffffff",
+    background: theme.mode === "light" ? "#303030" : "#ffffff",
     animation: "wave 1.3s linear infinite",
     "&:nth-child(2)": {
       animationDelay: "-1.1s",
     },
     "&:nth-child(3)": {
       animationDelay: "-0.9s",
-    }
+    },
   },
 
   wavebarsContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: "flex",
+    justifyContent: "space-between",
     height: "30px",
     marginTop: "5px",
     marginBottom: "5px",
@@ -454,26 +466,26 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "var(--boxSize)",
     animationDuration: "1.2s",
-    backgroundColor: theme.mode === 'light' ? "#303030" : "#ffffff",
-    animationTimingFunction: 'ease-in-out',
-    animationIterationCount: 'infinite',
-    borderRadius: '8px',
+    backgroundColor: theme.mode === "light" ? "#303030" : "#ffffff",
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+    borderRadius: "8px",
   },
 
   wavebar1: {
-    animationName: 'quiet'
+    animationName: "quiet",
   },
   wavebar2: {
-    animationName: 'normal'
+    animationName: "normal",
   },
   wavebar3: {
-    animationName: 'quiet'
+    animationName: "quiet",
   },
   wavebar4: {
-    animationName: 'loud'
+    animationName: "loud",
   },
   wavebar5: {
-    animationName: 'quiet'
+    animationName: "quiet",
   },
   linkPreviewThumbnail: {
     width: "328px",
@@ -481,17 +493,17 @@ const useStyles = makeStyles((theme) => ({
   },
   linkPreviewTitle: {
     fontWeight: "bold",
-    marginBottom: "4px"
+    marginBottom: "4px",
   },
   linkPreviewDescription: {
-    marginBottom: "4px"
+    marginBottom: "4px",
   },
   linkPreviewUrl: {
-    opacity: 0.6
+    opacity: 0.6,
   },
   linkPreviewAnchor: {
     textDecoration: "none",
-    color: theme.mode === 'light' ? "#303030" : "#ffffff",
+    color: theme.mode === "light" ? "#303030" : "#ffffff",
   },
   messageHighlighted: {
     backgroundColor: theme.palette.primary.main,
@@ -521,20 +533,20 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: 3,
     borderRadius: 15,
     backgroundColor: "gray",
-    cursor: "default"
+    cursor: "default",
   },
   mediaDescription: {
     padding: 5,
     marginBottom: 5,
     borderLeft: "5px solid",
-    borderColor: theme.mode === 'light' ? "#000" : "#fff",
+    borderColor: theme.mode === "light" ? "#000" : "#fff",
   },
   messageButton: {
     display: "flex",
     width: "100%",
     textTransform: "none",
     margin: "auto",
-  }
+  },
 }));
 
 const reducer = (state, action) => {
@@ -543,7 +555,6 @@ const reducer = (state, action) => {
     const newMessages = [];
 
     messages.forEach((message) => {
-
       const messageIndex = state.findIndex((m) => m.id === message.id);
       if (messageIndex !== -1) {
         state[messageIndex] = message;
@@ -566,13 +577,15 @@ const reducer = (state, action) => {
     }
 
     if (newMessage.mediaType === "reactionMessage") {
-      const reactionIndex = state.findIndex((m) => m.id === newMessage.quotedMsgId);
+      const reactionIndex = state.findIndex(
+        (m) => m.id === newMessage.quotedMsgId
+      );
       if (reactionIndex !== -1) {
         state[reactionIndex].replies = state[reactionIndex].replies || [];
         state[reactionIndex].replies.push(newMessage);
       }
     }
-    
+
     return [...state];
   }
 
@@ -592,7 +605,13 @@ const reducer = (state, action) => {
   }
 };
 
-const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons }) => {
+const MessagesList = ({
+  ticket,
+  ticketId,
+  isGroup,
+  markAsRead,
+  allowReplyButtons,
+}) => {
   const classes = useStyles();
 
   const [messagesList, dispatch] = useReducer(reducer, []);
@@ -648,7 +667,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
     setContactPresence("available");
 
     currentTicketId.current = ticketId;
-    
+
     await loadPageMutex.runExclusive(async () => {
       loadData();
     });
@@ -665,7 +684,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
 
     const onConnect = () => {
       socket.emit("joinChatBox", `${ticket.id}`);
-    }
+    };
 
     socketManager.onConnect(onConnect);
 
@@ -676,21 +695,27 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
           dispatch({ type: "ADD_MESSAGE", payload: data.message });
           if (data.message.mediaType !== "reactionMessage") {
             scrollToBottom();
-          } 
+          }
         }
 
         if (data.action === "update") {
           dispatch({ type: "UPDATE_MESSAGE", payload: data.message });
         }
       }
-    }
+    };
 
     socket.on(`company-${companyId}-appMessage`, onAppMessage);
 
     socket.on(`company-${companyId}-presence`, (data) => {
       const { scrollTop, clientHeight, scrollHeight } = scrollRef.current;
-      console.log({ presence: data.presence, scrollTop, clientHeight, scrollHeight });
-      const isAtBottom = scrollTop + clientHeight >= (scrollHeight - clientHeight / 4);
+      console.log({
+        presence: data.presence,
+        scrollTop,
+        clientHeight,
+        scrollHeight,
+      });
+      const isAtBottom =
+        scrollTop + clientHeight >= scrollHeight - clientHeight / 4;
       if (data?.ticketId === ticket.id) {
         setContactPresence(data.presence);
         if (["composing", "recording"].includes(data.presence)) {
@@ -747,68 +772,116 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
 
   const checkMessageMedia = (message, data) => {
     const document =
-      data?.message?.documentMessage
-      || data?.message?.documentWithCaptionMessage?.message?.documentMessage;
+      data?.message?.documentMessage ||
+      data?.message?.documentWithCaptionMessage?.message?.documentMessage;
     if (!document && message.mediaType === "image") {
       return (
         <>
-          { <ModalImageCors imageUrl={message.mediaUrl} isDeleted={message.isDeleted} /> }
+          {
+            <ModalImageCors
+              imageUrl={message.mediaUrl}
+              isDeleted={message.isDeleted}
+            />
+          }
           <>
-            <div className={[clsx({
-              [classes.textContentItemDeleted]: message.isDeleted,
-              [classes.textContentItem]: !message.isDeleted,
-            }),]}>
-              {message.body &&
+            <div
+              className={[
+                clsx({
+                  [classes.textContentItemDeleted]: message.isDeleted,
+                  [classes.textContentItem]: !message.isDeleted,
+                }),
+              ]}
+            >
+              {message.body && (
                 <>
-                  <WhatsMarked>
-                    {message.body}
-                  </WhatsMarked>
+                  <WhatsMarked>{message.body}</WhatsMarked>
                 </>
-              }
+              )}
             </div>
           </>
         </>
-      )
+      );
     }
     if (!document && message.mediaType === "audio") {
-
       return (
         <>
           <audio className={classes.audioBottom} controls>
             <source src={message.mediaUrl} type="audio/ogg"></source>
           </audio>
-          {
-            message.body &&
-            !["🔊","Áudio"].includes(message.body) &&
-            <div className={classes.mediaDescription}>
-              {message.body}
-            </div>
-          }
+          {message.body && !["🔊", "Áudio"].includes(message.body) && (
+            <div className={classes.mediaDescription}>{message.body}</div>
+          )}
         </>
       );
     }
 
     if (!document || message.mediaType === "video") {
+      if (message.mediaUrl && message.mediaUrl.startsWith("deleted:")) {
+        return (
+          <>
+            <Tooltip title={i18n.t("messages.mediaDeleted.tooltip")}>
+              <div
+                style={{
+                  width: "100%",
+                  height: 200,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#e0e0e0",
+                  borderRadius: 8,
+                  padding: 16,
+                }}
+              >
+                <Block
+                  style={{ fontSize: 48, color: "#9e9e9e", marginBottom: 8 }}
+                />
+                <Typography variant="body2" color="textSecondary">
+                  {i18n.t("messages.mediaDeleted.text")}
+                </Typography>
+              </div>
+            </Tooltip>
+            <div
+              className={[
+                clsx({
+                  [classes.textContentItemDeleted]: message.isDeleted,
+                  [classes.textContentItem]: !message.isDeleted,
+                }),
+              ]}
+            >
+              {message.body && (
+                <>
+                  <WhatsMarked>{message.body}</WhatsMarked>
+                </>
+              )}
+            </div>
+          </>
+        );
+      }
       return (
         <>
           <video
-            className={[clsx(classes.messageVideo, {
-              [classes.messageMediaDeleted]: message.isDeleted
-            })]}
+            className={[
+              clsx(classes.messageVideo, {
+                [classes.messageMediaDeleted]: message.isDeleted,
+              }),
+            ]}
             src={message.mediaUrl}
             controls
           />
-          <div className={[clsx({
-            [classes.textContentItemDeleted]: message.isDeleted,
-            [classes.textContentItem]: !message.isDeleted,
-          }),]}>
-            {message.body &&
+          <div
+            className={[
+              clsx({
+                [classes.textContentItemDeleted]: message.isDeleted,
+                [classes.textContentItem]: !message.isDeleted,
+              }),
+            ]}
+          >
+            {message.body && (
               <>
-                <WhatsMarked>
-                  {message.body}
-                </WhatsMarked>
+                <WhatsMarked>{message.body}</WhatsMarked>
               </>
-            }
+            )}
           </div>
         </>
       );
@@ -823,20 +896,22 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
               variant="outlined"
               onClick={() => downloadFile(message.mediaUrl)}
             >
-             { document?.fileName || message.body}
+              {document?.fileName || message.body}
             </Button>
           </div>
-          {message.body !== document?.fileName &&
+          {message.body !== document?.fileName && (
             <>
-              <div className={[clsx({
-                [classes.textContentItemDeleted]: message.isDeleted,
-              }),]}>
-                <WhatsMarked>
-                  { message.body }
-                </WhatsMarked>
+              <div
+                className={[
+                  clsx({
+                    [classes.textContentItemDeleted]: message.isDeleted,
+                  }),
+                ]}
+              >
+                <WhatsMarked>{message.body}</WhatsMarked>
               </div>
             </>
-          }
+          )}
         </>
       );
     }
@@ -908,7 +983,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
   const scrollToMessage = (id) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
 
       // Add the highlight class
       element.classList.add(classes.messageHighlighted);
@@ -928,17 +1003,21 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
     if (isVCard(quotedMsg?.body)) {
       return "🪪";
     }
-    
+
     return quotedMsg?.body;
-  }
-    
+  };
 
   const renderQuotedMessage = (message) => {
     const data = JSON.parse(message.quotedMsg.dataJson);
-    
+
     const thumbnail = data?.message?.imageMessage?.jpegThumbnail;
-    const mediaUrl = message.quotedMsg?.mediaType === "image" ? message.quotedMsg.mediaUrl : null;
-    const imageUrl = thumbnail ? "data:image/png;base64, " + thumbnail : mediaUrl;
+    const mediaUrl =
+      message.quotedMsg?.mediaType === "image"
+        ? message.quotedMsg.mediaUrl
+        : null;
+    const imageUrl = thumbnail
+      ? "data:image/png;base64, " + thumbnail
+      : mediaUrl;
     return (
       <div
         className={clsx(classes.quotedContainerLeft, {
@@ -959,84 +1038,70 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
           )}
           <WhatsMarked>{getQuotedMessageText(message.quotedMsg)}</WhatsMarked>
         </div>
-        {imageUrl && (
-          <img className={classes.quotedThumbnail} src={imageUrl} />
-        )}
+        {imageUrl && <img className={classes.quotedThumbnail} src={imageUrl} />}
       </div>
     );
   };
 
   const renderReplies = (replies) => {
-    const reactions = replies &&
-      replies.filter(
-        (reply) => reply?.mediaType === "reactionMessage"
-      ).map((reply) => {
-        return (
-          reply.contact?.name ?
-            <Tooltip title={reply.contact?.name} placement="top" arrow >
-              <div
-                key={reply.id}
-              >
-                {reply.body}
-              </div>
+    const reactions =
+      replies &&
+      replies
+        .filter((reply) => reply?.mediaType === "reactionMessage")
+        .map((reply) => {
+          return reply.contact?.name ? (
+            <Tooltip title={reply.contact?.name} placement="top" arrow>
+              <div key={reply.id}>{reply.body}</div>
             </Tooltip>
-            :
-            <div
-              key={reply.id}
-            >
-              {reply.body}
-            </div>
-        )
-      });
+          ) : (
+            <div key={reply.id}>{reply.body}</div>
+          );
+        });
 
     return (
-      reactions?.length > 0 && <div className={classes.reactionsContainer}>
-        <div className={classes.reactions}>
-          {reactions}
+      reactions?.length > 0 && (
+        <div className={classes.reactionsContainer}>
+          <div className={classes.reactions}>{reactions}</div>
         </div>
-      </div>
+      )
     );
-  }
-  
+  };
+
   const renderLinkPreview = (message) => {
     const data = JSON.parse(message.dataJson);
-    
+
     const title = data?.message?.extendedTextMessage?.title;
     const description = data?.message?.extendedTextMessage?.description;
     const canonicalUrl = data?.message?.extendedTextMessage?.canonicalUrl;
-    const url = canonicalUrl && new URL(
-      canonicalUrl,
-    );
-    
+    const url = canonicalUrl && new URL(canonicalUrl);
+
     if (!title && !description && !url) {
-      return (<></>);
+      return <></>;
     }
-    
+
     const thumbnail = data?.message?.extendedTextMessage?.jpegThumbnail;
     const imageUrl = thumbnail ? "data:image/png;base64, " + thumbnail : "";
     return (
-      <a href={canonicalUrl} className={classes.linkPreviewAnchor} target="_blank">
+      <a
+        href={canonicalUrl}
+        className={classes.linkPreviewAnchor}
+        target="_blank"
+      >
         <div
           className={clsx(classes.quotedContainerLeft, {
             [classes.quotedContainerRight]: message.fromMe,
           })}
         >
           <div className={classes.quotedMsg}>
-            {title &&
-              <div className={classes.linkPreviewTitle}>
-                {title}
-              </div>
-            }
-            {description &&
+            {title && <div className={classes.linkPreviewTitle}>{title}</div>}
+            {description && (
               <div className={classes.linkPreviewDescription}>
                 {description}
               </div>
-            }
-            {url?.hostname &&
-              <div className={classes.linkPreviewUrl}>
-                {url.hostname}
-              </div>
-            }
+            )}
+            {url?.hostname && (
+              <div className={classes.linkPreviewUrl}>{url.hostname}</div>
+            )}
           </div>
           {!message.thumbnailUrl && imageUrl && (
             <img className={classes.quotedThumbnail} src={imageUrl} />
@@ -1051,7 +1116,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
       read: 1,
       fromMe: true,
       mediaUrl: "",
-      body
+      body,
     };
 
     api.post(`/messages/${ticketId}`, message).catch((err) => {
@@ -1069,40 +1134,53 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
         onClick={() => {
           if (allowReplyButtons) {
             sendReply(text);
-          };
-        }
-        }
+          }
+        }}
       >
         {text}
       </Button>
     );
-  }
-  
-  const renderUrlButton = ({ displayText, url }) =>
+  };
+
+  const renderUrlButton = ({ displayText, url }) => (
     <Button
       className={classes.messageButton}
       color="primary"
-      startIcon={displayText === 'Facebook' ? <Facebook /> : displayText === 'Instagram' ? <Instagram /> : <Launch />}
+      startIcon={
+        displayText === "Facebook" ? (
+          <Facebook />
+        ) : displayText === "Instagram" ? (
+          <Instagram />
+        ) : (
+          <Launch />
+        )
+      }
     >
-      <a href={url} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <a
+        href={url}
+        target="_blank"
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
         {displayText}
       </a>
     </Button>
-  
+  );
+
   const renderButtons = (message) => {
-    const objects = 
+    const objects =
       message?.buttonsMessage?.buttons ||
       message?.listMessage?.sections ||
       message?.templateMessage?.hydratedTemplate?.hydratedButtons ||
-      message?.templateMessage?.interactiveMessageTemplate?.nativeFlowMessage?.buttons
+      message?.templateMessage?.interactiveMessageTemplate?.nativeFlowMessage
+        ?.buttons;
 
-    if (!objects) return (<></>);
+    if (!objects) return <></>;
 
     return objects.map((item) => {
       if (item.urlButton) {
         return renderUrlButton({
           displayText: item.urlButton.displayText,
-          url: item.urlButton.url
+          url: item.urlButton.url,
         });
       } else if (item.quickReplyButton) {
         return renderReplyButton(item.quickReplyButton.displayText);
@@ -1113,7 +1191,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
         if (params?.url && params.display_text) {
           return renderUrlButton({
             displayText: params.display_text,
-            url: params.url
+            url: params.url,
           });
         }
         if (params?.display_text) {
@@ -1124,26 +1202,25 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
           return renderReplyButton(row.title);
         });
       }
-         
-      return (<></>);
-    }
-    );
+
+      return <></>;
+    });
   };
-  
+
   const formatVCardN = (n) => {
-    return(
+    return (
       (n[3] ? n[3] + " " : "") +
       (n[1] ? n[1] + " " : "") +
       (n[2] ? n[2] + " " : "") +
       (n[0] ? n[0] + " " : "") +
       (n[4] ? n[4] + " " : "")
     );
-  }
+  };
 
   const isVCard = (message) => {
     return message.startsWith('{"ticketzvCard":');
   };
-  
+
   const stringOrFirstElement = (data) => {
     if (!data) {
       return "";
@@ -1155,21 +1232,24 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
   };
 
   const handleContactClick = (name, number) => {
-    api.post(`/contacts/findOrInsert`, {
-      name,
-      number
-    }).then((response) => {
-      if (response?.data?.id) {
-        window.mentionClick(response.data);
-      }
-    }).catch((err) => {
-      toastError(err);
-    });
+    api
+      .post(`/contacts/findOrInsert`, {
+        name,
+        number,
+      })
+      .then((response) => {
+        if (response?.data?.id) {
+          window.mentionClick(response.data);
+        }
+      })
+      .catch((err) => {
+        toastError(err);
+      });
   };
-  
+
   const renderVCard = (vcardJson) => {
     const cardArray = JSON.parse(vcardJson)?.ticketzvCard;
-    
+
     if (!cardArray || !Array.isArray(cardArray)) {
       return <div>Invalid VCARD data</div>;
     }
@@ -1180,21 +1260,44 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
         return <></>;
       }
       const parsedVCard = vCard.parse(message);
-      console.debug("vCard data:", { message , parsedVCard });
-      
+      console.debug("vCard data:", { message, parsedVCard });
+
       const name = stringOrFirstElement(
-        parsedVCard['X-WA-BIZ-NAME']?.[0]?.value ||
-        parsedVCard.fn?.[0]?.value ||
-        formatVCardN(parsedVCard.n?.[0]?.value));
+        parsedVCard["X-WA-BIZ-NAME"]?.[0]?.value ||
+          parsedVCard.fn?.[0]?.value ||
+          formatVCardN(parsedVCard.n?.[0]?.value)
+      );
       const description = stringOrFirstElement(
-        parsedVCard['X-WA-BIZ-DESCRIPTION']?.[0]?.value || "");
+        parsedVCard["X-WA-BIZ-DESCRIPTION"]?.[0]?.value || ""
+      );
       const number = stringOrFirstElement(parsedVCard?.tel?.[0]?.value);
-      const metaNumber = parsedVCard?.tel?.[0]?.meta?.waid?.[0] || number || "unknown";
-      
+      const metaNumber =
+        parsedVCard?.tel?.[0]?.meta?.waid?.[0] || number || "unknown";
+
       return (
         <div>
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 20, marginBottom: 20 }}>
-            <Avatar style={{ backgroundColor: generateColor(metaNumber), marginRight: 10, marginLeft: 20, width: 60, height: 60, color: "white", fontWeight: "bold" }}>{ getInitials(name)}</Avatar>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 20,
+              marginBottom: 20,
+            }}
+          >
+            <Avatar
+              style={{
+                backgroundColor: generateColor(metaNumber),
+                marginRight: 10,
+                marginLeft: 20,
+                width: 60,
+                height: 60,
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              {getInitials(name)}
+            </Avatar>
             <div style={{ width: 350 }}>
               <div>
                 <Typography
@@ -1202,7 +1305,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
                   component="h4"
                   variant="body2"
                   color="textPrimary"
-                  style={{ fontWeight: '700' }}
+                  style={{ fontWeight: "700" }}
                 >
                   {name}
                 </Typography>
@@ -1213,7 +1316,7 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
                   component="span"
                   variant="body2"
                   color="textPrimary"
-                  style={{ display: 'flex' }}
+                  style={{ display: "flex" }}
                 >
                   {description}
                 </Typography>
@@ -1224,21 +1327,23 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
                   component="span"
                   variant="body2"
                   color="textPrimary"
-                  style={{ display: 'flex' }}
+                  style={{ display: "flex" }}
                 >
-                  <span class="ticketzMention" onClick={() => handleContactClick(name, metaNumber)}>{number}</span>
+                  <span
+                    class="ticketzMention"
+                    onClick={() => handleContactClick(name, metaNumber)}
+                  >
+                    {number}
+                  </span>
                 </Typography>
               </div>
-
             </div>
-
           </div>
         </div>
-      )
-
+      );
     });
   };
-  
+
   const convertToDMS = (degrees) => {
     const deg = Math.floor(degrees);
     const minFloat = (degrees - deg) * 60;
@@ -1246,46 +1351,80 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
     const sec = Math.floor((minFloat - min) * 60);
     const frac = ((minFloat - min) * 60 - sec).toFixed(2).substring(1);
     return `${deg}°${min}'${sec}${frac}"`;
-  }
-  
+  };
+
   const convertCoordinates = (lat, lon) => {
     const latitude = convertToDMS(Math.abs(lat)) + (lat >= 0 ? " N" : " S");
     const longitude = convertToDMS(Math.abs(lon)) + (lon >= 0 ? " E" : " W");
     return `${latitude}, ${longitude}`;
-  }
+  };
 
   const messageLocation = (data, createdAt) => {
     const location = data?.message?.locationMessage;
     if (!location) {
-      return (<></>);
+      return <></>;
     }
 
     const mapUrl = `https://www.google.com/maps?q=${location?.degreesLatitude},${location?.degreesLongitude}`;
 
     return (
-      <div onClick={
-        () => {
-          window.open(mapUrl, '_blank');
-        }
-      } className={[clsx(classes.textContentItem, classes.messageLocation)]}>
+      <div
+        onClick={() => {
+          window.open(mapUrl, "_blank");
+        }}
+        className={[clsx(classes.textContentItem, classes.messageLocation)]}
+      >
         <div>
-        { location?.jpegThumbnail ? 
-        <img src={`data:image/png;base64, ${location.jpegThumbnail}`} className={classes.imageLocation} />
-        :
-        <LocationOn className={classes.imageLocation} fontSize="large" color="red" />
-        }
+          {location?.jpegThumbnail ? (
+            <img
+              src={`data:image/png;base64, ${location.jpegThumbnail}`}
+              className={classes.imageLocation}
+            />
+          ) : (
+            <LocationOn
+              className={classes.imageLocation}
+              fontSize="large"
+              color="red"
+            />
+          )}
         </div>
         <div className={classes.messageLocationText}>
-           { location.name ? <><b>{location.name}</b><br /></> : "" }
-           { location.url ? <><a href={location.url} target="_blank" rel="noreferrer">{location.url}</a><br /></> : "" }
-           { location.address ? <>{location.address}<br /></> : "" }
-           { convertCoordinates(location.degreesLatitude, location.degreesLongitude) }
+          {location.name ? (
+            <>
+              <b>{location.name}</b>
+              <br />
+            </>
+          ) : (
+            ""
+          )}
+          {location.url ? (
+            <>
+              <a href={location.url} target="_blank" rel="noreferrer">
+                {location.url}
+              </a>
+              <br />
+            </>
+          ) : (
+            ""
+          )}
+          {location.address ? (
+            <>
+              {location.address}
+              <br />
+            </>
+          ) : (
+            ""
+          )}
+          {convertCoordinates(
+            location.degreesLatitude,
+            location.degreesLongitude
+          )}
         </div>
         <span className={classes.timestamp}>
           {format(parseISO(createdAt), "HH:mm")}
         </span>
       </div>
-    )
+    );
   };
 
   const getDataContextInfo = (data) => {
@@ -1293,7 +1432,8 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
       return null;
     }
 
-    return data.message?.extendedTextMessage?.contextInfo ||
+    return (
+      data.message?.extendedTextMessage?.contextInfo ||
       data.message?.imageMessage?.contextInfo ||
       data.message?.videoMessage?.contextInfo ||
       data.message?.audioMessage?.contextInfo ||
@@ -1310,9 +1450,11 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
       data.message?.productCatalogMessage?.contextInfo ||
       data.message?.templateButtonReplyMessage?.contextInfo ||
       data.message?.templateMessage?.contextInfo ||
-      data.message?.documentWithCaptionMessage?.contextInfo || null;
+      data.message?.documentWithCaptionMessage?.contextInfo ||
+      null
+    );
   };
-        
+
   const renderMessages = () => {
     const viewMessagesList = messagesList.map((message, index) => {
       if (message.mediaType === "reactionMessage") {
@@ -1320,16 +1462,19 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
       }
       const data = JSON.parse(message.dataJson);
       const dataContext = getDataContextInfo(data);
-      const isSticker = data?.message && ("stickerMessage" in data.message);
+      const isSticker = data?.message && "stickerMessage" in data.message;
       if (!message.fromMe) {
         return (
           <React.Fragment key={message.id}>
             {renderDailyTimestamps(message, index)}
             {renderMessageDivider(message, index)}
-            <div id={message.id}
-              className={[clsx(classes.messageContainer, classes.messageLeft, {
-                [classes.messageMediaSticker]: isSticker,
-              })]}
+            <div
+              id={message.id}
+              className={[
+                clsx(classes.messageContainer, classes.messageLeft, {
+                  [classes.messageMediaSticker]: isSticker,
+                }),
+              ]}
               title={message.queueId && message.queue?.name}
             >
               <IconButton
@@ -1342,73 +1487,92 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
               >
                 <ExpandMore />
               </IconButton>
-              { dataContext?.isForwarded && (
+              {dataContext?.isForwarded && (
                 <span className={classes.forwardedMessage}>
-                  <Forward fontSize="small" className={classes.forwardedIcon}/> {i18n.t("message.forwarded")}
+                  <Forward fontSize="small" className={classes.forwardedIcon} />{" "}
+                  {i18n.t("message.forwarded")}
                 </span>
               )}
               {isGroup && (
-                <span className={classes.messageContactName} onClick={() => {
-                  window.mentionClick({
-                    contactId: message.contact?.id,
-                    name: message.contact?.name,
-                    number: message.contact?.number
-                  })
-                }}>
+                <span
+                  className={classes.messageContactName}
+                  onClick={() => {
+                    window.mentionClick({
+                      contactId: message.contact?.id,
+                      name: message.contact?.name,
+                      number: message.contact?.number,
+                    });
+                  }}
+                >
                   {message.contact?.name}
                 </span>
               )}
 
               {message.thumbnailUrl && !message.mediaUrl && (
-                <img className={classes.previewThumbnail} src={message.thumbnailUrl} />
+                <img
+                  className={classes.previewThumbnail}
+                  src={message.thumbnailUrl}
+                />
               )}
 
-              {data?.message?.locationMessage ? messageLocation(data, message.createdAt)
-                :
-                isVCard(message.body) ?
-                  <div
-                    className={[clsx(classes.textContentItem, {
-                      [classes.textContentItemEdited]: message.isEdited
-                    }), { marginRight: 0 }]}>
-                    {renderVCard(message.body)}
-                  </div>
-
-                  :
-
-                  (<div className={[clsx(classes.textContentItem, {
-                    [classes.textContentItemDeleted]: message.isDeleted,
-                    [classes.textContentItemEdited]: message.isEdited
-                  }),]}>
-                    {message.quotedMsg && renderQuotedMessage(message)}
-                    {renderLinkPreview(message)}
-                    {!isSticker && (
-                      message.mediaUrl && !data?.message?.extendedTextMessage ?
-                        ""
-                        :
-                        <>
-                          {message.isDeleted && (
-                            <Block
-                              color="disabled"
-                              fontSize="small"
-                              className={classes.deletedIcon}
-                            />
-                          )}
-                          <WhatsMarked>
-                            {message.body}
-                          </WhatsMarked>
-                        </>
-                    )
-                    }
-                    <span className={[clsx(classes.timestamp, {
-                      [classes.timestampStickerLeft]: isSticker
-                    })]}>
-                      {message.isEdited && <span> {i18n.t("message.edited")} </span>}
-                      {format(parseISO(message.createdAt), "HH:mm")}
-                    </span>
-                  </div>)}
-                  {message.mediaUrl && !data?.message?.extendedTextMessage && checkMessageMedia(message, data)}
-                  {renderButtons(data?.message)}
-                  {renderReplies(message.replies)}
+              {data?.message?.locationMessage ? (
+                messageLocation(data, message.createdAt)
+              ) : isVCard(message.body) ? (
+                <div
+                  className={[
+                    clsx(classes.textContentItem, {
+                      [classes.textContentItemEdited]: message.isEdited,
+                    }),
+                    { marginRight: 0 },
+                  ]}
+                >
+                  {renderVCard(message.body)}
+                </div>
+              ) : (
+                <div
+                  className={[
+                    clsx(classes.textContentItem, {
+                      [classes.textContentItemDeleted]: message.isDeleted,
+                      [classes.textContentItemEdited]: message.isEdited,
+                    }),
+                  ]}
+                >
+                  {message.quotedMsg && renderQuotedMessage(message)}
+                  {renderLinkPreview(message)}
+                  {!isSticker &&
+                    (message.mediaUrl && !data?.message?.extendedTextMessage ? (
+                      ""
+                    ) : (
+                      <>
+                        {message.isDeleted && (
+                          <Block
+                            color="disabled"
+                            fontSize="small"
+                            className={classes.deletedIcon}
+                          />
+                        )}
+                        <WhatsMarked>{message.body}</WhatsMarked>
+                      </>
+                    ))}
+                  <span
+                    className={[
+                      clsx(classes.timestamp, {
+                        [classes.timestampStickerLeft]: isSticker,
+                      }),
+                    ]}
+                  >
+                    {message.isEdited && (
+                      <span> {i18n.t("message.edited")} </span>
+                    )}
+                    {format(parseISO(message.createdAt), "HH:mm")}
+                  </span>
+                </div>
+              )}
+              {message.mediaUrl &&
+                !data?.message?.extendedTextMessage &&
+                checkMessageMedia(message, data)}
+              {renderButtons(data?.message)}
+              {renderReplies(message.replies)}
             </div>
           </React.Fragment>
         );
@@ -1417,10 +1581,13 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
           <React.Fragment key={message.id}>
             {renderDailyTimestamps(message, index)}
             {renderMessageDivider(message, index)}
-            <div id={message.id}
-              className={[clsx(classes.messageContainer, classes.messageRight, {
-                [classes.messageMediaSticker]: isSticker,
-              })]}
+            <div
+              id={message.id}
+              className={[
+                clsx(classes.messageContainer, classes.messageRight, {
+                  [classes.messageMediaSticker]: isSticker,
+                }),
+              ]}
               title={message.queueId && message.queue?.name}
             >
               <IconButton
@@ -1434,15 +1601,19 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
                 <ExpandMore />
               </IconButton>
 
-              { dataContext?.isForwarded && (
+              {dataContext?.isForwarded && (
                 <span className={classes.forwardedMessage}>
-                   <Forward fontSize="small" className={classes.forwardedIcon}/> {i18n.t("message.forwarded")}
+                  <Forward fontSize="small" className={classes.forwardedIcon} />{" "}
+                  {i18n.t("message.forwarded")}
                 </span>
               )}
 
               {message.thumbnailUrl && !message.mediaUrl && (
-                <img className={classes.previewThumbnail} src={message.thumbnailUrl} />
-              )}                                
+                <img
+                  className={classes.previewThumbnail}
+                  src={message.thumbnailUrl}
+                />
+              )}
 
               <div
                 className={clsx(classes.textContentItem, {
@@ -1458,24 +1629,32 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
                   />
                 )}
 
-                { data?.message?.locationMessage ? messageLocation(data, message.createdAt)
-                  :
-                  isVCard(message.body) ?
-                    <div className={[classes.textContentItem]}>
-                      {renderVCard(message.body)}
-                    </div>
-
-                    :
-                    message.quotedMsg && renderQuotedMessage(message)}
+                {data?.message?.locationMessage ? (
+                  messageLocation(data, message.createdAt)
+                ) : isVCard(message.body) ? (
+                  <div className={[classes.textContentItem]}>
+                    {renderVCard(message.body)}
+                  </div>
+                ) : (
+                  message.quotedMsg && renderQuotedMessage(message)
+                )}
                 {renderLinkPreview(message)}
-                {!isSticker && (
-                  message.mediaUrl ? "" : <WhatsMarked>{message.body}</WhatsMarked>
-                )
-                }
-                <span className={[clsx(classes.timestamp, {
-                  [classes.timestampStickerRight]: isSticker
-                })]}>
-                  {message.isEdited && <span> {i18n.t("message.edited")} </span>}
+                {!isSticker &&
+                  (message.mediaUrl ? (
+                    ""
+                  ) : (
+                    <WhatsMarked>{message.body}</WhatsMarked>
+                  ))}
+                <span
+                  className={[
+                    clsx(classes.timestamp, {
+                      [classes.timestampStickerRight]: isSticker,
+                    }),
+                  ]}
+                >
+                  {message.isEdited && (
+                    <span> {i18n.t("message.edited")} </span>
+                  )}
                   {format(parseISO(message.createdAt), "HH:mm")}
                   {renderMessageAck(message)}
                 </span>
@@ -1527,28 +1706,29 @@ const MessagesList = ({ ticket, ticketId, isGroup, markAsRead, allowReplyButtons
           </div>
         )}
       </div>
-      {ticket?.channel !== "whatsapp" || ticket.channel === undefined && (
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            padding: "10px",
-            alignItems: "center",
-            backgroundColor: "#E1F3FB",
-          }}
-        >
-          {ticket?.channel === "facebook" ? (
-            <Facebook small />
-          ) : (
-            <Instagram small />
-          )}
+      {ticket?.channel !== "whatsapp" ||
+        (ticket.channel === undefined && (
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              padding: "10px",
+              alignItems: "center",
+              backgroundColor: "#E1F3FB",
+            }}
+          >
+            {ticket?.channel === "facebook" ? (
+              <Facebook small />
+            ) : (
+              <Instagram small />
+            )}
 
-          <span>
-            Você tem 24h para responder após receber uma mensagem, de acordo
-            com as políticas do Facebook.
-          </span>
-        </div>
-      )}
+            <span>
+              Você tem 24h para responder após receber uma mensagem, de acordo
+              com as políticas do Facebook.
+            </span>
+          </div>
+        ))}
       {loading && (
         <div>
           <CircularProgress className={classes.circleLoading} />

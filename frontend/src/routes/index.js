@@ -1,37 +1,38 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import LoggedInLayout from "../layout";
-import Dashboard from "../pages/Dashboard/";
-import TicketResponsiveContainer from "../pages/TicketResponsiveContainer";
-import Signup from "../pages/Signup/";
-import Login from "../pages/Login/";
 import Connections from "../pages/Connections/";
-import SettingsCustom from "../pages/SettingsCustom/";
-import Financeiro from "../pages/Financeiro/";
-import Users from "../pages/Users";
-import Contacts from "../pages/Contacts/";
-import Queues from "../pages/Queues/";
-import Tags from "../pages/Tags/";
-import MessagesAPI from "../pages/MessagesAPI/";
-import Helps from "../pages/Helps/";
-import ContactLists from "../pages/ContactLists/";
 import ContactListItems from "../pages/ContactListItems/";
+import ContactLists from "../pages/ContactLists/";
+import Contacts from "../pages/Contacts/";
+import Dashboard from "../pages/Dashboard/";
+import Financeiro from "../pages/Financeiro/";
+import Helps from "../pages/Helps/";
+import Login from "../pages/Login/";
+import MessagesAPI from "../pages/MessagesAPI/";
+import Queues from "../pages/Queues/";
+import SettingsCustom from "../pages/SettingsCustom/";
+import Signup from "../pages/Signup/";
+import Tags from "../pages/Tags/";
+import TicketResponsiveContainer from "../pages/TicketResponsiveContainer";
+import Users from "../pages/Users";
 // import Companies from "../pages/Companies/";
-import QuickMessages from "../pages/QuickMessages/";
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { TicketsContextProvider } from "../context/Tickets/TicketsContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
-import Route from "./Route";
-import Schedules from "../pages/Schedules";
+import Annoucements from "../pages/Annoucements";
+import CampaignReport from "../pages/CampaignReport";
 import Campaigns from "../pages/Campaigns";
 import CampaignsConfig from "../pages/CampaignsConfig";
-import CampaignReport from "../pages/CampaignReport";
-import Annoucements from "../pages/Annoucements";
 import Chat from "../pages/Chat";
-import ToDoList from "../pages/ToDoList/";
+import MediaManagement from "../pages/MediaManagement";
+import QuickMessages from "../pages/QuickMessages/";
+import Schedules from "../pages/Schedules";
 import Subscription from "../pages/Subscription/";
+import ToDoList from "../pages/ToDoList/";
+import Route from "./Route";
 
 const Routes = () => {
   const [showCampaigns, setShowCampaigns] = useState(false);
@@ -78,12 +79,7 @@ const Routes = () => {
                   component={Schedules}
                   isPrivate
                 />
-                <Route
-                  exact
-                  path="/todolist"
-                  component={ToDoList}
-                  isPrivate
-                />
+                <Route exact path="/todolist" component={ToDoList} isPrivate />
                 <Route exact path="/tags" component={Tags} isPrivate />
                 <Route exact path="/contacts" component={Contacts} isPrivate />
                 <Route exact path="/helps" component={Helps} isPrivate />
@@ -119,7 +115,13 @@ const Routes = () => {
                   component={Subscription}
                   isPrivate
                 />
-                
+                <Route
+                  exact
+                  path="/media-management"
+                  component={MediaManagement}
+                  isPrivate
+                />
+
                 <Route exact path="/chats/:id?" component={Chat} isPrivate />
                 {showCampaigns && (
                   <>
@@ -153,7 +155,6 @@ const Routes = () => {
                       component={CampaignsConfig}
                       isPrivate
                     />
-                    
                   </>
                 )}
               </LoggedInLayout>

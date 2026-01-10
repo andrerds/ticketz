@@ -343,7 +343,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add storage statistics
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 11.10_
 
-- [ ] 9.1 Create media management services
+- [x] 9.1 Create media management services
 
   - Implement ListMediaFilesService with filtering
   - Implement GetMediaStatsService for storage statistics
@@ -351,23 +351,23 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Implement BulkDeleteMediaFilesService
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.9_
 
-- [ ] 9.2 Write property test for media grouping
+- [x] 9.2 Write property test for media grouping
 
   - **Property 28: Media grouping by date and type**
   - **Validates: Requirements 11.1**
 
-- [ ] 9.3 Write property test for media information completeness
+- [x] 9.3 Write property test for media information completeness
 
   - **Property 29: Media information completeness**
   - **Validates: Requirements 11.2**
 
-- [ ] 9.4 Write property test for age-based deletion
+- [x] 9.4 Write property test for age-based deletion
 
   - **Property 30: Age-based deletion permission**
   - **Property 31: Recent file protection**
   - **Validates: Requirements 11.3, 11.4**
 
-- [ ] 9.5 Write property test for deleted media marking
+- [x] 9.5 Write property test for deleted media marking
 
   - **Property 32: Deleted media marking**
   - **Validates: Requirements 11.5**
@@ -388,7 +388,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - **Property 37: Storage usage statistics**
   - **Validates: Requirements 11.10**
 
-- [ ] 9.2 Create media management API endpoints
+- [x] 9.2 Create media management API endpoints
 
   - Add GET /api/media endpoint with query params for filters
   - Add GET /api/media/stats endpoint
@@ -397,7 +397,7 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add proper authentication and authorization
   - _Requirements: 11.1, 11.2, 11.3, 11.9_
 
-- [ ] 9.3 Create MediaManagement page component
+- [x] 9.3 Create MediaManagement page component
 
   - Create new page in frontend/src/pages/MediaManagement/
   - Add MediaFilters component (date range, type, location)
@@ -408,19 +408,19 @@ This implementation plan breaks down the S3 media storage feature into increment
   - Add DeleteConfirmationDialog
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.8_
 
-- [ ] 9.4 Implement deleted media placeholder
+- [x] 9.4 Implement deleted media placeholder
 
   - Update Message display components to check isDeleted flag
   - Show placeholder image/text when media is deleted
   - Add tooltip explaining media was manually removed
   - _Requirements: 11.5, 11.6_
 
-- [ ] 9.5 Write property test for placeholder display
+- [x] 9.5 Write property test for placeholder display
 
   - **Property 33: Deleted media placeholder**
   - **Validates: Requirements 11.6**
 
-- [ ] 9.5 Add media management to navigation
+- [x] 9.5 Add media management to navigation
 
   - Add "Media Management" menu item to admin navigation
   - Ensure proper permissions (admin only)

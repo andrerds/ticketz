@@ -113,7 +113,7 @@ const messages = {
           last7days: "Últimos 7 dias",
           last14days: "Últimos 14 dias",
           last30days: "Últimos 30 dias",
-          last90days: "Últimos 90 dias"
+          last90days: "Últimos 90 dias",
         },
         date: {
           start: "Data inicial",
@@ -180,8 +180,7 @@ const messages = {
         },
       },
       internalChat: {
-        title: "Chat Interno"
-
+        title: "Chat Interno",
       },
       whatsappModal: {
         title: {
@@ -286,14 +285,14 @@ const messages = {
           friday: "Sexta-feira",
           saturday: "Sábado",
           sunday: "Domingo",
-        }
+        },
       },
       userModal: {
         title: {
           add: "Adicionar usuário",
           edit: "Editar usuário",
         },
-        listItems:{
+        listItems: {
           adminProfile: "Administrador",
           userProfile: "Usuário",
         },
@@ -348,7 +347,6 @@ const messages = {
         },
         success: "Tag salvo com sucesso.",
         successKanban: "Lane salva com sucesso.",
-
       },
       chat: {
         noTicketMessage: "Selecione um ticket para começar a conversar.",
@@ -356,7 +354,7 @@ const messages = {
       uploads: {
         titles: {
           titleUploadMsgDragDrop: "ARRASTE E SOLTE ARQUIVOS NO CAMPO ABAIXO",
-          titleFileList: "Lista de arquivo(s)"
+          titleFileList: "Lista de arquivo(s)",
         },
       },
       todolist: {
@@ -451,12 +449,13 @@ const messages = {
           logout: "Sair",
           management: "Gerência",
           kanban: "Kanban",
-          tasks: "Tarefas"
+          tasks: "Tarefas",
+          mediaManagement: "Gerenciar Mídias",
         },
         appBar: {
           i18n: {
             language: "Português 🇧🇷",
-            language_short: "pt_BR"
+            language_short: "pt_BR",
           },
           user: {
             profile: "Perfil",
@@ -466,6 +465,50 @@ const messages = {
             about: "Sobre",
             logout: "Sair",
           },
+        },
+      },
+      mediaManagement: {
+        title: "Gerenciamento de Mídias",
+        stats: {
+          title: "Estatísticas de Armazenamento",
+          totalFiles: "Total de Arquivos",
+          totalSize: "Tamanho Total",
+          byLocation: "Por Localização",
+        },
+        filters: {
+          startDate: "Data Inicial",
+          endDate: "Data Final",
+          fileType: "Tipo de Arquivo",
+          location: "Localização",
+          all: "Todos",
+        },
+        buttons: {
+          filter: "Filtrar",
+          deleteSelected: "Excluir Selecionados",
+          cancel: "Cancelar",
+          confirm: "Confirmar",
+        },
+        table: {
+          fileName: "Nome do Arquivo",
+          fileSize: "Tamanho",
+          uploadDate: "Data de Upload",
+          fileType: "Tipo",
+          location: "Localização",
+          actions: "Ações",
+        },
+        messages: {
+          deleteSuccess: "Mídia excluída com sucesso",
+          bulkDeleteSuccess: "Mídias excluídas com sucesso",
+          protected: "Protegido (menos de 30 dias)",
+          mediaDeleted: {
+            text: "Mídia removida manualmente",
+            tooltip: "Esta mídia foi removida manualmente pelo administrador",
+          },
+        },
+        confirmDialog: {
+          title: "Confirmar Exclusão",
+          message:
+            "Tem certeza que deseja excluir esta mídia? Esta ação não pode ser revertida.",
         },
       },
       messagesAPI: {
@@ -500,8 +543,8 @@ const messages = {
         searchPlaceholder: "Pesquisa",
         subMenus: {
           list: "Painel",
-          tags: "Lanes"
-        }
+          tags: "Lanes",
+        },
       },
       tagsKanban: {
         title: "Lanes",
@@ -753,14 +796,16 @@ const messages = {
         buttonclose: "Fechar",
         title: "Sobre o ticketz",
         abouttitle: "Origem e melhorias",
-        aboutdetail: "O ticketz é derivado indireto do projeto Whaticket com melhorias compartilhadas pelos desenvolvedores do sistema EquipeChat através do canal VemFazer no youtube, posteriormente melhoradas por Claudemir Todo Bom",
+        aboutdetail:
+          "O ticketz é derivado indireto do projeto Whaticket com melhorias compartilhadas pelos desenvolvedores do sistema EquipeChat através do canal VemFazer no youtube, posteriormente melhoradas por Claudemir Todo Bom",
         aboutauthorsite: "Site do autor",
         aboutwhaticketsite: "Site do Whaticket Community no Github",
         aboutvemfazersite: "Site do canal Vem Fazer no Github",
         licenseheading: "Licença em Código Aberto",
-        licensedetail: "O ticketz está licenciado sob a GNU Affero General Public License versão 3, isso significa que qualquer usuário que tiver acesso a esta aplicação tem o direito de obter acesso ao código fonte. Mais informações nos links abaixo:",
+        licensedetail:
+          "O ticketz está licenciado sob a GNU Affero General Public License versão 3, isso significa que qualquer usuário que tiver acesso a esta aplicação tem o direito de obter acesso ao código fonte. Mais informações nos links abaixo:",
         licensefulltext: "Texto completo da licença",
-        licensesourcecode: "Código fonte do ticketz"
+        licensesourcecode: "Código fonte do ticketz",
       },
       schedules: {
         title: "Agendamentos",
@@ -924,33 +969,33 @@ const messages = {
         FileDownloadLimit: {
           title: "Limite de Download de arquivos (MB)",
         },
-        "messageVisibility": {
-          "title": "Visibilidade da mensagem",
-          "options": {
-            "respectMessageQueue": "Respeitar fila da mensagem",
-            "respectTicketQueue": "Respeitar fila do ticket"
-          }
+        messageVisibility: {
+          title: "Visibilidade da mensagem",
+          options: {
+            respectMessageQueue: "Respeitar fila da mensagem",
+            respectTicketQueue: "Respeitar fila do ticket",
+          },
         },
-        "keepQueueAndUser": {
-          "title": "Manter fila e usuário no ticket fechado",
-          "options": {
-            "enabled": "Ativado",
-            "disabled": "Desativado"
-          }
+        keepQueueAndUser: {
+          title: "Manter fila e usuário no ticket fechado",
+          options: {
+            enabled: "Ativado",
+            disabled: "Desativado",
+          },
         },
         GracePeriod: {
           title: "Carência após vencimento (dias)",
         },
-        "ticketAcceptedMessage": {
-          "title": "Mensagem de ticket aceito",
-          "placeholder": "Digite sua mensagem de ticket aceito aqui"
+        ticketAcceptedMessage: {
+          title: "Mensagem de ticket aceito",
+          placeholder: "Digite sua mensagem de ticket aceito aqui",
         },
-        "transferMessage": {
-          "title": "Mensagem de transferência",
-          "placeholder": "Digite sua mensagem de transferência aqui"
+        transferMessage: {
+          title: "Mensagem de transferência",
+          placeholder: "Digite sua mensagem de transferência aqui",
         },
-        "mustacheVariables": {
-          "title": "Variáveis disponíveis:"
+        mustacheVariables: {
+          title: "Variáveis disponíveis:",
         },
         WelcomeGreeting: {
           greetings: "Olá",
@@ -991,13 +1036,13 @@ const messages = {
         },
         AudioTranscriptions: {
           title: "Transcrição de áudio",
-        },        
+        },
         TagsMode: {
           title: "Modo de Tags",
           options: {
             ticket: "Ticket",
             contact: "Contato",
-            both: "Ticket e Contacto"
+            both: "Ticket e Contacto",
           },
         },
       },
@@ -1073,7 +1118,7 @@ const messages = {
       },
       messageHistoryModal: {
         close: "Fechar",
-        title: "Histórico de edição da mensagem"
+        title: "Histórico de edição da mensagem",
       },
       presence: {
         unavailable: "Indisponível",
@@ -1118,8 +1163,10 @@ const messages = {
       },
       frontendErrors: {
         ERR_CONFIG_ERROR: "Erro de configuração. Por favor, contate o suporte.",
-        ERR_CLOCK_OUT_OF_SYNC: "Relógio fora de sincronia. Por favor, verifique as configurações de data e hora do seu dispositivo.",
-        ERR_BACKEND_UNREACHABLE: "Backend inacessível. Por favor, tente novamente mais tarde.",
+        ERR_CLOCK_OUT_OF_SYNC:
+          "Relógio fora de sincronia. Por favor, verifique as configurações de data e hora do seu dispositivo.",
+        ERR_BACKEND_UNREACHABLE:
+          "Backend inacessível. Por favor, tente novamente mais tarde.",
       },
       backendErrors: {
         ERR_UNAUTHORIZED: "Você não está autorizado a acessar este recurso.",
@@ -1170,13 +1217,16 @@ const messages = {
       },
       wavoipModal: {
         title: "Insira o token da sua conexão no Wavoip",
-        instructions: "Acessando o endereço abaixo você pode criar uma conta com 50 ligações gratuitas para teste",
-        coupon: "Ao contratar o serviço use o cupom TICKETZ para ganhar um desconto!",
+        instructions:
+          "Acessando o endereço abaixo você pode criar uma conta com 50 ligações gratuitas para teste",
+        coupon:
+          "Ao contratar o serviço use o cupom TICKETZ para ganhar um desconto!",
       },
       ticketz: {
         registration: {
           header: "Cadastre-se na base de usuários do Ticketz",
-          description: "Preencha os campos abaixo para se cadastrar na base de usuários do Ticketz e receber novidades sobre o projeto.",
+          description:
+            "Preencha os campos abaixo para se cadastrar na base de usuários do Ticketz e receber novidades sobre o projeto.",
           name: "Nome",
           country: "País",
           phoneNumber: "Número de Whatsapp",
@@ -1188,7 +1238,7 @@ const messages = {
           recurringbrl: "Doação recorrente em R$",
           paypaltitle: "Cartão de Crédito",
           international: "Internacional em US$",
-        }
+        },
       },
     },
   },
