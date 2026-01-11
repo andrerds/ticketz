@@ -21,7 +21,7 @@ COPY --from=build /usr/src/app/node_modules/@socket.io/admin-ui/ui/dist /var/www
 
 COPY nginx /etc/nginx
 
-EXPOSE 80
+EXPOSE 80 3000
 
 CMD (echo "{" && while IFS='=' read -r name value; do \
         printf '\t"%s": "%s"\n' "$name" "$value"; \

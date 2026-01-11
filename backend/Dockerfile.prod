@@ -25,9 +25,9 @@ COPY --from=build /usr/src/app/scripts ./scripts
 RUN chmod +x ./scripts/*.sh 2>/dev/null || true
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD dockerize -wait tcp://${DB_HOST}:${DB_PORT:-5432} -timeout 60s \
   && npx sequelize db:migrate --config dist/config/database.js --migrations-path dist/database/migrations \
