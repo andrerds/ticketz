@@ -64,4 +64,4 @@ temp/
 *.DS_Store
 free-react-tailwind-admin-dashboard-main
 .kiro/*
-.zip
+*.zip
