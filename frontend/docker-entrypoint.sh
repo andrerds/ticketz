@@ -1,21 +1,27 @@
 #!/bin/bash
 set -e
 
+CONFIG_PATH="/var/www/public/config.json"
+
 echo "Creating config.json from environment variables..."
 
-# Create config.json from environment variables
 {
     echo "{"
-    env | while IFS='=' read -r name value; do
-        printf '  "%s": "%s",\n' "$name" "$value"
-    done | sed '$ s/,$//'
+    first=true
+    while IFS='=' read -r name value; do
+        if [ "$first" = true ]; then
+            first=false
+        else
+            echo ","
+        fi
+        printf '  "%s": "%s"' "$name" "$value"
+    done < <(env)
+    echo ""
     echo "}"
-} > /var/www/public/config.json
+} > "$CONFIG_PATH"
 
-echo "config.json created successfully"
-cat /var/www/public/config.json
+echo "config.json created at $CONFIG_PATH"
 
-# Add backend to hosts if BACKEND_SERVICE is set
 if [ -n "$BACKEND_SERVICE" ]; then
     echo "Resolving BACKEND_SERVICE: $BACKEND_SERVICE"
     BACKEND_IP=$(getent hosts "$BACKEND_SERVICE" | awk '{ print $1 }')

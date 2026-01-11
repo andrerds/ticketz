@@ -20,11 +20,15 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build /usr/src/app/build /var/www/public
 COPY --from=build /usr/src/app/node_modules/@socket.io/admin-ui/ui/dist /var/www/public/socket-admin
 
-COPY nginx /etc/nginx
+COPY nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/include.d /etc/nginx/include.d/
+COPY nginx/sites.d /etc/nginx/sites.d/
+COPY nginx/ticketz.d /etc/nginx/ticketz.d/
 COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    chmod -R 755 /var/www/public
+    chmod -R 755 /var/www/public && \
+    mkdir -p /var/www/backend-public
 
 EXPOSE 80
 
