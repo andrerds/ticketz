@@ -4,7 +4,10 @@
 !.env.example
 .env.local
 .env.production
-.env.prod
+
+# Production env files (configure before deploy)
+.env-backend-prod
+.env-frontend-prod
 
 # Documentation (local only)
 docs/docker/
