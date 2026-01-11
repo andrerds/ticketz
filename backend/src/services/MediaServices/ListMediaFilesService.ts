@@ -35,19 +35,17 @@ const detectStorageLocation = async (
   mediaUrl: string,
   companyId: number
 ): Promise<"local" | "s3"> => {
-  // If URL is absolute (starts with http:// or https://), it's definitely S3
   if (/^https?:\/\//.test(mediaUrl)) {
     return "s3";
   }
 
-  // Check if file exists locally
+  const mediaKey = mediaUrl.replace(/^\/public\//, "");
+  const fullPath = path.join(getPublicPath(), mediaKey);
+
   try {
-    const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");
-    const fullPath = path.join(getPublicPath(), mediaKey);
     await fs.access(fullPath);
     return "local";
   } catch {
-    // File doesn't exist locally, so it must be in S3
     return "s3";
   }
 };

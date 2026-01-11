@@ -173,4 +173,10 @@ const GetStorageConfigService = async ({
   return config;
 };
 
+export const clearStorageConfigCache = (companyId: number): void => {
+  const cacheKey = `storage-config-${companyId}`;
+  configCache.remove(cacheKey);
+  logger.info({ companyId }, "[STORAGE-CONFIG] Cache cleared for company");
+};
+
 export default GetStorageConfigService;

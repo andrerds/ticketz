@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
 
-import { getIO } from "../libs/socket";
 import AppError from "../errors/AppError";
+import { getIO } from "../libs/socket";
 
-import UpdateSettingService from "../services/SettingServices/UpdateSettingService";
-import ListSettingsService from "../services/SettingServices/ListSettingsService";
 import GetPublicSettingService from "../services/SettingServices/GetPublicSettingService";
 import { GetSettingService } from "../services/SettingServices/GetSettingService";
-import GetStorageConfigService from "../services/StorageServices/GetStorageConfigService";
-import UpdateStorageConfigService from "../services/StorageServices/UpdateStorageConfigService";
+import ListSettingsService from "../services/SettingServices/ListSettingsService";
+import UpdateSettingService from "../services/SettingServices/UpdateSettingService";
+import GetStorageConfigService, {
+  clearStorageConfigCache
+} from "../services/StorageServices/GetStorageConfigService";
 import TestStorageConnectionService from "../services/StorageServices/TestStorageConnectionService";
+import UpdateStorageConfigService from "../services/StorageServices/UpdateStorageConfigService";
 
 type LogoRequest = {
   mode: string;
@@ -161,4 +163,18 @@ export const testStorageConnection = async (
   });
 
   return res.status(200).json(result);
+};
+
+export const clearStorageCache = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { companyId } = req.user;
+
+  clearStorageConfigCache(companyId);
+
+  return res.status(200).json({
+    message: "Storage cache cleared successfully",
+    companyId
+  });
 };

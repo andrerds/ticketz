@@ -489,6 +489,7 @@ const messages = {
           confirm: "Confirmar",
         },
         table: {
+          preview: "Preview",
           fileName: "Nome do Arquivo",
           fileSize: "Tamanho",
           uploadDate: "Data de Upload",

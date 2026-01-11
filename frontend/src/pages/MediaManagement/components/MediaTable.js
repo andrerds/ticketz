@@ -11,12 +11,16 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { format } from "date-fns";
+import MediaPreview from "../../../components/MediaPreview";
 import { i18n } from "../../../translate/i18n";
 import { formatBytes } from "../utils/formatters";
-
 const useStyles = makeStyles((theme) => ({
   deleteButton: {
     color: theme.palette.error.main,
+  },
+  previewCell: {
+    width: 80,
+    padding: theme.spacing(1),
   },
 }));
 
@@ -40,6 +44,7 @@ const MediaTable = ({
           <TableCell padding="checkbox">
             <Checkbox checked={isAllSelected} onChange={onSelectAll} />
           </TableCell>
+          <TableCell>{i18n.t("mediaManagement.table.preview")}</TableCell>
           <TableCell>{i18n.t("mediaManagement.table.fileName")}</TableCell>
           <TableCell>{i18n.t("mediaManagement.table.fileSize")}</TableCell>
           <TableCell>{i18n.t("mediaManagement.table.uploadDate")}</TableCell>
@@ -58,6 +63,13 @@ const MediaTable = ({
                   onChange={() => onSelectFile(file.messageId)}
                 />
               )}
+            </TableCell>
+            <TableCell className={classes.previewCell}>
+              <MediaPreview
+                mediaUrl={file.mediaUrl}
+                size="thumbnail"
+                alt={`Preview of ${file.fileName}`}
+              />
             </TableCell>
             <TableCell>{file.fileName}</TableCell>
             <TableCell>{formatBytes(file.fileSize)}</TableCell>

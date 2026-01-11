@@ -23,4 +23,6 @@ export interface IThumbnailHandlerService {
     companyId: number,
     options?: ThumbnailOptions
   ): Promise<void>;
+
+  getContentTypeForFile(mediaKey: string, isOriginalFile?: boolean): string;
 }

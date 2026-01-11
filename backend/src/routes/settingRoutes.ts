@@ -1,13 +1,13 @@
 import { Router } from "express";
 import multer from "multer";
-import isAuth from "../middleware/isAuth";
-import isAdmin from "../middleware/isAdmin";
 import envTokenAuth from "../middleware/envTokenAuth";
+import isAdmin from "../middleware/isAdmin";
+import isAuth from "../middleware/isAuth";
 
+import uploadPrivateConfig from "../config/privateFiles";
+import uploadConfig from "../config/upload";
 import * as SettingController from "../controllers/SettingController";
 import isSuper from "../middleware/isSuper";
-import uploadConfig from "../config/upload";
-import uploadPrivateConfig from "../config/privateFiles";
 
 const settingRoutes = Router();
 
@@ -57,6 +57,13 @@ settingRoutes.post(
   isAuth,
   isAdmin,
   SettingController.testStorageConnection
+);
+
+settingRoutes.delete(
+  "/settings/storage/cache",
+  isAuth,
+  isAdmin,
+  SettingController.clearStorageCache
 );
 
 settingRoutes.get("/settings/:settingKey", isAuth, SettingController.show);

@@ -166,31 +166,12 @@ export class ThumbnailHandlerService implements IThumbnailHandlerService {
         "[THUMBNAIL] Thumbnail generation failed, trying fallback strategies"
       );
 
-      // Fallback 1: Try to return original file if it's an image
-      try {
-        const originalBuffer = await this.getOriginalFileBuffer(
-          mediaKey,
-          storageLocation,
-          companyId
-        );
-
-        // Check if it's a supported image format
-        if (await this.isImageFile(originalBuffer)) {
-          logger.info(
-            { mediaKey },
-            "[THUMBNAIL] Returning original file as thumbnail fallback"
-          );
-          return originalBuffer;
-        }
-      } catch (originalError) {
-        logger.warn(
-          { error: originalError.message, mediaKey },
-          "[THUMBNAIL] Failed to retrieve original file for fallback"
-        );
-      }
-
-      // Fallback 2: Return placeholder image
-      return await this.getPlaceholderImage();
+      return this.executeFallbackStrategies(
+        mediaKey,
+        storageLocation,
+        companyId,
+        options
+      );
     }
   }
 
@@ -537,8 +518,7 @@ export class ThumbnailHandlerService implements IThumbnailHandlerService {
 
   private async getPlaceholderImage(): Promise<Buffer> {
     // Generate a simple placeholder image using sharp
-    const width = PREVIEW_SIZE_DIMENSIONS.thumbnail.width;
-    const height = PREVIEW_SIZE_DIMENSIONS.thumbnail.height;
+    const { width, height } = PREVIEW_SIZE_DIMENSIONS.thumbnail;
 
     try {
       return await sharp({
@@ -563,5 +543,357 @@ export class ThumbnailHandlerService implements IThumbnailHandlerService {
         "base64"
       );
     }
+  }
+
+  /**
+   * Execute comprehensive fallback strategies for thumbnail generation failures
+   */
+  private async executeFallbackStrategies(
+    mediaKey: string,
+    storageLocation: StorageLocation,
+    companyId: number,
+    _options?: ThumbnailOptions
+  ): Promise<Buffer> {
+    logger.info(
+      { mediaKey, storageLocation, companyId },
+      "[THUMBNAIL] Executing fallback strategies"
+    );
+
+    // Fallback 1: Try to return original file if it's an image
+    try {
+      const originalBuffer = await this.getOriginalFileBuffer(
+        mediaKey,
+        storageLocation,
+        companyId
+      );
+
+      // Check if it's a supported image format
+      if (await this.isImageFile(originalBuffer)) {
+        logger.info(
+          { mediaKey },
+          "[THUMBNAIL] Returning original file as thumbnail fallback"
+        );
+        return originalBuffer;
+      }
+
+      // Fallback 2: Check if it's a PDF and return PDF placeholder
+      if (await this.isPdfFile(originalBuffer, mediaKey)) {
+        logger.info(
+          { mediaKey },
+          "[THUMBNAIL] Detected PDF file, returning PDF placeholder"
+        );
+        return await this.getPdfPlaceholderImage();
+      }
+
+      // Fallback 3: Check if it's a video and return video placeholder
+      if (this.isVideoFile(mediaKey)) {
+        logger.info(
+          { mediaKey },
+          "[THUMBNAIL] Detected video file, returning video placeholder"
+        );
+        return await this.getVideoPlaceholderImage();
+      }
+
+      // Fallback 4: Check if it's an audio file and return audio placeholder
+      if (this.isAudioFile(mediaKey)) {
+        logger.info(
+          { mediaKey },
+          "[THUMBNAIL] Detected audio file, returning audio placeholder"
+        );
+        return await this.getAudioPlaceholderImage();
+      }
+
+      // Fallback 5: Return generic file placeholder
+      logger.info(
+        { mediaKey },
+        "[THUMBNAIL] Unknown file type, returning generic file placeholder"
+      );
+      return await this.getGenericFilePlaceholderImage();
+    } catch (originalError) {
+      logger.warn(
+        { error: originalError.message, mediaKey },
+        "[THUMBNAIL] Failed to retrieve original file for fallback analysis"
+      );
+    }
+
+    // Final fallback: Return default placeholder image
+    logger.info(
+      { mediaKey },
+      "[THUMBNAIL] All fallback strategies failed, returning default placeholder"
+    );
+    return this.getPlaceholderImage();
+  }
+
+  /**
+   * Check if the buffer contains a PDF file
+   */
+  private async isPdfFile(buffer: Buffer, mediaKey: string): Promise<boolean> {
+    // Check file extension first
+    const ext = path.extname(mediaKey).toLowerCase();
+    if (ext === ".pdf") {
+      return true;
+    }
+
+    // Check PDF magic bytes (%PDF)
+    if (buffer.length >= 4) {
+      const header = buffer.subarray(0, 4).toString("ascii");
+      return header === "%PDF";
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if the file is a video based on extension
+   */
+  private isVideoFile(mediaKey: string): boolean {
+    const ext = path.extname(mediaKey).toLowerCase();
+    const videoExtensions = [
+      ".mp4",
+      ".avi",
+      ".mov",
+      ".wmv",
+      ".flv",
+      ".webm",
+      ".mkv",
+      ".m4v"
+    ];
+    return videoExtensions.includes(ext);
+  }
+
+  /**
+   * Check if the file is an audio file based on extension
+   */
+  private isAudioFile(mediaKey: string): boolean {
+    const ext = path.extname(mediaKey).toLowerCase();
+    const audioExtensions = [
+      ".mp3",
+      ".wav",
+      ".flac",
+      ".aac",
+      ".ogg",
+      ".wma",
+      ".m4a"
+    ];
+    return audioExtensions.includes(ext);
+  }
+
+  /**
+   * Generate a PDF-specific placeholder image
+   */
+  private async getPdfPlaceholderImage(): Promise<Buffer> {
+    const { width, height } = PREVIEW_SIZE_DIMENSIONS.thumbnail;
+
+    try {
+      // Create a red-tinted placeholder for PDFs
+      return sharp({
+        create: {
+          width,
+          height,
+          channels: 3,
+          background: { r: 220, g: 53, b: 69 } // Bootstrap danger color
+        }
+      })
+        .composite([
+          {
+            input: Buffer.from(
+              `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="rgba(220,53,69,0.1)"/>
+                <text x="50%" y="40%" text-anchor="middle" fill="white" font-size="12" font-family="Arial">PDF</text>
+                <text x="50%" y="60%" text-anchor="middle" fill="white" font-size="8" font-family="Arial">Document</text>
+              </svg>`
+            ),
+            top: 0,
+            left: 0
+          }
+        ])
+        .jpeg({ quality: this.DEFAULT_QUALITY })
+        .toBuffer();
+    } catch (error) {
+      logger.warn(
+        { error: error.message },
+        "[THUMBNAIL] Failed to generate PDF placeholder, using default"
+      );
+      return this.getPlaceholderImage();
+    }
+  }
+
+  /**
+   * Generate a video-specific placeholder image
+   */
+  private async getVideoPlaceholderImage(): Promise<Buffer> {
+    const { width, height } = PREVIEW_SIZE_DIMENSIONS.thumbnail;
+
+    try {
+      // Create a blue-tinted placeholder for videos
+      return sharp({
+        create: {
+          width,
+          height,
+          channels: 3,
+          background: { r: 13, g: 110, b: 253 } // Bootstrap primary color
+        }
+      })
+        .composite([
+          {
+            input: Buffer.from(
+              `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="rgba(13,110,253,0.1)"/>
+                <polygon points="${width / 2 - 8},${height / 2 - 6} ${
+                width / 2 - 8
+              },${height / 2 + 6} ${width / 2 + 8},${height / 2}" fill="white"/>
+                <text x="50%" y="75%" text-anchor="middle" fill="white" font-size="8" font-family="Arial">VIDEO</text>
+              </svg>`
+            ),
+            top: 0,
+            left: 0
+          }
+        ])
+        .jpeg({ quality: this.DEFAULT_QUALITY })
+        .toBuffer();
+    } catch (error) {
+      logger.warn(
+        { error: error.message },
+        "[THUMBNAIL] Failed to generate video placeholder, using default"
+      );
+      return this.getPlaceholderImage();
+    }
+  }
+
+  /**
+   * Generate an audio-specific placeholder image
+   */
+  private async getAudioPlaceholderImage(): Promise<Buffer> {
+    const { width, height } = PREVIEW_SIZE_DIMENSIONS.thumbnail;
+
+    try {
+      // Create a green-tinted placeholder for audio
+      return sharp({
+        create: {
+          width,
+          height,
+          channels: 3,
+          background: { r: 25, g: 135, b: 84 } // Bootstrap success color
+        }
+      })
+        .composite([
+          {
+            input: Buffer.from(
+              `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="rgba(25,135,84,0.1)"/>
+                <circle cx="${width / 2}" cy="${
+                height / 2 - 5
+              }" r="8" fill="none" stroke="white" stroke-width="2"/>
+                <path d="M${width / 2 - 3} ${height / 2 - 8} L${
+                width / 2 - 3
+              } ${height / 2 - 2} L${width / 2 + 3} ${height / 2 - 5} L${
+                width / 2 + 3
+              } ${height / 2 - 11} Z" fill="white"/>
+                <text x="50%" y="75%" text-anchor="middle" fill="white" font-size="8" font-family="Arial">AUDIO</text>
+              </svg>`
+            ),
+            top: 0,
+            left: 0
+          }
+        ])
+        .jpeg({ quality: this.DEFAULT_QUALITY })
+        .toBuffer();
+    } catch (error) {
+      logger.warn(
+        { error: error.message },
+        "[THUMBNAIL] Failed to generate audio placeholder, using default"
+      );
+      return this.getPlaceholderImage();
+    }
+  }
+
+  /**
+   * Generate a generic file placeholder image
+   */
+  private async getGenericFilePlaceholderImage(): Promise<Buffer> {
+    const { width, height } = PREVIEW_SIZE_DIMENSIONS.thumbnail;
+
+    try {
+      // Create a gray placeholder for generic files
+      return sharp({
+        create: {
+          width,
+          height,
+          channels: 3,
+          background: { r: 108, g: 117, b: 125 } // Bootstrap secondary color
+        }
+      })
+        .composite([
+          {
+            input: Buffer.from(
+              `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="rgba(108,117,125,0.1)"/>
+                <rect x="${width / 2 - 8}" y="${
+                height / 2 - 10
+              }" width="16" height="12" fill="none" stroke="white" stroke-width="2"/>
+                <path d="M${width / 2 - 2} ${height / 2 - 10} L${
+                width / 2 - 2
+              } ${height / 2 - 6} L${width / 2 + 2} ${
+                height / 2 - 6
+              } Z" fill="white"/>
+                <text x="50%" y="75%" text-anchor="middle" fill="white" font-size="8" font-family="Arial">FILE</text>
+              </svg>`
+            ),
+            top: 0,
+            left: 0
+          }
+        ])
+        .jpeg({ quality: this.DEFAULT_QUALITY })
+        .toBuffer();
+    } catch (error) {
+      logger.warn(
+        { error: error.message },
+        "[THUMBNAIL] Failed to generate generic file placeholder, using default"
+      );
+      return this.getPlaceholderImage();
+    }
+  }
+
+  /**
+   * Get the appropriate Content-Type header for a file
+   */
+  getContentTypeForFile(mediaKey: string, isOriginalFile = false): string {
+    const ext = path.extname(mediaKey).toLowerCase();
+
+    // If returning original file, use its actual content type
+    if (isOriginalFile) {
+      switch (ext) {
+        case ".pdf":
+          return "application/pdf";
+        case ".mp4":
+          return "video/mp4";
+        case ".avi":
+          return "video/x-msvideo";
+        case ".mov":
+          return "video/quicktime";
+        case ".webm":
+          return "video/webm";
+        case ".mp3":
+          return "audio/mpeg";
+        case ".wav":
+          return "audio/wav";
+        case ".ogg":
+          return "audio/ogg";
+        case ".png":
+          return "image/png";
+        case ".jpg":
+        case ".jpeg":
+          return "image/jpeg";
+        case ".gif":
+          return "image/gif";
+        case ".webp":
+          return "image/webp";
+        default:
+          return "application/octet-stream";
+      }
+    }
+
+    // For thumbnails, always return JPEG
+    return "image/jpeg";
   }
 }

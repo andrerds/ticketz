@@ -218,7 +218,8 @@ export class PreviewURLGeneratorService implements IPreviewURLGeneratorService {
     const baseHost = host.replace(/\/$/, "");
 
     // Construct the local preview URL
-    const previewURL = `${baseHost}/public/media/${mediaKey}`;
+    // mediaKey already contains the full path (e.g., "media/1/1/1/filename.jpg")
+    const previewURL = `${baseHost}/public/${mediaKey}`;
 
     // Add query parameters if specified
     const url = new URL(previewURL);

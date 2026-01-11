@@ -3,7 +3,7 @@
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
-    "source.removeUnused": "explicit",
+    // "source.removeUnused": "explicit",
     "source.fixAll": "explicit",
     "source.addMissingImports": "explicit"
   },
@@ -26,9 +26,9 @@
     "strings": false
   },
 
-  "typescript.updateImportsOnFileMove.enabled": "always",
+  // "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.preferences.organizeImports": {},
-  "javascript.updateImportsOnFileMove.enabled": "always",
+  // "javascript.updateImportsOnFileMove.enabled": "always",
   "eslint.format.enable": true,
   "eslint.codeActionsOnSave.mode": "all",
   "prettier.requireConfig": false,

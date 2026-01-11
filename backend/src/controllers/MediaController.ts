@@ -5,8 +5,16 @@ import path from "path";
 import { getPublicPath } from "../helpers/GetPublicPath";
 import { StorageDriverFactory } from "../infrastructure/storage/StorageDriverFactory";
 import { DebugS3Service } from "../services/MediaServices/DebugS3Service";
+import { PreviewURLGeneratorService } from "../services/PreviewServices/PreviewURLGeneratorService";
+import { StorageDetectionService } from "../services/PreviewServices/StorageDetectionService";
+import { ThumbnailHandlerService } from "../services/PreviewServices/ThumbnailHandlerService";
 import GetStorageConfigService from "../services/StorageServices/GetStorageConfigService";
 import { logger } from "../utils/logger";
+
+// Initialize preview services for enhanced media serving
+const storageDetectionService = new StorageDetectionService();
+const previewURLGeneratorService = new PreviewURLGeneratorService();
+const thumbnailHandlerService = new ThumbnailHandlerService();
 
 export const serve = async (req: Request, res: Response): Promise<void> => {
   const mediaKey = req.params[0];
@@ -18,6 +26,124 @@ export const serve = async (req: Request, res: Response): Promise<void> => {
   );
 
   try {
+    // Extract company ID from media key for new preview system integration
+    const companyIdMatch = mediaKey.match(/^media\/(\d+)\//);
+    const companyId = companyIdMatch ? parseInt(companyIdMatch[1], 10) : null;
+
+    if (companyId) {
+      logger.info(
+        { mediaKey, companyId },
+        "[MEDIA-CONTROLLER] Using new preview system for media serving"
+      );
+
+      try {
+        // Use new storage detection service
+        const storageLocation =
+          await storageDetectionService.detectStorageLocation(
+            mediaKey,
+            companyId
+          );
+
+        logger.info(
+          { mediaKey, companyId, storageLocation },
+          "[MEDIA-CONTROLLER] Storage location detected via new preview system"
+        );
+
+        // Check if this is a thumbnail request
+        const isThumbnailRequest =
+          req.query.thumbnail === "true" ||
+          req.query.size === "thumbnail" ||
+          mediaKey.includes("thumbnail");
+
+        if (isThumbnailRequest) {
+          logger.info(
+            { mediaKey, companyId },
+            "[MEDIA-CONTROLLER] Thumbnail request detected, using ThumbnailHandlerService"
+          );
+
+          try {
+            const thumbnailBuffer = await thumbnailHandlerService.getThumbnail(
+              mediaKey,
+              storageLocation,
+              companyId,
+              {
+                width: req.query.width
+                  ? parseInt(req.query.width as string, 10)
+                  : undefined,
+                height: req.query.height
+                  ? parseInt(req.query.height as string, 10)
+                  : undefined,
+                quality: req.query.quality
+                  ? parseInt(req.query.quality as string, 10)
+                  : 80
+              }
+            );
+
+            res.setHeader("Content-Type", "image/jpeg");
+            res.setHeader("Content-Length", thumbnailBuffer.length.toString());
+            res.setHeader("Cache-Control", "public, max-age=86400"); // 24 hour cache
+
+            logger.info(
+              { mediaKey, companyId, thumbnailSize: thumbnailBuffer.length },
+              "[MEDIA-CONTROLLER] Thumbnail served successfully via new system"
+            );
+
+            res.send(thumbnailBuffer);
+            return;
+          } catch (thumbnailError) {
+            logger.warn(
+              { error: thumbnailError.message, mediaKey, companyId },
+              "[MEDIA-CONTROLLER] Thumbnail generation failed, falling back to original file"
+            );
+            // Fall through to serve original file
+          }
+        }
+
+        // Generate preview URL using the new preview system
+        const previewURL = await previewURLGeneratorService.generatePreviewURL(
+          mediaKey,
+          storageLocation,
+          companyId,
+          {
+            size: (req.query.size as "thumbnail" | "medium" | "full") || "full",
+            quality: req.query.quality
+              ? parseInt(req.query.quality as string, 10)
+              : 100
+          }
+        );
+
+        logger.info(
+          { mediaKey, companyId, storageLocation, previewURL },
+          "[MEDIA-CONTROLLER] Preview URL generated successfully via new system"
+        );
+
+        // Set security headers
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("X-Frame-Options", "DENY");
+        res.setHeader("Cache-Control", "public, max-age=3600"); // 1 hour cache
+
+        // Redirect to the generated preview URL
+        res.redirect(302, previewURL);
+        return;
+      } catch (previewError) {
+        logger.warn(
+          {
+            error: previewError.message,
+            mediaKey,
+            companyId
+          },
+          "[MEDIA-CONTROLLER] Preview system failed, falling back to legacy logic"
+        );
+        // Fall through to legacy logic
+      }
+    }
+
+    // Legacy logic for backward compatibility (files without company ID)
+    logger.info(
+      { mediaKey },
+      "[MEDIA-CONTROLLER] Using legacy media serving logic"
+    );
+
     await fs.promises.access(localFilePath, fs.constants.F_OK);
 
     logger.info(
@@ -158,18 +284,20 @@ export const debugS3 = async (req: Request, res: Response): Promise<void> => {
     );
 
     res.json(debugInfo);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     logger.error(
       {
-        error: error.message,
-        errorStack: error.stack,
+        error: errorMessage,
+        errorStack: error instanceof Error ? error.stack : undefined,
         companyId: req.user?.companyId
       },
       "[MEDIA-CONTROLLER] Error in S3 debug endpoint"
     );
 
     res.status(500).json({
-      error: error.message || "Failed to retrieve S3 debug information"
+      error: errorMessage || "Failed to retrieve S3 debug information"
     });
   }
 };
