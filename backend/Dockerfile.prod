@@ -29,9 +29,9 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD dockerize -wait tcp://${DB_HOST}:${DB_PORT:-5432} -timeout 60s \
+CMD dockerize -wait tcp://${DB_HOST}:${DB_PORT:-5432} -timeout 120s \
   && npx sequelize db:migrate --config dist/config/database.js --migrations-path dist/database/migrations \
-  && ./scripts/load-retrieved.sh /retrieve; exit_code=$? \
-  && if [ $exit_code -eq 1 ]; then npm run mark-seeds; exit 0; elif [ $exit_code -ge 100 ]; then exit 1; fi \
+  && psql -h "${DB_HOST}" -U "${DB_USER}" -d "${DB_NAME}" -f ./scripts/fix-sequence.sql \
+  && ./scripts/load-retrieved.sh /retrieve || true \
   && npx sequelize db:seed:all --config dist/config/database.js --seeders-path dist/database/seeds \
   && node dist/server.js

@@ -92,4 +92,4 @@ if [ $? -gt 0 ]; then
     exit 100
 fi
 
-exit 1
+exit 0
