@@ -35,7 +35,7 @@ import moment from "moment";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     width: "100%",
   },
@@ -71,18 +71,19 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
   },
   inactive: {
-    color: "gray"
+    color: "gray",
   },
   gracePeriod: {
-    color: "orange"
+    color: "orange",
   },
   almostDue: {
-    color: theme.mode === "light" ? "blue" : "#38f"
+    color: theme.mode === "light" ? "blue" : "#38f",
   },
 }));
 
 export function CompanyForm(props) {
-  const { onSubmit, onDelete, onImpersonate, onCancel, initialValue, loading } = props;
+  const { onSubmit, onDelete, onImpersonate, onCancel, initialValue, loading } =
+    props;
   const classes = useStyles();
   const [plans, setPlans] = useState([]);
   const [modalUser, setModalUser] = useState(false);
@@ -113,7 +114,7 @@ export function CompanyForm(props) {
   }, []);
 
   useEffect(() => {
-    setRecord((prev) => {
+    setRecord(prev => {
       if (moment(initialValue).isValid()) {
         initialValue.dueDate = moment(initialValue.dueDate).format(
           "YYYY-MM-DD"
@@ -126,7 +127,7 @@ export function CompanyForm(props) {
     });
   }, [initialValue]);
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async data => {
     if (data.dueDate === "" || moment(data.dueDate).isValid() === false) {
       data.dueDate = null;
     }
@@ -357,19 +358,19 @@ export function CompanyForm(props) {
                   </Grid>
                   {record.id !== undefined ? (
                     <>
-                    <Grid xs={6} md={2} item>
-                      <ButtonWithSpinner
-                        style={{ marginTop: 7 }}
-                        className={classes.fullWidth}
-                        loading={loading}
-                        onClick={() => onImpersonate(record)}
-                        variant="outlined"
-                        color="primary"
-                      >
-                        Acessar como
-                      </ButtonWithSpinner>
-                    </Grid>
-                    <Grid xs={6} md={1} item>
+                      <Grid xs={6} md={2} item>
+                        <ButtonWithSpinner
+                          style={{ marginTop: 7 }}
+                          className={classes.fullWidth}
+                          loading={loading}
+                          onClick={() => onImpersonate(record)}
+                          variant="outlined"
+                          color="primary"
+                        >
+                          Acessar como
+                        </ButtonWithSpinner>
+                      </Grid>
+                      <Grid xs={6} md={1} item>
                         <ButtonWithSpinner
                           style={{ marginTop: 7 }}
                           className={classes.fullWidth}
@@ -435,30 +436,30 @@ export function CompaniesManagerGrid(props) {
   const { dateToClient } = useDate();
   const { getSetting } = useSettings();
   const [gracePeriod, setGracePeriod] = useState(5);
-  
+
   useEffect(() => {
-    getSetting("gracePeriod").then((value) => {
+    getSetting("gracePeriod").then(value => {
       if (!isNaN(Number(value))) {
         setGracePeriod(Number(value));
       }
     });
   }, [getSetting]);
-        
-  const renderStatus = (row) => {
+
+  const renderStatus = row => {
     return row.status === false ? "Não" : "Sim";
   };
 
-  const renderPlan = (row) => {
+  const renderPlan = row => {
     return row.planId !== null ? row.plan.name : "-";
   };
 
-  const renderCampaignsStatus = (row) => {
+  const renderCampaignsStatus = row => {
     if (
       has(row, "settings") &&
       isArray(row.settings) &&
       row.settings.length > 0
     ) {
-      const setting = row.settings.find((s) => s.key === "campaignsEnabled");
+      const setting = row.settings.find(s => s.key === "campaignsEnabled");
       if (setting) {
         return setting.value === "true" ? "Habilitadas" : "Desabilitadas";
       }
@@ -466,7 +467,7 @@ export function CompaniesManagerGrid(props) {
     return "Desabilitadas";
   };
 
-  const rowClass = (record) => {
+  const rowClass = record => {
     if (moment(record.dueDate).isValid()) {
       const now = moment();
       const dueDate = moment(record.dueDate);
@@ -514,13 +515,27 @@ export function CompaniesManagerGrid(props) {
                   <EditIcon />
                 </IconButton>
               </TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{row.name || "-"}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{row.email || "-"}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{row.phone || "-"}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{renderPlan(row)}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{renderCampaignsStatus(row)}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{renderStatus(row)}</TableCell>
-              <TableCell align="left" style={{ color: "unset" }}>{dateToClient(row.createdAt)}</TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {row.name || "-"}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {row.email || "-"}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {row.phone || "-"}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {renderPlan(row)}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {renderCampaignsStatus(row)}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {renderStatus(row)}
+              </TableCell>
+              <TableCell align="left" style={{ color: "unset" }}>
+                {dateToClient(row.createdAt)}
+              </TableCell>
               <TableCell align="left" style={{ color: "unset" }}>
                 {dateToClient(row.dueDate)}
                 <br />
@@ -539,7 +554,8 @@ export default function CompaniesManager() {
   const { list, save, update, remove } = useCompanies();
 
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
-  const [showConfirmImpersonateDialog, setShowConfirmImpersonateDialog] = useState(false);
+  const [showConfirmImpersonateDialog, setShowConfirmImpersonateDialog] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const [records, setRecords] = useState([]);
   const [record, setRecord] = useState({
@@ -572,7 +588,7 @@ export default function CompaniesManager() {
     setLoading(false);
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async data => {
     setLoading(true);
     try {
       if (data.id !== undefined) {
@@ -617,7 +633,7 @@ export default function CompaniesManager() {
   };
 
   const handleCancel = () => {
-    setRecord((prev) => ({
+    setRecord(prev => ({
       ...prev,
       name: "",
       email: "",
@@ -631,18 +647,18 @@ export default function CompaniesManager() {
     }));
   };
 
-  const handleSelect = (data) => {
+  const handleSelect = data => {
     let campaignsEnabled = false;
 
     const setting = data.settings.find(
-      (s) => s.key.indexOf("campaignsEnabled") > -1
+      s => s.key.indexOf("campaignsEnabled") > -1
     );
     if (setting) {
       campaignsEnabled =
         setting.value === "true" || setting.value === "enabled";
     }
 
-    setRecord((prev) => ({
+    setRecord(prev => ({
       ...prev,
       id: data.id,
       name: data.name || "",

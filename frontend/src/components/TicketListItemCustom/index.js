@@ -27,18 +27,18 @@ import { TicketsContext } from "../../context/Tickets/TicketsContext";
 import toastError from "../../errors/toastError";
 import { v4 as uuidv4 } from "uuid";
 
-import RoomIcon from '@material-ui/icons/Room';
+import RoomIcon from "@material-ui/icons/Room";
 import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 import AndroidIcon from "@material-ui/icons/Android";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import TicketMessagesDialog from "../TicketMessagesDialog";
-import DoneIcon from '@material-ui/icons/Done';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
+import DoneIcon from "@material-ui/icons/Done";
+import ClearOutlinedIcon from "@material-ui/icons/ClearOutlined";
 import { generateColor } from "../../helpers/colorGenerator";
 import { getInitials } from "../../helpers/getInitials";
 import TagsLine from "../TagsLine";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   ticket: {
     position: "relative",
     height: 98,
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "right",
     position: "relative",
     top: -23,
-    fontSize: 12
+    fontSize: 12,
   },
 
   closedBadge: {
@@ -95,22 +95,21 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "auto",
   },
 
-  contactLastMessage: {
-  },
+  contactLastMessage: {},
 
   newMessagesCount: {
     alignSelf: "center",
     marginRight: 0,
     marginLeft: "auto",
     top: -10,
-    right: 10
+    right: 10,
   },
 
   badgeStyle: {
     color: "white",
     backgroundColor: green[500],
     right: 0,
-    top: 10
+    top: 10,
   },
 
   acceptButton: {
@@ -129,16 +128,15 @@ const useStyles = makeStyles((theme) => ({
 
   ticketInfo: {
     position: "relative",
-    top: 0
+    top: 0,
   },
 
   ticketInfo1: {
     position: "relative",
     top: 40,
-    right: 0
+    right: 0,
   },
   Radiusdot: {
-
     "& .MuiBadge-badge": {
       borderRadius: 2,
       position: "inherit",
@@ -152,9 +150,9 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   presence: {
-    color: theme.mode === 'light' ? "green" : "lightgreen",
+    color: theme.mode === "light" ? "green" : "lightgreen",
     fontWeight: "bold",
-  }
+  },
 }));
 
 const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
@@ -184,7 +182,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
     };
   }, [ticket]);
 
-  const handleCloseTicket = async (id) => {
+  const handleCloseTicket = async id => {
     try {
       await api.put(`/tickets/${id}`, {
         status: "closed",
@@ -197,7 +195,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
     history.push(`/tickets/`);
   };
 
-  const handleAcceptTicket = async (id) => {
+  const handleAcceptTicket = async id => {
     try {
       await api.put(`/tickets/${id}`, {
         status: "open",
@@ -211,7 +209,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
     setTabOpen("open");
   };
 
-  const handleSelectTicket = (ticket) => {
+  const handleSelectTicket = ticket => {
     const code = uuidv4();
     const { id, uuid } = ticket;
     setCurrentTicket({ id, uuid, code });
@@ -231,7 +229,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
               padding: 5,
               position: "inherit",
               borderRadius: 7,
-              color: '#fff',
+              color: "#fff",
               top: -6,
               marginRight: 3,
             }}
@@ -249,11 +247,10 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 borderRadius: 7,
                 color: "white",
                 top: -6,
-                marginRight: 3
+                marginRight: 3,
               }}
             />
           )}
-
 
           {ticket.queue?.name !== null && (
             <Badge
@@ -266,10 +263,10 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 borderRadius: 7,
                 color: "white",
                 top: -6,
-                marginRight: 3
+                marginRight: 3,
               }}
               badgeContent={ticket.queue?.name || "Sem fila"}
-            //color="primary"
+              //color="primary"
             />
           )}
           {ticket.status === "open" && (
@@ -278,7 +275,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 onClick={() => handleCloseTicket(ticket.id)}
                 fontSize="small"
                 style={{
-                  color: '#fff',
+                  color: "#fff",
                   backgroundColor: red[700],
                   cursor: "pointer",
                   //margin: '0 5 0 5',
@@ -287,9 +284,9 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                   width: 23,
                   fontSize: 12,
                   borderRadius: 50,
-                  position: 'absolute',
+                  position: "absolute",
                   right: 0,
-                  top: -8
+                  top: -8,
                 }}
               />
             </Tooltip>
@@ -297,9 +294,9 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
           {profile === "admin" && (
             <Tooltip title="Espiar Conversa">
               <VisibilityIcon
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
-                  setOpenTicketMessageDialog(true)
+                  setOpenTicketMessageDialog(true);
                 }}
                 fontSize="small"
                 style={{
@@ -307,13 +304,13 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                   height: 23,
                   width: 23,
                   fontSize: 12,
-                  color: '#fff',
+                  color: "#fff",
                   cursor: "pointer",
                   backgroundColor: blue[700],
                   borderRadius: 50,
-                  position: 'absolute',
+                  position: "absolute",
                   right: 28,
-                  top: -8
+                  top: -8,
                 }}
               />
             </Tooltip>
@@ -326,13 +323,11 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
               />
             </Tooltip>
           )}
-
         </>
       );
     } else {
       return (
         <>
-
           {ticket.whatsappId && (
             <Badge
               className={classes.Radiusdot}
@@ -345,7 +340,7 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 borderRadius: 7,
                 color: "white",
                 top: -6,
-                marginRight: 3
+                marginRight: 3,
               }}
             />
           )}
@@ -362,35 +357,35 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 borderRadius: 7,
                 color: "white",
                 top: -6,
-                marginRight: 2
-
+                marginRight: 2,
               }}
               badgeContent={ticket.queue?.name || "Sem fila"}
-            //color=
+              //color=
             />
           )}
-          {ticket.status === "pending" && (groupActionButtons || !ticket.isGroup) && (
-            <Tooltip title="Fechar Conversa">
-              <ClearOutlinedIcon
-                onClick={() => handleCloseTicket(ticket.id)}
-                fontSize="small"
-                style={{
-                  color: '#fff',
-                  backgroundColor: red[700],
-                  cursor: "pointer",
-                  margin: '0 5 0 5',
-                  padding: 2,
-                  right: 48,
-                  height: 23,
-                  width: 23,
-                  fontSize: 12,
-                  borderRadius: 50,
-                  top: -8,
-                  position: 'absolute',
-                }}
-              />
-            </Tooltip>
-          )}
+          {ticket.status === "pending" &&
+            (groupActionButtons || !ticket.isGroup) && (
+              <Tooltip title="Fechar Conversa">
+                <ClearOutlinedIcon
+                  onClick={() => handleCloseTicket(ticket.id)}
+                  fontSize="small"
+                  style={{
+                    color: "#fff",
+                    backgroundColor: red[700],
+                    cursor: "pointer",
+                    margin: "0 5 0 5",
+                    padding: 2,
+                    right: 48,
+                    height: 23,
+                    width: 23,
+                    fontSize: 12,
+                    borderRadius: 50,
+                    top: -8,
+                    position: "absolute",
+                  }}
+                />
+              </Tooltip>
+            )}
           {ticket.chatbot && (
             <Tooltip title="Chatbot">
               <AndroidIcon
@@ -399,51 +394,53 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
               />
             </Tooltip>
           )}
-          {ticket.status === "open" && (groupActionButtons || !ticket.isGroup) && (
-            <Tooltip title="Fechar Conversa">
-              <ClearOutlinedIcon
-                onClick={() => handleCloseTicket(ticket.id)}
-                fontSize="small"
-                style={{
-                  color: red[700],
-                  cursor: "pointer",
-                  marginRight: 5,
-                  right: 49,
-                  top: -8,
-                  position: 'absolute',
-                }}
-              />
-            </Tooltip>
-          )}
-          {ticket.status === "pending" && (groupActionButtons || !ticket.isGroup) && (
-            <Tooltip title="Aceitar Conversa">
-              <DoneIcon
-                onClick={() => handleAcceptTicket(ticket.id)}
-                fontSize="small"
-                style={{
-                  color: '#fff',
-                  backgroundColor: green[700],
-                  cursor: "pointer",
-                  //margin: '0 5 0 5',
-                  padding: 2,
-                  height: 23,
-                  width: 23,
-                  fontSize: 12,
-                  borderRadius: 50,
-                  right: 25,
-                  top: -8,
-                  position: 'absolute',
-                }}
-              />
-            </Tooltip>
-          )}
+          {ticket.status === "open" &&
+            (groupActionButtons || !ticket.isGroup) && (
+              <Tooltip title="Fechar Conversa">
+                <ClearOutlinedIcon
+                  onClick={() => handleCloseTicket(ticket.id)}
+                  fontSize="small"
+                  style={{
+                    color: red[700],
+                    cursor: "pointer",
+                    marginRight: 5,
+                    right: 49,
+                    top: -8,
+                    position: "absolute",
+                  }}
+                />
+              </Tooltip>
+            )}
+          {ticket.status === "pending" &&
+            (groupActionButtons || !ticket.isGroup) && (
+              <Tooltip title="Aceitar Conversa">
+                <DoneIcon
+                  onClick={() => handleAcceptTicket(ticket.id)}
+                  fontSize="small"
+                  style={{
+                    color: "#fff",
+                    backgroundColor: green[700],
+                    cursor: "pointer",
+                    //margin: '0 5 0 5',
+                    padding: 2,
+                    height: 23,
+                    width: 23,
+                    fontSize: 12,
+                    borderRadius: 50,
+                    right: 25,
+                    top: -8,
+                    position: "absolute",
+                  }}
+                />
+              </Tooltip>
+            )}
 
           {profile === "admin" && (groupActionButtons || !ticket.isGroup) && (
             <Tooltip title="Espiar Conversa">
               <VisibilityIcon
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
-                  setOpenTicketMessageDialog(true)
+                  setOpenTicketMessageDialog(true);
                 }}
                 fontSize="small"
                 style={{
@@ -451,23 +448,21 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                   height: 23,
                   width: 23,
                   fontSize: 12,
-                  color: '#fff',
+                  color: "#fff",
                   cursor: "pointer",
                   backgroundColor: blue[700],
                   borderRadius: 50,
                   right: 0,
                   top: -8,
-                  position: 'absolute',
+                  position: "absolute",
                 }}
               />
             </Tooltip>
           )}
-
         </>
       );
     }
   };
-
 
   return (
     <React.Fragment key={ticket.id}>
@@ -479,8 +474,12 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
       <ListItem
         dense
         button
-        onClick={(e) => {
-          if ((groupActionButtons || !ticket.isGroup) && ticket.status === "pending") return;
+        onClick={e => {
+          if (
+            (groupActionButtons || !ticket.isGroup) &&
+            ticket.status === "pending"
+          )
+            return;
           handleSelectTicket(ticket);
         }}
         selected={ticketId && +ticketId === ticket.id}
@@ -499,14 +498,22 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
           ></span>
         </Tooltip>
         <ListItemAvatar>
-          <Avatar style={{ backgroundColor: generateColor(ticket?.contact?.number), color: "white", fontWeight: "bold" }} src={ticket?.contact?.profilePicUrl}>{ getInitials(ticket?.contact?.name || "") }</Avatar>
+          <Avatar
+            style={{
+              backgroundColor: generateColor(ticket?.contact?.number),
+              color: "white",
+              fontWeight: "bold",
+            }}
+            src={ticket?.contact?.profilePicUrl}
+          >
+            {getInitials(ticket?.contact?.name || "")}
+          </Avatar>
         </ListItemAvatar>
         <ListItemText
           style={{ paddingBottom: 10 }}
           disableTypography
           primary={
             <span className={classes.contactNameWrapper}>
-
               <Typography
                 noWrap
                 component="span"
@@ -515,12 +522,14 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
               >
                 {ticket.channel === "whatsapp" && (
                   <Tooltip title={`Atribuido à ${ticketUser}`}>
-                    <WhatsAppIcon fontSize="inherit" style={{ color: grey[700] }} />
+                    <WhatsAppIcon
+                      fontSize="inherit"
+                      style={{ color: grey[700] }}
+                    />
                   </Tooltip>
-                )}{' '}
+                )}{" "}
                 {ticket.contact.name}
               </Typography>
-
             </span>
           }
           secondary={
@@ -537,17 +546,24 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                     {i18n.t(`presence.${ticket.presence}`)}
                   </span>
                 ) : (
-                <>
-                  {ticket.lastMessage?.includes('data:image/png;base64') ? <div>Localização</div> : <WhatsMarked oneline>{ticket.lastMessage.startsWith('{"ticketzvCard"') ? "🪪" : ticket.lastMessage.split("\n")[0] }</WhatsMarked>}
-                </>
-              )}
+                  <>
+                    {ticket.lastMessage?.includes("data:image/png;base64") ? (
+                      <div>Localização</div>
+                    ) : (
+                      <WhatsMarked oneline>
+                        {ticket.lastMessage.startsWith('{"ticketzvCard"')
+                          ? "🪪"
+                          : ticket.lastMessage.split("\n")[0]}
+                      </WhatsMarked>
+                    )}
+                  </>
+                )}
               </Typography>
               <TagsLine ticket={ticket} />
               <ListItemSecondaryAction style={{ left: 73 }}>
                 <Box className={classes.ticketInfo1}>{renderTicketInfo()}</Box>
               </ListItemSecondaryAction>
             </span>
-
           }
         />
         <ListItemSecondaryAction style={{}}>
@@ -564,15 +580,13 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
                 borderRadius: 7,
                 color: "white",
                 top: -28,
-                marginRight: 5
-
+                marginRight: 5,
               }}
             />
           )}
 
           {ticket.lastMessage && (
             <>
-
               <Typography
                 className={classes.lastMessageTime}
                 component="span"
@@ -588,18 +602,17 @@ const TicketListItemCustom = ({ ticket, setTabOpen, groupActionButtons }) => {
 
               <Badge
                 className={classes.newMessagesCount}
-                badgeContent={ticket.unreadMessages ? ticket.unreadMessages : null}
+                badgeContent={
+                  ticket.unreadMessages ? ticket.unreadMessages : null
+                }
                 classes={{
                   badge: classes.badgeStyle,
                 }}
               />
               <br />
-
             </>
           )}
-
         </ListItemSecondaryAction>
-
       </ListItem>
       <Divider variant="inset" component="li" />
     </React.Fragment>

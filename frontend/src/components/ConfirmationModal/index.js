@@ -31,7 +31,16 @@ import { FormControlLabel, Switch } from "@material-ui/core";
  * />
  * */
 
-const ConfirmationModal = ({ title, children, open, onClose, onConfirm, rawChildren, okEnabled=true, checkbox }) => {
+const ConfirmationModal = ({
+  title,
+  children,
+  open,
+  onClose,
+  onConfirm,
+  rawChildren,
+  okEnabled = true,
+  checkbox,
+}) => {
   const [checked, setChecked] = React.useState(false);
 
   return (
@@ -48,7 +57,7 @@ const ConfirmationModal = ({ title, children, open, onClose, onConfirm, rawChild
             control={
               <Switch
                 checked={checked}
-                onChange={(e) => setChecked(e.target.checked)}
+                onChange={e => setChecked(e.target.checked)}
                 name="confirmSwitch"
                 color="primary"
               />

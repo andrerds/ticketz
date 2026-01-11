@@ -1,30 +1,38 @@
-import React, { useState, useContext } from "react";
 import PropTypes from "prop-types";
+import React, { useContext, useState } from "react";
 
 import MenuItem from "@material-ui/core/MenuItem";
 
-import { i18n } from "../../translate/i18n";
-import api from "../../services/api";
-import ConfirmationModal from "../ConfirmationModal";
-import { Dialog, DialogContent, DialogTitle, Menu } from "@material-ui/core";
-import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import { Dialog, Menu } from "@material-ui/core";
 import { EditMessageContext } from "../../context/EditingMessage/EditingMessageContext";
+import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import toastError from "../../errors/toastError";
-import MessageHistoryModal from "../MessageHistoryModal";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
+import ConfirmationModal from "../ConfirmationModal";
 import MessageForwardModal from "../MessageForwardModal";
+import MessageHistoryModal from "../MessageHistoryModal";
 import { useStyles } from "./style";
 
-import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 
 const mostUsedEmojis = ["👍", "❤️", "😂", "🎉", "😮", "😢", "🙏"];
 
-const MessageOptionsMenu = ({ message, data, menuOpen, handleClose, anchorEl }) => {
+const MessageOptionsMenu = ({
+  message,
+  data,
+  menuOpen,
+  handleClose,
+  anchorEl,
+}) => {
   const classes = useStyles();
   const { setReplyingMessage } = useContext(ReplyMessageContext);
- 	const editingContext = useContext(EditMessageContext);
- 	const setEditingMessage = editingContext ? editingContext.setEditingMessage : null;
- 	
+  const editingContext = useContext(EditMessageContext);
+  const setEditingMessage = editingContext
+    ? editingContext.setEditingMessage
+    : null;
+
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [forwardModalOpen, setForwardModalOpen] = useState(false);
   const [messageHistoryOpen, setMessageHistoryOpen] = useState(false);
@@ -34,66 +42,70 @@ const MessageOptionsMenu = ({ message, data, menuOpen, handleClose, anchorEl }) 
     handleClose();
     setShowEmoji(false);
   };
-  
+
   const openEmoji = () => {
     handleClose();
     setShowEmoji(true);
   };
-  
-	const handleDeleteMessage = async () => {
-		try {
-			await api.delete(`/messages/${message.id}`);
-		} catch (err) {
-			toastError(err);
-		}
-	};
+
+  const handleDeleteMessage = async () => {
+    try {
+      await api.delete(`/messages/${message.id}`);
+    } catch (err) {
+      toastError(err);
+    }
+  };
 
   const handleReact = async emoji => {
     handleClose();
-    api.post(`/messages/react/${message.id}`, { ticketId: message.ticketId, emoji }).catch(err => {
-      ;
-      toastError(err);
-    });
+    api
+      .post(`/messages/react/${message.id}`, {
+        ticketId: message.ticketId,
+        emoji,
+      })
+      .catch(err => {
+        toastError(err);
+      });
     setShowEmoji(false);
   };
 
   const handleReplyMessage = () => {
-		setReplyingMessage(message);
-		closeMenu();
-	};
+    setReplyingMessage(message);
+    closeMenu();
+  };
 
-	const handleOpenConfirmationModal = e => {
-		setConfirmationOpen(true);
-		closeMenu();
-	};
-	
-	const handleEditMessage = async () => {
-		setEditingMessage(message);
-		closeMenu();
-	}
-	
-	const handleOpenMessageHistoryModal = (e) => {
-		setMessageHistoryOpen(true);
-		closeMenu();
-	}
-  
-  const handleOpenForwardModal = (e) => {
+  const handleOpenConfirmationModal = e => {
+    setConfirmationOpen(true);
+    closeMenu();
+  };
+
+  const handleEditMessage = async () => {
+    setEditingMessage(message);
+    closeMenu();
+  };
+
+  const handleOpenMessageHistoryModal = e => {
+    setMessageHistoryOpen(true);
+    closeMenu();
+  };
+
+  const handleOpenForwardModal = e => {
     setForwardModalOpen(true);
     closeMenu();
-  }
+  };
 
-  const isSticker = data?.message && ("stickerMessage" in data.message);
+  const isSticker = data?.message && "stickerMessage" in data.message;
 
-	return (
-		<>
-			<ConfirmationModal
-				title={i18n.t("messageOptionsMenu.confirmationModal.title")}
-				open={confirmationOpen}
-				onClose={setConfirmationOpen}
-				onConfirm={handleDeleteMessage}
-			>
-				{i18n.t("messageOptionsMenu.confirmationModal.message")}
-			</ConfirmationModal>
+  return (
+    <>
+      <ConfirmationModal
+        title={i18n.t("messageOptionsMenu.confirmationModal.title")}
+        open={confirmationOpen}
+        onClose={setConfirmationOpen}
+        onConfirm={handleDeleteMessage}
+      >
+        {i18n.t("messageOptionsMenu.confirmationModal.message")}
+      </ConfirmationModal>
       <MessageHistoryModal
         open={messageHistoryOpen}
         onClose={setMessageHistoryOpen}
@@ -106,12 +118,12 @@ const MessageOptionsMenu = ({ message, data, menuOpen, handleClose, anchorEl }) 
         messageId={message.id}
       />
       <Dialog open={showEmoji} onClose={() => setShowEmoji(false)}>
-          <Picker
-            perLine={16}
-            showPreview={false}
-            showSkinTones={false}
-            onSelect={(e) => handleReact(e.native)}
-          />
+        <Picker
+          perLine={16}
+          showPreview={false}
+          showSkinTones={false}
+          onSelect={e => handleReact(e.native)}
+        />
       </Dialog>
       <Menu
         anchorEl={anchorEl}
@@ -130,7 +142,11 @@ const MessageOptionsMenu = ({ message, data, menuOpen, handleClose, anchorEl }) 
         <>
           <div className={classes.flexContainer}>
             {mostUsedEmojis.map((emoji, index) => (
-              <div className={classes.emojiButton} onClick={() => handleReact(emoji)} key={index}>
+              <div
+                className={classes.emojiButton}
+                onClick={() => handleReact(emoji)}
+                key={index}
+              >
                 <span style={{ fontSize: "1rem" }}>{emoji}</span>
               </div>
             ))}
@@ -161,15 +177,15 @@ const MessageOptionsMenu = ({ message, data, menuOpen, handleClose, anchorEl }) 
           </MenuItem>
         </>
       </Menu>
-		</>
-	);
+    </>
+  );
 };
 
 MessageOptionsMenu.propTypes = {
   message: PropTypes.object,
   menuOpen: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.object
-}
+  anchorEl: PropTypes.object,
+};
 
 export default MessageOptionsMenu;

@@ -33,7 +33,7 @@ import { QueueOptions } from "../QueueOptions";
 import SchedulesForm from "../SchedulesForm";
 import ConfirmationModal from "../ConfirmationModal";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -82,7 +82,6 @@ const QueueModal = ({ open, onClose, queueId }) => {
     color: "",
     greetingMessage: "",
     outOfHoursMessage: "",
-
   };
 
   const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
@@ -96,19 +95,54 @@ const QueueModal = ({ open, onClose, queueId }) => {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const [schedules, setSchedules] = useState([
-    { weekday: "Segunda-feira",weekdayEn: "monday",startTime: "08:00",endTime: "18:00",},
-    { weekday: "Terça-feira",weekdayEn: "tuesday",startTime: "08:00",endTime: "18:00",},
-    { weekday: "Quarta-feira",weekdayEn: "wednesday",startTime: "08:00",endTime: "18:00",},
-    { weekday: "Quinta-feira",weekdayEn: "thursday",startTime: "08:00",endTime: "18:00",},
-    { weekday: "Sexta-feira", weekdayEn: "friday",startTime: "08:00",endTime: "18:00",},
-    { weekday: "Sábado", weekdayEn: "saturday",startTime: "08:00",endTime: "12:00",},
-    { weekday: "Domingo", weekdayEn: "sunday",startTime: "00:00",endTime: "00:00",},
+    {
+      weekday: "Segunda-feira",
+      weekdayEn: "monday",
+      startTime: "08:00",
+      endTime: "18:00",
+    },
+    {
+      weekday: "Terça-feira",
+      weekdayEn: "tuesday",
+      startTime: "08:00",
+      endTime: "18:00",
+    },
+    {
+      weekday: "Quarta-feira",
+      weekdayEn: "wednesday",
+      startTime: "08:00",
+      endTime: "18:00",
+    },
+    {
+      weekday: "Quinta-feira",
+      weekdayEn: "thursday",
+      startTime: "08:00",
+      endTime: "18:00",
+    },
+    {
+      weekday: "Sexta-feira",
+      weekdayEn: "friday",
+      startTime: "08:00",
+      endTime: "18:00",
+    },
+    {
+      weekday: "Sábado",
+      weekdayEn: "saturday",
+      startTime: "08:00",
+      endTime: "12:00",
+    },
+    {
+      weekday: "Domingo",
+      weekdayEn: "sunday",
+      startTime: "00:00",
+      endTime: "00:00",
+    },
   ]);
 
   useEffect(() => {
     api.get(`/settings`).then(({ data }) => {
       if (Array.isArray(data)) {
-        const scheduleType = data.find((d) => d.key === "scheduleType");
+        const scheduleType = data.find(d => d.key === "scheduleType");
         if (scheduleType) {
           setSchedulesEnabled(scheduleType.value === "queue");
         }
@@ -121,7 +155,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
       if (!queueId) return;
       try {
         const { data } = await api.get(`/queue/${queueId}`);
-        setQueue((prevState) => {
+        setQueue(prevState => {
           return { ...prevState, ...data };
         });
         setSchedules(data.schedules);
@@ -144,7 +178,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
     setQueue(initialState);
   };
 
-  const handleAttachmentFile = (e) => {
+  const handleAttachmentFile = e => {
     const file = head(e.target.files);
     if (file) {
       setAttachment(file);
@@ -159,12 +193,12 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
     if (queue.mediaPath) {
       await api.delete(`/queue/${queue.id}/media-upload`);
-      setQueue((prev) => ({ ...prev, mediaPath: null, mediaName: null }));
+      setQueue(prev => ({ ...prev, mediaPath: null, mediaName: null }));
       toast.success(i18n.t("queueModal.toasts.deleted"));
     }
   };
 
-  const handleSaveQueue = async (values) => {
+  const handleSaveQueue = async values => {
     try {
       if (queueId) {
         await api.put(`/queue/${queueId}`, { ...values, schedules });
@@ -188,7 +222,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
     }
   };
 
-  const handleSaveSchedules = async (values) => {
+  const handleSaveSchedules = async values => {
     toast.success("Clique em salvar para registar as alterações");
     setSchedules(values);
     setTab(0);
@@ -196,7 +230,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
 
   return (
     <div className={classes.root}>
-       <ConfirmationModal
+      <ConfirmationModal
         title={i18n.t("queueModal.confirmationModal.deleteTitle")}
         open={confirmationOpen}
         onClose={() => setConfirmationOpen(false)}
@@ -215,11 +249,11 @@ const QueueModal = ({ open, onClose, queueId }) => {
           {queueId
             ? `${i18n.t("queueModal.title.edit")}`
             : `${i18n.t("queueModal.title.add")}`}
-           <div style={{ display: "none" }}>
+          <div style={{ display: "none" }}>
             <input
               type="file"
               ref={attachmentFile}
-              onChange={(e) => handleAttachmentFile(e)}
+              onChange={e => handleAttachmentFile(e)}
             />
           </div>
         </DialogTitle>
@@ -297,7 +331,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
                     <ColorPicker
                       open={colorPickerModalOpen}
                       handleClose={() => setColorPickerModalOpen(false)}
-                      onChange={(color) => {
+                      onChange={color => {
                         values.color = color;
                         setQueue(() => {
                           return { ...values, color };
@@ -305,67 +339,68 @@ const QueueModal = ({ open, onClose, queueId }) => {
                       }}
                     />
                     <div style={{ marginTop: 5 }}>
-                          <Field
-                            as={TextField}
-                            label={i18n.t("queueModal.form.greetingMessage")}
-                            type="greetingMessage"
-                            multiline
-                            inputRef={greetingRef}
-                            rows={5}
-                            fullWidth
-                            name="greetingMessage"
-                            spellCheck={true}
-                            error={
-                              touched.greetingMessage &&
-                              Boolean(errors.greetingMessage)
-                            }
-                            helperText={
-                              touched.greetingMessage && errors.greetingMessage
-                            }
-                            variant="outlined"
-                            margin="dense"
-                          />
-                        {schedulesEnabled && (
-                            <Field
-                              as={TextField}
-                              InputLabelProps={{ shrink: true }}
-                              label={i18n.t("queueModal.form.outOfHoursMessage")}
-                              type="outOfHoursMessage"
-                              multiline
-                              rows={5}
-                              fullWidth
-                              name="outOfHoursMessage"
-                              spellCheck={true}
-                              error={
-                                touched.outOfHoursMessage &&
-                                Boolean(errors.outOfHoursMessage)
-                              }
-                              helperText={
-                                touched.outOfHoursMessage && errors.outOfHoursMessage
-                              }
-                              variant="outlined"
-                              margin="dense"
-                            />
-                        )}
+                      <Field
+                        as={TextField}
+                        label={i18n.t("queueModal.form.greetingMessage")}
+                        type="greetingMessage"
+                        multiline
+                        inputRef={greetingRef}
+                        rows={5}
+                        fullWidth
+                        name="greetingMessage"
+                        spellCheck={true}
+                        error={
+                          touched.greetingMessage &&
+                          Boolean(errors.greetingMessage)
+                        }
+                        helperText={
+                          touched.greetingMessage && errors.greetingMessage
+                        }
+                        variant="outlined"
+                        margin="dense"
+                      />
+                      {schedulesEnabled && (
+                        <Field
+                          as={TextField}
+                          InputLabelProps={{ shrink: true }}
+                          label={i18n.t("queueModal.form.outOfHoursMessage")}
+                          type="outOfHoursMessage"
+                          multiline
+                          rows={5}
+                          fullWidth
+                          name="outOfHoursMessage"
+                          spellCheck={true}
+                          error={
+                            touched.outOfHoursMessage &&
+                            Boolean(errors.outOfHoursMessage)
+                          }
+                          helperText={
+                            touched.outOfHoursMessage &&
+                            errors.outOfHoursMessage
+                          }
+                          variant="outlined"
+                          margin="dense"
+                        />
+                      )}
                     </div>
                     <QueueOptions queueId={queueId} />
                     {(queue.mediaPath || attachment) && (
-                    <Grid xs={12} item>
-                      <Button startIcon={<AttachFile />}>
-                        {attachment != null
-                          ? attachment.name
-                          : queue.mediaName}
-                      </Button>
-                      {queueEditable && (
-                        <IconButton
-                          onClick={() => setConfirmationOpen(true)}
-                          color="secondary"
-                        >
-                          <DeleteOutline />
-                        </IconButton>
-                      )}
-                    </Grid>
-                  )}
+                      <Grid xs={12} item>
+                        <Button startIcon={<AttachFile />}>
+                          {attachment != null
+                            ? attachment.name
+                            : queue.mediaName}
+                        </Button>
+                        {queueEditable && (
+                          <IconButton
+                            onClick={() => setConfirmationOpen(true)}
+                            color="secondary"
+                          >
+                            <DeleteOutline />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    )}
                   </DialogContent>
                   <DialogActions>
                     {!attachment && !queue.mediaPath && queueEditable && (

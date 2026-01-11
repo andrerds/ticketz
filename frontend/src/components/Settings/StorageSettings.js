@@ -23,7 +23,7 @@ const MASKED_SECRET = "*****";
 const STORAGE_API_ENDPOINT = "/settings/storage";
 const STORAGE_TEST_ENDPOINT = "/settings/storage/test";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   fieldContainer: {
     width: "100%",
     textAlign: "left",
@@ -201,7 +201,7 @@ export default function StorageSettings() {
             <Select
               labelId="storage-driver-label"
               value={driver}
-              onChange={(e) => setDriver(e.target.value)}
+              onChange={e => setDriver(e.target.value)}
             >
               <MenuItem value="local">Local Filesystem</MenuItem>
               <MenuItem value="s3">S3-Compatible Storage</MenuItem>
@@ -221,7 +221,7 @@ export default function StorageSettings() {
                   label="Endpoint *"
                   placeholder="https://s3.amazonaws.com"
                   value={endpoint}
-                  onChange={(e) => setEndpoint(e.target.value)}
+                  onChange={e => setEndpoint(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -233,7 +233,7 @@ export default function StorageSettings() {
                   label="Region *"
                   placeholder="us-east-1"
                   value={region}
-                  onChange={(e) => setRegion(e.target.value)}
+                  onChange={e => setRegion(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -245,7 +245,7 @@ export default function StorageSettings() {
                   label="Bucket *"
                   placeholder="my-bucket"
                   value={bucket}
-                  onChange={(e) => setBucket(e.target.value)}
+                  onChange={e => setBucket(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -256,7 +256,7 @@ export default function StorageSettings() {
                 <TextField
                   label="Access Key ID *"
                   value={accessKeyId}
-                  onChange={(e) => setAccessKeyId(e.target.value)}
+                  onChange={e => setAccessKeyId(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -268,7 +268,7 @@ export default function StorageSettings() {
                   label="Secret Access Key *"
                   type={showSecretKey ? "text" : "password"}
                   value={secretAccessKey}
-                  onChange={(e) => setSecretAccessKey(e.target.value)}
+                  onChange={e => setSecretAccessKey(e.target.value)}
                   variant="standard"
                   InputProps={{
                     endAdornment: (
@@ -292,7 +292,7 @@ export default function StorageSettings() {
                   label="Prefix (optional)"
                   placeholder="media"
                   value={prefix}
-                  onChange={(e) => setPrefix(e.target.value)}
+                  onChange={e => setPrefix(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -304,7 +304,7 @@ export default function StorageSettings() {
                   control={
                     <Switch
                       checked={forcePathStyle}
-                      onChange={(e) => setForcePathStyle(e.target.checked)}
+                      onChange={e => setForcePathStyle(e.target.checked)}
                       color="primary"
                     />
                   }
@@ -325,9 +325,7 @@ export default function StorageSettings() {
               control={
                 <Switch
                   checked={imageOptimizationEnabled}
-                  onChange={(e) =>
-                    setImageOptimizationEnabled(e.target.checked)
-                  }
+                  onChange={e => setImageOptimizationEnabled(e.target.checked)}
                   color="primary"
                 />
               }
@@ -344,7 +342,7 @@ export default function StorageSettings() {
                   label="Max Width (pixels)"
                   type="number"
                   value={maxWidth}
-                  onChange={(e) => setMaxWidth(e.target.value)}
+                  onChange={e => setMaxWidth(e.target.value)}
                   variant="standard"
                 />
               </FormControl>
@@ -356,7 +354,7 @@ export default function StorageSettings() {
                   label="Quality (0-100)"
                   type="number"
                   value={quality}
-                  onChange={(e) => setQuality(e.target.value)}
+                  onChange={e => setQuality(e.target.value)}
                   variant="standard"
                   inputProps={{ min: 0, max: 100 }}
                 />
@@ -369,7 +367,7 @@ export default function StorageSettings() {
                   label="Max Size (bytes)"
                   type="number"
                   value={maxBytes}
-                  onChange={(e) => setMaxBytes(e.target.value)}
+                  onChange={e => setMaxBytes(e.target.value)}
                   variant="standard"
                 />
               </FormControl>

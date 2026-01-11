@@ -19,7 +19,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -70,7 +70,7 @@ const ContactListModal = ({ open, onClose, contactListId }) => {
       if (!contactListId) return;
       try {
         const { data } = await api.get(`/contact-lists/${contactListId}`);
-        setContactList((prevState) => {
+        setContactList(prevState => {
           return { ...prevState, ...data };
         });
       } catch (err) {
@@ -86,7 +86,7 @@ const ContactListModal = ({ open, onClose, contactListId }) => {
     setContactList(initialState);
   };
 
-  const handleSaveContactList = async (values) => {
+  const handleSaveContactList = async values => {
     const contactListData = { ...values };
     try {
       if (contactListId) {

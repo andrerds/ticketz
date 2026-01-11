@@ -4,7 +4,7 @@ export const useDeleteDialog = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
 
-  const openDeleteDialog = (file) => {
+  const openDeleteDialog = file => {
     setFileToDelete(file);
     setDeleteDialogOpen(true);
   };

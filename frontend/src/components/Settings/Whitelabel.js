@@ -50,11 +50,7 @@ import { grey, blue } from "@material-ui/core/colors";
 import OnlyForSuperUser from "../OnlyForSuperUser";
 import useAuth from "../../hooks/useAuth.js";
 
-import {
-  IconButton,
-  InputAdornment,
-  Typography,
-} from "@material-ui/core";
+import { IconButton, InputAdornment, Typography } from "@material-ui/core";
 
 import { Colorize, AttachFile, Delete } from "@material-ui/icons";
 import ColorPicker from "../ColorPicker";
@@ -68,7 +64,7 @@ const defaultLogoLight = "/vector/logo.svg";
 const defaultLogoDark = "/vector/logo-dark.svg";
 const defaultLogoFavicon = "/vector/favicon.svg";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
@@ -84,13 +80,11 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 4,
     width: "100%",
     "& .MuiTab-wrapper": {
-      color: "#128c7e"
+      color: "#128c7e",
     },
     "& .MuiTabs-flexContainer": {
-      justifyContent: "center"
-    }
-
-
+      justifyContent: "center",
+    },
   },
   paper: {
     padding: theme.spacing(2),
@@ -128,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
     width: 20,
     height: 20,
   },
-  
+
   uploadInput: {
     display: "none",
   },
@@ -141,7 +135,7 @@ const useStyles = makeStyles((theme) => ({
     borderColor: "#424242",
     textAlign: "center",
   },
-  
+
   appLogoDarkPreviewDiv: {
     backgroundColor: "#424242",
     padding: "10px",
@@ -150,7 +144,7 @@ const useStyles = makeStyles((theme) => ({
     borderColor: "white",
     textAlign: "center",
   },
-  
+
   appLogoFaviconPreviewDiv: {
     padding: "10px",
     borderStyle: "solid",
@@ -158,24 +152,24 @@ const useStyles = makeStyles((theme) => ({
     borderColor: "black",
     textAlign: "center",
   },
-  
+
   appLogoLightPreviewImg: {
     width: "100%",
     maxHeight: 72,
-    content: `url("${theme.calculatedLogoLight()}")`
+    content: `url("${theme.calculatedLogoLight()}")`,
   },
-  
+
   appLogoDarkPreviewImg: {
     width: "100%",
     maxHeight: 72,
-    content: `url("${theme.calculatedLogoDark()}")`
+    content: `url("${theme.calculatedLogoDark()}")`,
   },
 
   appLogoFaviconPreviewImg: {
     width: "100%",
     maxHeight: 72,
-    content: `url("${((theme.appLogoFavicon) ? theme.appLogoFavicon : "/vector/favicon.svg" )}")`
-  }
+    content: `url("${theme.appLogoFavicon ? theme.appLogoFavicon : "/vector/favicon.svg"}")`,
+  },
 }));
 
 export default function Whitelabel(props) {
@@ -187,8 +181,10 @@ export default function Whitelabel(props) {
   const [currentUser, setCurrentUser] = useState({});
 
   const { colorMode } = useContext(ColorModeContext);
-  const [primaryColorLightModalOpen, setPrimaryColorLightModalOpen] = useState(false);
-  const [primaryColorDarkModalOpen, setPrimaryColorDarkModalOpen] = useState(false);
+  const [primaryColorLightModalOpen, setPrimaryColorLightModalOpen] =
+    useState(false);
+  const [primaryColorDarkModalOpen, setPrimaryColorDarkModalOpen] =
+    useState(false);
 
   const logoLightInput = useRef(null);
   const logoDarkInput = useRef(null);
@@ -206,23 +202,35 @@ export default function Whitelabel(props) {
   }
 
   useEffect(() => {
-    getCurrentUserInfo().then(
-      (u) => {
-        setCurrentUser(u);
-      }
-    );
+    getCurrentUserInfo().then(u => {
+      setCurrentUser(u);
+    });
 
     console.debug("settings", settings);
 
     if (Array.isArray(settings) && settings.length) {
-      const primaryColorLight = settings.find((s) => s.key === "primaryColorLight")?.value;
-      const primaryColorDark = settings.find((s) => s.key === "primaryColorDark")?.value;
-      const appLogoLight = settings.find((s) => s.key === "appLogoLight")?.value;
-      const appLogoDark = settings.find((s) => s.key === "appLogoDark")?.value;
-      const appLogoFavicon = settings.find((s) => s.key === "appLogoFavicon")?.value;
-      const appName = settings.find((s) => s.key === "appName")?.value;
+      const primaryColorLight = settings.find(
+        s => s.key === "primaryColorLight"
+      )?.value;
+      const primaryColorDark = settings.find(
+        s => s.key === "primaryColorDark"
+      )?.value;
+      const appLogoLight = settings.find(s => s.key === "appLogoLight")?.value;
+      const appLogoDark = settings.find(s => s.key === "appLogoDark")?.value;
+      const appLogoFavicon = settings.find(
+        s => s.key === "appLogoFavicon"
+      )?.value;
+      const appName = settings.find(s => s.key === "appName")?.value;
       setAppName(appName || "");
-      setSettingsLoaded( { ...settingsLoaded , primaryColorLight, primaryColorDark, appLogoLight, appLogoDark, appLogoFavicon, appName });
+      setSettingsLoaded({
+        ...settingsLoaded,
+        primaryColorLight,
+        primaryColorDark,
+        appLogoLight,
+        appLogoDark,
+        appLogoFavicon,
+        appName,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
@@ -240,31 +248,30 @@ export default function Whitelabel(props) {
     if (!e.target.files) {
       return;
     }
-    
+
     const file = e.target.files[0];
     const formData = new FormData();
-    
+
     formData.append("file", file);
     formData.append("mode", mode);
-    
-    api.post("/settings/logo", formData, {
-      onUploadProgress: (event) => {
-        let progress = Math.round(
-          (event.loaded * 100) / event.total
+
+    api
+      .post("/settings/logo", formData, {
+        onUploadProgress: event => {
+          let progress = Math.round((event.loaded * 100) / event.total);
+          console.log(`A imagem  está ${progress}% carregada... `);
+        },
+      })
+      .then(response => {
+        updateSettingsLoaded(`appLogo${mode}`, response.data);
+        colorMode[`setAppLogo${mode}`](
+          getBackendURL() + "/public/" + response.data
         );
-        console.log(
-          `A imagem  está ${progress}% carregada... `
-        );
-      },
-    }).then((response) => {
-      updateSettingsLoaded(`appLogo${mode}`, response.data);
-      colorMode[`setAppLogo${mode}`]( getBackendURL()+"/public/"+response.data );
-    }).catch((err) => {
-      console.error(
-        `Houve um problema ao realizar o upload da imagem.`
-      );
-      console.log(err);
-    });
+      })
+      .catch(err => {
+        console.error(`Houve um problema ao realizar o upload da imagem.`);
+        console.log(err);
+      });
   };
 
   return (
@@ -289,7 +296,9 @@ export default function Whitelabel(props) {
                       startAdornment: (
                         <InputAdornment position="start">
                           <div
-                            style={{ backgroundColor: settingsLoaded.primaryColorLight }}
+                            style={{
+                              backgroundColor: settingsLoaded.primaryColorLight,
+                            }}
                             className={classes.colorAdorment}
                           ></div>
                         </InputAdornment>
@@ -309,7 +318,7 @@ export default function Whitelabel(props) {
                 <ColorPicker
                   open={primaryColorLightModalOpen}
                   handleClose={() => setPrimaryColorDarkModalOpen(false)}
-                  onChange={(color) => {
+                  onChange={color => {
                     setPrimaryColorLightModalOpen(false);
                     handleSaveSetting("primaryColorLight", color);
                     colorMode.setPrimaryColorLight(color);
@@ -328,7 +337,9 @@ export default function Whitelabel(props) {
                       startAdornment: (
                         <InputAdornment position="start">
                           <div
-                            style={{ backgroundColor: settingsLoaded.primaryColorDark }}
+                            style={{
+                              backgroundColor: settingsLoaded.primaryColorDark,
+                            }}
                             className={classes.colorAdorment}
                           ></div>
                         </InputAdornment>
@@ -348,7 +359,7 @@ export default function Whitelabel(props) {
                 <ColorPicker
                   open={primaryColorDarkModalOpen}
                   handleClose={() => setPrimaryColorDarkModalOpen(false)}
-                  onChange={(color) => {
+                  onChange={color => {
                     setPrimaryColorDarkModalOpen(false);
                     handleSaveSetting("primaryColorDark", color);
                     colorMode.setPrimaryColorDark(color);
@@ -364,11 +375,11 @@ export default function Whitelabel(props) {
                     name="appName"
                     value={appName}
                     inputRef={appNameInput}
-                    onChange={(e) => {
+                    onChange={e => {
                       setAppName(e.target.value);
                     }}
-                    onBlur={async (_) => {
-                      await handleSaveSetting("appName",appName);
+                    onBlur={async _ => {
+                      await handleSaveSetting("appName", appName);
                       colorMode.setAppName(appName || "ticketz");
                     }}
                   />
@@ -384,35 +395,32 @@ export default function Whitelabel(props) {
                     InputProps={{
                       endAdornment: (
                         <>
-                          { settingsLoaded.appLogoLight &&
+                          {settingsLoaded.appLogoLight && (
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={() => { 
-                                  handleSaveSetting("appLogoLight","");
-                                  colorMode.setAppLogoLight(defaultLogoLight);
-                                }
-                              }  
+                              onClick={() => {
+                                handleSaveSetting("appLogoLight", "");
+                                colorMode.setAppLogoLight(defaultLogoLight);
+                              }}
                             >
                               <Delete />
                             </IconButton>
-                          }
+                          )}
                           <input
                             type="file"
                             id="upload-logo-light-button"
                             ref={logoLightInput}
                             className={classes.uploadInput}
-                            onChange={(e) => uploadLogo(e,"Light")}
+                            onChange={e => uploadLogo(e, "Light")}
                           />
                           <label htmlFor="upload-logo-light-button">
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={
-                                () => {
-                                  logoLightInput.current.click();
-                                }
-                              }
+                              onClick={() => {
+                                logoLightInput.current.click();
+                              }}
                             >
                               <AttachFile />
                             </IconButton>
@@ -423,9 +431,9 @@ export default function Whitelabel(props) {
                   />
                 </FormControl>
                 <div>
-                 <Typography style={{fontSize: "11px"}}>
-                  {i18n.t("whitelabel.logoHint")}
-                 </Typography>
+                  <Typography style={{ fontSize: "11px" }}>
+                    {i18n.t("whitelabel.logoHint")}
+                  </Typography>
                 </div>
               </Grid>
               <Grid xs={12} sm={6} md={4} item>
@@ -438,35 +446,32 @@ export default function Whitelabel(props) {
                     InputProps={{
                       endAdornment: (
                         <>
-                          { settingsLoaded.appLogoDark &&
+                          {settingsLoaded.appLogoDark && (
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={() => { 
-                                  handleSaveSetting("appLogoDark","");
-                                  colorMode.setAppLogoDark(defaultLogoDark);
-                                }
-                              }  
+                              onClick={() => {
+                                handleSaveSetting("appLogoDark", "");
+                                colorMode.setAppLogoDark(defaultLogoDark);
+                              }}
                             >
                               <Delete />
                             </IconButton>
-                          }
+                          )}
                           <input
                             type="file"
                             id="upload-logo-dark-button"
                             ref={logoDarkInput}
                             className={classes.uploadInput}
-                            onChange={(e) => uploadLogo(e,"Dark")}
+                            onChange={e => uploadLogo(e, "Dark")}
                           />
                           <label htmlFor="upload-logo-dark-button">
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={
-                                () => {
-                                  logoDarkInput.current.click();
-                                }
-                              }
+                              onClick={() => {
+                                logoDarkInput.current.click();
+                              }}
                             >
                               <AttachFile />
                             </IconButton>
@@ -477,9 +482,9 @@ export default function Whitelabel(props) {
                   />
                 </FormControl>
                 <div>
-                 <Typography style={{fontSize: "11px"}}>
-                  {i18n.t("whitelabel.logoHint")}
-                 </Typography>
+                  <Typography style={{ fontSize: "11px" }}>
+                    {i18n.t("whitelabel.logoHint")}
+                  </Typography>
                 </div>
               </Grid>
               <Grid xs={12} sm={6} md={4} item>
@@ -492,35 +497,32 @@ export default function Whitelabel(props) {
                     InputProps={{
                       endAdornment: (
                         <>
-                          { settingsLoaded.appLogoFavicon &&
+                          {settingsLoaded.appLogoFavicon && (
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={() => { 
-                                  handleSaveSetting("appLogoFavicon","");
-                                  colorMode.setAppLogoFavicon(defaultLogoFavicon);
-                                }
-                              }  
+                              onClick={() => {
+                                handleSaveSetting("appLogoFavicon", "");
+                                colorMode.setAppLogoFavicon(defaultLogoFavicon);
+                              }}
                             >
                               <Delete />
                             </IconButton>
-                          }
+                          )}
                           <input
                             type="file"
                             id="upload-logo-favicon-button"
                             ref={logoFaviconInput}
                             className={classes.uploadInput}
-                            onChange={(e) => uploadLogo(e,"Favicon")}
+                            onChange={e => uploadLogo(e, "Favicon")}
                           />
                           <label htmlFor="upload-logo-favicon-button">
                             <IconButton
                               size="small"
                               color="default"
-                              onClick={
-                                () => {
-                                  logoFaviconInput.current.click();
-                                }
-                              }
+                              onClick={() => {
+                                logoFaviconInput.current.click();
+                              }}
                             >
                               <AttachFile />
                             </IconButton>
@@ -531,24 +533,33 @@ export default function Whitelabel(props) {
                   />
                 </FormControl>
                 <div>
-                 <Typography style={{fontSize: "11px"}}>
-                  {i18n.t("whitelabel.faviconHint")}
-                 </Typography>
+                  <Typography style={{ fontSize: "11px" }}>
+                    {i18n.t("whitelabel.faviconHint")}
+                  </Typography>
                 </div>
               </Grid>
               <Grid xs={12} sm={6} md={4} item>
                 <div className={classes.appLogoLightPreviewDiv}>
-                  <img className={classes.appLogoLightPreviewImg} alt="light-logo-preview" />
+                  <img
+                    className={classes.appLogoLightPreviewImg}
+                    alt="light-logo-preview"
+                  />
                 </div>
               </Grid>
               <Grid xs={12} sm={6} md={4} item>
                 <div className={classes.appLogoDarkPreviewDiv}>
-                  <img className={classes.appLogoDarkPreviewImg} alt="dark-logo-preview" />
+                  <img
+                    className={classes.appLogoDarkPreviewImg}
+                    alt="dark-logo-preview"
+                  />
                 </div>
               </Grid>
               <Grid xs={12} sm={6} md={4} item>
                 <div className={classes.appLogoFaviconPreviewDiv}>
-                  <img className={classes.appLogoFaviconPreviewImg} alt="favicon-preview" />
+                  <img
+                    className={classes.appLogoFaviconPreviewImg}
+                    alt="favicon-preview"
+                  />
                 </div>
               </Grid>
             </>

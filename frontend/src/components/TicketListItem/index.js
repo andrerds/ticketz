@@ -23,7 +23,7 @@ import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   ticket: {
     position: "relative",
   },
@@ -115,7 +115,7 @@ const TicketListItem = ({ ticket, groupActionButtons }) => {
     };
   }, []);
 
-  const handleAcepptTicket = async (ticket) => {
+  const handleAcepptTicket = async ticket => {
     setLoading(true);
     try {
       await api.put(`/tickets/${ticket.id}`, {
@@ -132,7 +132,7 @@ const TicketListItem = ({ ticket, groupActionButtons }) => {
     history.push(`/tickets/${ticket.uuid}`);
   };
 
-  const handleSelectTicket = (ticket) => {
+  const handleSelectTicket = ticket => {
     history.push(`/tickets/${ticket.uuid}`);
   };
 
@@ -141,8 +141,12 @@ const TicketListItem = ({ ticket, groupActionButtons }) => {
       <ListItem
         dense
         button
-        onClick={(e) => {
-          if (ticket.status === "pending" && (groupActionButtons || !ticket.isGroup)) return;
+        onClick={e => {
+          if (
+            ticket.status === "pending" &&
+            (groupActionButtons || !ticket.isGroup)
+          )
+            return;
           handleSelectTicket(ticket);
         }}
         selected={ticketId && +ticketId === ticket.id}
@@ -209,9 +213,9 @@ const TicketListItem = ({ ticket, groupActionButtons }) => {
               >
                 {ticket.lastMessage ? (
                   <WhatsMarked oneline>
-                    {
-                      ticket.lastMessage.startsWith('{"ticketzvCard"') ? "🪪" : ticket.lastMessage.split("\n")[0]
-                    }
+                    {ticket.lastMessage.startsWith('{"ticketzvCard"')
+                      ? "🪪"
+                      : ticket.lastMessage.split("\n")[0]}
                   </WhatsMarked>
                 ) : (
                   <br />
@@ -228,18 +232,19 @@ const TicketListItem = ({ ticket, groupActionButtons }) => {
             </span>
           }
         />
-        {ticket.status === "pending" && (groupActionButtons || !ticket.isGroup) && (
-          <ButtonWithSpinner
-            color="primary"
-            variant="contained"
-            className={classes.acceptButton}
-            size="small"
-            loading={loading}
-            onClick={(e) => handleAcepptTicket(ticket)}
-          >
-            {i18n.t("ticketsList.buttons.accept")}
-          </ButtonWithSpinner>
-        )}
+        {ticket.status === "pending" &&
+          (groupActionButtons || !ticket.isGroup) && (
+            <ButtonWithSpinner
+              color="primary"
+              variant="contained"
+              className={classes.acceptButton}
+              size="small"
+              loading={loading}
+              onClick={e => handleAcepptTicket(ticket)}
+            >
+              {i18n.t("ticketsList.buttons.accept")}
+            </ButtonWithSpinner>
+          )}
       </ListItem>
       <Divider variant="inset" component="li" />
     </React.Fragment>

@@ -26,9 +26,12 @@
     "strings": false
   },
 
-  // "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "javascript.suggest.autoImports": true,
+  "javascript.suggest.paths": true,
+  "javascript.preferences.importModuleSpecifier": "relative",
   "javascript.preferences.organizeImports": {},
-  // "javascript.updateImportsOnFileMove.enabled": "always",
   "eslint.format.enable": true,
   "eslint.codeActionsOnSave.mode": "all",
   "prettier.requireConfig": false,

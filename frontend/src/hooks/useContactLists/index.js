@@ -1,7 +1,7 @@
 import api from "../../services/api";
 
 const useContactLists = () => {
-  const save = async (data) => {
+  const save = async data => {
     const { data: responseData } = await api.request({
       url: "/contact-lists",
       method: "POST",
@@ -10,7 +10,7 @@ const useContactLists = () => {
     return responseData;
   };
 
-  const update = async (data) => {
+  const update = async data => {
     const { data: responseData } = await api.request({
       url: `/contact-lists/${data.id}`,
       method: "PUT",
@@ -19,7 +19,7 @@ const useContactLists = () => {
     return responseData;
   };
 
-  const deleteRecord = async (id) => {
+  const deleteRecord = async id => {
     const { data } = await api.request({
       url: `/contact-lists/${id}`,
       method: "DELETE",
@@ -27,7 +27,7 @@ const useContactLists = () => {
     return data;
   };
 
-  const findById = async (id) => {
+  const findById = async id => {
     const { data } = await api.request({
       url: `/contact-lists/${id}`,
       method: "GET",
@@ -35,7 +35,7 @@ const useContactLists = () => {
     return data;
   };
 
-  const list = async (params) => {
+  const list = async params => {
     const { data } = await api.request({
       url: "/contact-lists/list",
       method: "GET",

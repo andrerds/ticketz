@@ -52,10 +52,11 @@ import { downloadFile } from "../../helpers/downloadFile";
 import { getInitials } from "../../helpers/getInitials";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+import ThumbnailPreview from "../MediaPreview/ThumbnailPreview";
 
 const loadPageMutex = new Mutex();
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   messageContainer: {
     "& a": {
       color: theme.palette.primary.main,
@@ -554,8 +555,8 @@ const reducer = (state, action) => {
     const messages = action.payload;
     const newMessages = [];
 
-    messages.forEach((message) => {
-      const messageIndex = state.findIndex((m) => m.id === message.id);
+    messages.forEach(message => {
+      const messageIndex = state.findIndex(m => m.id === message.id);
       if (messageIndex !== -1) {
         state[messageIndex] = message;
       } else {
@@ -568,7 +569,7 @@ const reducer = (state, action) => {
 
   if (action.type === "ADD_MESSAGE") {
     const newMessage = action.payload;
-    const messageIndex = state.findIndex((m) => m.id === newMessage.id);
+    const messageIndex = state.findIndex(m => m.id === newMessage.id);
 
     if (messageIndex !== -1) {
       state[messageIndex] = newMessage;
@@ -578,7 +579,7 @@ const reducer = (state, action) => {
 
     if (newMessage.mediaType === "reactionMessage") {
       const reactionIndex = state.findIndex(
-        (m) => m.id === newMessage.quotedMsgId
+        m => m.id === newMessage.quotedMsgId
       );
       if (reactionIndex !== -1) {
         state[reactionIndex].replies = state[reactionIndex].replies || [];
@@ -591,7 +592,7 @@ const reducer = (state, action) => {
 
   if (action.type === "UPDATE_MESSAGE") {
     const messageToUpdate = action.payload;
-    const messageIndex = state.findIndex((m) => m.id === messageToUpdate.id);
+    const messageIndex = state.findIndex(m => m.id === messageToUpdate.id);
 
     if (messageIndex !== -1) {
       state[messageIndex] = messageToUpdate;
@@ -662,6 +663,7 @@ const MessagesList = ({
     };
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     dispatch({ type: "RESET" });
     setContactPresence("available");
@@ -688,7 +690,7 @@ const MessagesList = ({
 
     socketManager.onConnect(onConnect);
 
-    const onAppMessage = (data) => {
+    const onAppMessage = data => {
       if (data.message.ticketId === currentTicketId.current) {
         setContactPresence("available");
         if (data.action === "create") {
@@ -706,7 +708,7 @@ const MessagesList = ({
 
     socket.on(`company-${companyId}-appMessage`, onAppMessage);
 
-    socket.on(`company-${companyId}-presence`, (data) => {
+    socket.on(`company-${companyId}-presence`, data => {
       const { scrollTop, clientHeight, scrollHeight } = scrollRef.current;
       console.log({
         presence: data.presence,
@@ -743,7 +745,7 @@ const MessagesList = ({
     }
   };
 
-  const handleScroll = (e) => {
+  const handleScroll = e => {
     if (!hasMore) return;
     const { scrollTop } = e.currentTarget;
 
@@ -917,7 +919,7 @@ const MessagesList = ({
     }
   };
 
-  const renderMessageAck = (message) => {
+  const renderMessageAck = message => {
     if (message.ack === 0) {
       return <Warning fontSize="small" className={classes.ackIcons} />;
     }
@@ -980,7 +982,7 @@ const MessagesList = ({
     }
   };
 
-  const scrollToMessage = (id) => {
+  const scrollToMessage = id => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -995,7 +997,7 @@ const MessagesList = ({
     }
   };
 
-  const getQuotedMessageText = (quotedMsg) => {
+  const getQuotedMessageText = quotedMsg => {
     if (!quotedMsg?.body && quotedMsg?.mediaUrl) {
       return "📎 " + quotedMsg.mediaUrl.split("/").pop();
     }
@@ -1007,7 +1009,7 @@ const MessagesList = ({
     return quotedMsg?.body;
   };
 
-  const renderQuotedMessage = (message) => {
+  const renderQuotedMessage = message => {
     const data = JSON.parse(message.quotedMsg.dataJson);
 
     const thumbnail = data?.message?.imageMessage?.jpegThumbnail;
@@ -1038,17 +1040,25 @@ const MessagesList = ({
           )}
           <WhatsMarked>{getQuotedMessageText(message.quotedMsg)}</WhatsMarked>
         </div>
-        {imageUrl && <img className={classes.quotedThumbnail} src={imageUrl} />}
+        {
+          imageUrl && (
+            <ThumbnailPreview
+              mediaUrl={imageUrl}
+              className={classes.quotedThumbnail}
+            />
+          )
+          // <img className={classes.quotedThumbnail} src={imageUrl}
+        }
       </div>
     );
   };
 
-  const renderReplies = (replies) => {
+  const renderReplies = replies => {
     const reactions =
       replies &&
       replies
-        .filter((reply) => reply?.mediaType === "reactionMessage")
-        .map((reply) => {
+        .filter(reply => reply?.mediaType === "reactionMessage")
+        .map(reply => {
           return reply.contact?.name ? (
             <Tooltip title={reply.contact?.name} placement="top" arrow>
               <div key={reply.id}>{reply.body}</div>
@@ -1067,7 +1077,7 @@ const MessagesList = ({
     );
   };
 
-  const renderLinkPreview = (message) => {
+  const renderLinkPreview = message => {
     const data = JSON.parse(message.dataJson);
 
     const title = data?.message?.extendedTextMessage?.title;
@@ -1086,6 +1096,7 @@ const MessagesList = ({
         href={canonicalUrl}
         className={classes.linkPreviewAnchor}
         target="_blank"
+        rel="noreferrer"
       >
         <div
           className={clsx(classes.quotedContainerLeft, {
@@ -1104,14 +1115,19 @@ const MessagesList = ({
             )}
           </div>
           {!message.thumbnailUrl && imageUrl && (
-            <img className={classes.quotedThumbnail} src={imageUrl} />
+            <ThumbnailPreview
+              className={classes.quotedThumbnail}
+              mediaUrl={imageUrl}
+            />
+
+            // <img className={classes.quotedThumbnail} src={imageUrl} />
           )}
         </div>
       </a>
     );
   };
 
-  const sendReply = async (body) => {
+  const sendReply = async body => {
     const message = {
       read: 1,
       fromMe: true,
@@ -1119,12 +1135,12 @@ const MessagesList = ({
       body,
     };
 
-    api.post(`/messages/${ticketId}`, message).catch((err) => {
+    api.post(`/messages/${ticketId}`, message).catch(err => {
       toastError(err);
     });
   };
 
-  const renderReplyButton = (text) => {
+  const renderReplyButton = text => {
     return (
       <Button
         className={classes.messageButton}
@@ -1160,13 +1176,14 @@ const MessagesList = ({
         href={url}
         target="_blank"
         style={{ textDecoration: "none", color: "inherit" }}
+        rel="noreferrer"
       >
         {displayText}
       </a>
     </Button>
   );
 
-  const renderButtons = (message) => {
+  const renderButtons = message => {
     const objects =
       message?.buttonsMessage?.buttons ||
       message?.listMessage?.sections ||
@@ -1176,7 +1193,7 @@ const MessagesList = ({
 
     if (!objects) return <></>;
 
-    return objects.map((item) => {
+    return objects.map(item => {
       if (item.urlButton) {
         return renderUrlButton({
           displayText: item.urlButton.displayText,
@@ -1198,7 +1215,7 @@ const MessagesList = ({
           return renderReplyButton(params.display_text);
         }
       } else if (item.rows) {
-        return item.rows.map((row) => {
+        return item.rows.map(row => {
           return renderReplyButton(row.title);
         });
       }
@@ -1207,7 +1224,7 @@ const MessagesList = ({
     });
   };
 
-  const formatVCardN = (n) => {
+  const formatVCardN = n => {
     return (
       (n[3] ? n[3] + " " : "") +
       (n[1] ? n[1] + " " : "") +
@@ -1217,11 +1234,11 @@ const MessagesList = ({
     );
   };
 
-  const isVCard = (message) => {
+  const isVCard = message => {
     return message.startsWith('{"ticketzvCard":');
   };
 
-  const stringOrFirstElement = (data) => {
+  const stringOrFirstElement = data => {
     if (!data) {
       return "";
     }
@@ -1237,24 +1254,24 @@ const MessagesList = ({
         name,
         number,
       })
-      .then((response) => {
+      .then(response => {
         if (response?.data?.id) {
           window.mentionClick(response.data);
         }
       })
-      .catch((err) => {
+      .catch(err => {
         toastError(err);
       });
   };
 
-  const renderVCard = (vcardJson) => {
+  const renderVCard = vcardJson => {
     const cardArray = JSON.parse(vcardJson)?.ticketzvCard;
 
     if (!cardArray || !Array.isArray(cardArray)) {
       return <div>Invalid VCARD data</div>;
     }
 
-    return cardArray.map((item) => {
+    return cardArray.map(item => {
       const message = item?.vcard;
       if (!message) {
         return <></>;
@@ -1344,7 +1361,7 @@ const MessagesList = ({
     });
   };
 
-  const convertToDMS = (degrees) => {
+  const convertToDMS = degrees => {
     const deg = Math.floor(degrees);
     const minFloat = (degrees - deg) * 60;
     const min = Math.floor(minFloat);
@@ -1376,11 +1393,15 @@ const MessagesList = ({
       >
         <div>
           {location?.jpegThumbnail ? (
-            <img
-              src={`data:image/png;base64, ${location.jpegThumbnail}`}
+            <ThumbnailPreview
               className={classes.imageLocation}
+              mediaUrl={`data:image/png;base64, ${location.jpegThumbnail}`}
             />
           ) : (
+            // <img
+            //   src={`data:image/png;base64, ${location.jpegThumbnail}`}
+            //   className={classes.imageLocation}
+            // />
             <LocationOn
               className={classes.imageLocation}
               fontSize="large"
@@ -1427,7 +1448,7 @@ const MessagesList = ({
     );
   };
 
-  const getDataContextInfo = (data) => {
+  const getDataContextInfo = data => {
     if (!data) {
       return null;
     }
@@ -1458,7 +1479,7 @@ const MessagesList = ({
   const renderMessages = () => {
     const viewMessagesList = messagesList.map((message, index) => {
       if (message.mediaType === "reactionMessage") {
-        return;
+        return "";
       }
       const data = JSON.parse(message.dataJson);
       const dataContext = getDataContextInfo(data);
@@ -1466,6 +1487,7 @@ const MessagesList = ({
       if (!message.fromMe) {
         return (
           <React.Fragment key={message.id}>
+            <div> asdl;asmdadasda </div>
             {renderDailyTimestamps(message, index)}
             {renderMessageDivider(message, index)}
             <div
@@ -1483,7 +1505,7 @@ const MessagesList = ({
                 id={`messageActionsButton-${message.id}`}
                 disabled={message.isDeleted}
                 className={classes.messageActionsButton}
-                onClick={(e) => handleOpenMessageOptionsMenu(e, message, data)}
+                onClick={e => handleOpenMessageOptionsMenu(e, message, data)}
               >
                 <ExpandMore />
               </IconButton>
@@ -1509,10 +1531,14 @@ const MessagesList = ({
               )}
 
               {message.thumbnailUrl && !message.mediaUrl && (
-                <img
+                <ModalImageCors
                   className={classes.previewThumbnail}
-                  src={message.thumbnailUrl}
-                />
+                  imageUrl={message.previewThumbnail}
+                ></ModalImageCors>
+                // <img
+                //   className={classes.previewThumbnail}
+                //   src={message.thumbnailUrl}
+                // />
               )}
 
               {data?.message?.locationMessage ? (
@@ -1596,7 +1622,7 @@ const MessagesList = ({
                 id={`messageActionsButton-${message.id}`}
                 disabled={message.isDeleted}
                 className={classes.messageActionsButton}
-                onClick={(e) => handleOpenMessageOptionsMenu(e, message, data)}
+                onClick={e => handleOpenMessageOptionsMenu(e, message, data)}
               >
                 <ExpandMore />
               </IconButton>
@@ -1609,10 +1635,15 @@ const MessagesList = ({
               )}
 
               {message.thumbnailUrl && !message.mediaUrl && (
-                <img
+                <ThumbnailPreview
+                  alt={message.body}
                   className={classes.previewThumbnail}
-                  src={message.thumbnailUrl}
+                  mediaUrl={message.thumbnailUrl}
                 />
+                // <img
+                //   className={classes.previewThumbnail}
+                //   src={message.thumbnailUrl}
+                // />
               )}
 
               <div

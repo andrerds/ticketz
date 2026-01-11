@@ -25,7 +25,7 @@ import useSettings from "../../hooks/useSettings";
 
 import OnlyForSuperUser from "../../components/OnlyForSuperUser";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flex: 1,
     backgroundColor: theme.palette.background.paper,
@@ -84,9 +84,7 @@ const SettingsCustom = () => {
         setSettings(settingList);
 
         if (Array.isArray(settingList)) {
-          const scheduleType = settingList.find(
-            (d) => d.key === "scheduleType"
-          );
+          const scheduleType = settingList.find(d => d.key === "scheduleType");
           if (scheduleType) {
             setSchedulesEnabled(scheduleType.value === "company");
           }
@@ -115,9 +113,7 @@ const SettingsCustom = () => {
         setSettings(settingList);
 
         if (Array.isArray(settingList)) {
-          const scheduleType = settingList.find(
-            (d) => d.key === "scheduleType"
-          );
+          const scheduleType = settingList.find(d => d.key === "scheduleType");
           if (scheduleType) {
             setSchedulesEnabled(scheduleType.value === "company");
           }
@@ -136,7 +132,7 @@ const SettingsCustom = () => {
     setTab(newValue);
   };
 
-  const handleSubmitSchedules = async (data) => {
+  const handleSubmitSchedules = async data => {
     setLoading(true);
     try {
       setSchedules(data);
@@ -267,7 +263,7 @@ const SettingsCustom = () => {
           <TabPanel className={classes.container} value={tab} name={"options"}>
             <Options
               settings={settings}
-              scheduleTypeChanged={(value) =>
+              scheduleTypeChanged={value =>
                 setSchedulesEnabled(value === "company")
               }
             />

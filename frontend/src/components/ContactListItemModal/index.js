@@ -22,7 +22,7 @@ import toastError from "../../errors/toastError";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -93,7 +93,7 @@ const ContactListItemModal = ({
   useEffect(() => {
     const fetchContact = async () => {
       if (initialValues) {
-        setContact((prevState) => {
+        setContact(prevState => {
           return { ...prevState, ...initialValues };
         });
       }
@@ -118,7 +118,7 @@ const ContactListItemModal = ({
     setContact(initialState);
   };
 
-  const handleSaveContact = async (values) => {
+  const handleSaveContact = async values => {
     try {
       if (contactId) {
         await api.put(`/contact-list-items/${contactId}`, {

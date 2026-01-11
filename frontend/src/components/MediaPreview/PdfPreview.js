@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { PictureAsPdf as PdfIcon } from "@material-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   container: {
     position: "relative",
     display: "inline-block",
@@ -148,7 +148,7 @@ const PdfPreview = ({
           align="center"
           style={{ fontSize: "0.7rem", marginTop: 4 }}
         >
-          Click to open
+          Abrir PDF
         </Typography>
       </div>
     </div>

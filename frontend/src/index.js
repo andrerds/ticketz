@@ -14,17 +14,22 @@ if (!config) {
   const protocol = config.BACKEND_PROTOCOL || "https";
   const hostname = config.BACKEND_HOST || window.location.hostname;
   const port = config.BACKEND_PORT ? `:${config.BACKEND_PORT}` : "";
-  const path = config.BACKEND_PATH || ((hostname === "localhost" || hostname !== window.location.hostname) ? "" : "/backend");
+  const path =
+    config.BACKEND_PATH ||
+    (hostname === "localhost" || hostname !== window.location.hostname
+      ? ""
+      : "/backend");
 
   const backendUrl = `${protocol}://${hostname}${port}${path}/?cb=${Date.now()}`;
 
-  axios.get(backendUrl)
-    .then((response) => {
+  axios
+    .get(backendUrl)
+    .then(response => {
       console.log(response);
       const serverDate = new Date(response.headers["date"]);
       const clientDate = new Date();
       const diff = Math.abs(serverDate - clientDate);
-      const diffMinutes = Math.floor((diff / 1000) / 60);
+      const diffMinutes = Math.floor(diff / 1000 / 60);
       if (diffMinutes > 5) {
         let message = i18n.t("frontendErrors.ERR_CLOCK_OUT_OF_SYNC");
         message += `<br><br>Server time: ${serverDate.toLocaleString()}`;
@@ -38,9 +43,8 @@ if (!config) {
         // <React.StrictMode>
         <CssBaseline>
           <App />
-        </CssBaseline>
+        </CssBaseline>,
         // </React.StrictMode>
-        ,
         document.getElementById("root"),
         () => {
           window.finishProgress();

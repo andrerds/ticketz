@@ -36,16 +36,16 @@ function ContactListsTable(props) {
     }
   }, [contactLists, showLoading]);
 
-  const handleEdit = (contactList) => {
+  const handleEdit = contactList => {
     editContactList(contactList);
   };
 
-  const handleDelete = (contactList) => {
+  const handleDelete = contactList => {
     deleteContactList(contactList);
   };
 
   const renderRows = () => {
-    return rows.map((contactList) => {
+    return rows.map(contactList => {
       return (
         <TableRow key={contactList.id}>
           <TableCell align="left">{contactList.name}</TableCell>

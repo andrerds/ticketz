@@ -26,7 +26,7 @@ import QueueSelectCustom from "../QueueSelectCustom";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../Can";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -86,10 +86,10 @@ const ModalUsers = ({ open, onClose, userId, companyId }) => {
       if (open) {
         try {
           const { data } = await api.get(`/users/${userId}`);
-          setUser((prevState) => {
+          setUser(prevState => {
             return { ...prevState, ...data };
           });
-          const userQueueIds = data.queues?.map((queue) => queue.id);
+          const userQueueIds = data.queues?.map(queue => queue.id);
           setSelectedQueueIds(userQueueIds);
         } catch (err) {
           toastError(err);
@@ -105,7 +105,7 @@ const ModalUsers = ({ open, onClose, userId, companyId }) => {
     setUser(initialState);
   };
 
-  const handleSaveUser = async (values) => {
+  const handleSaveUser = async values => {
     const userData = { ...values, companyId, queueIds: selectedQueueIds };
     try {
       if (userId) {
@@ -220,7 +220,7 @@ const ModalUsers = ({ open, onClose, userId, companyId }) => {
                     <QueueSelectCustom
                       companyId={companyId}
                       selectedQueueIds={selectedQueueIds}
-                      onChange={(values) => setSelectedQueueIds(values)}
+                      onChange={values => setSelectedQueueIds(values)}
                     />
                   )}
                 />

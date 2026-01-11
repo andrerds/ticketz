@@ -1,29 +1,29 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
-import { toast } from "react-toastify";
 import clsx from "clsx";
+import { toast } from "react-toastify";
 
 import { Paper, makeStyles } from "@material-ui/core";
 
+import { AuthContext } from "../../context/Auth/AuthContext";
+import { EditMessageProvider } from "../../context/EditingMessage/EditingMessageContext";
+import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import { SocketContext } from "../../context/Socket/SocketContext";
+import toastError from "../../errors/toastError";
+import useSettings from "../../hooks/useSettings";
+import api from "../../services/api";
 import ContactDrawer from "../ContactDrawer";
 import MessageInput from "../MessageInputCustom/";
+import MessagesList from "../MessagesList";
+import { TagsContainer } from "../TagsContainer";
+import TicketActionButtons from "../TicketActionButtonsCustom";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
-import TicketActionButtons from "../TicketActionButtonsCustom";
-import MessagesList from "../MessagesList";
-import api from "../../services/api";
-import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
-import { EditMessageProvider } from "../../context/EditingMessage/EditingMessageContext";
-import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { TagsContainer } from "../TagsContainer";
-import { SocketContext } from "../../context/Socket/SocketContext";
-import useSettings from "../../hooks/useSettings";
 
 const drawerWidth = 320;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     height: "100%",
@@ -88,14 +88,15 @@ const Ticket = () => {
   const socketManager = useContext(SocketContext);
 
   useEffect(() => {
-    Promise.all([
-      getSetting("CheckMsgIsGroup"),
-      getSetting("groupsTab")
-    ]).then(([ignoreGroups, groupsTab]) => {
-      setShowTabGroups(ignoreGroups === "disabled" && groupsTab === "enabled");
-    });
-    
-    getSetting("tagsMode","ticket").then((tagsMode) => {
+    Promise.all([getSetting("CheckMsgIsGroup"), getSetting("groupsTab")]).then(
+      ([ignoreGroups, groupsTab]) => {
+        setShowTabGroups(
+          ignoreGroups === "disabled" && groupsTab === "enabled"
+        );
+      }
+    );
+
+    getSetting("tagsMode", "ticket").then(tagsMode => {
       setTagsMode(tagsMode);
     });
   }, []);
@@ -109,7 +110,7 @@ const Ticket = () => {
           const { queueId } = data;
           const { queues, profile } = user;
 
-          const queueAllowed = queues.find((q) => q.id === queueId);
+          const queueAllowed = queues.find(q => q.id === queueId);
           if (queueAllowed === undefined && profile !== "admin") {
             toast.error("Acesso não permitido");
             history.push("/tickets");
@@ -136,11 +137,11 @@ const Ticket = () => {
 
     const onConnectTicket = () => {
       socket.emit("joinChatBox", `${ticket.id}`);
-    }
+    };
 
     socketManager.onConnect(onConnectTicket);
 
-    const onCompanyTicket = (data) => {
+    const onCompanyTicket = data => {
       if (data.action === "update" && data.ticket.id === ticket.id) {
         setTicket(data.ticket);
       }
@@ -150,9 +151,9 @@ const Ticket = () => {
       }
     };
 
-    const onCompanyContact = (data) => {
+    const onCompanyContact = data => {
       if (data.action === "update") {
-        setContact((prevState) => {
+        setContact(prevState => {
           if (prevState.id === data.contact?.id) {
             return { ...prevState, ...data.contact };
           }
@@ -213,23 +214,24 @@ const Ticket = () => {
           [classes.mainWrapperShift]: drawerOpen,
         })}
       >
-        <div className={clsx({
-          [classes.drawerShade]: drawerOpen,
-        })} onClick={() => setDrawerOpen(false)}></div>
+        <div
+          className={clsx({
+            [classes.drawerShade]: drawerOpen,
+          })}
+          onClick={() => setDrawerOpen(false)}
+        ></div>
         <TicketHeader loading={loading}>
           {renderTicketInfo()}
           <TicketActionButtons ticket={ticket} showTabGroups={showTabGroups} />
         </TicketHeader>
         <Paper>
           <TagsContainer
-            ticket={["ticket","both"].includes(tagsMode) && ticket}
+            ticket={["ticket", "both"].includes(tagsMode) && ticket}
             contact={tagsMode === "contact" && contact}
           />
         </Paper>
         <ReplyMessageProvider>
-          <EditMessageProvider>
-	        {renderMessagesList()}
-          </EditMessageProvider>
+          <EditMessageProvider>{renderMessagesList()}</EditMessageProvider>
         </ReplyMessageProvider>
       </Paper>
       <ContactDrawer

@@ -21,7 +21,7 @@ import { SocketContext } from "../../context/Socket/SocketContext";
 
 const drawerWidth = 320;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     height: "100%",
@@ -66,7 +66,7 @@ export default function TicketMessagesDialog({ open, handleClose, ticketId }) {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
-  
+
   const socketManager = useContext(SocketContext);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function TicketMessagesDialog({ open, handleClose, ticketId }) {
             const { queueId } = data;
             const { queues, profile } = user;
 
-            const queueAllowed = queues.find((q) => q.id === queueId);
+            const queueAllowed = queues.find(q => q.id === queueId);
             if (queueAllowed === undefined && profile !== "admin") {
               toast.error("Acesso não permitido");
               history.push("/tickets");
@@ -108,16 +108,16 @@ export default function TicketMessagesDialog({ open, handleClose, ticketId }) {
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");
     let socket = null;
-    let onReturn = () => { };
+    let onReturn = () => {};
 
     if (open) {
       socket = socketManager.GetSocket(companyId);
 
       const onConnectTicketMessagesDialog = () => {
         socket.emit("joinChatBox", `${ticket.id}`);
-      }
+      };
 
-      const onCompanyTicketMessagesDialog = (data) => {
+      const onCompanyTicketMessagesDialog = data => {
         if (data.action === "update" && data.ticket.id === ticket.id) {
           setTicket(data.ticket);
         }
@@ -125,24 +125,24 @@ export default function TicketMessagesDialog({ open, handleClose, ticketId }) {
         if (data.action === "delete" && data.ticketId === ticket.id) {
           history.push("/tickets");
         }
-      }
+      };
 
-      const onCompanyContactMessagesDialog = (data) => {
+      const onCompanyContactMessagesDialog = data => {
         if (data.action === "update") {
-          setContact((prevState) => {
+          setContact(prevState => {
             if (prevState.id === data.contact?.id) {
               return { ...prevState, ...data.contact };
             }
             return prevState;
           });
         }
-      }
+      };
 
       onReturn = () => {
         if (socket !== null) {
           socket.disconnect();
         }
-      }
+      };
 
       socketManager.onConnect(onConnectTicketMessagesDialog);
       socket.on(`company-${companyId}-ticket`, onCompanyTicketMessagesDialog);

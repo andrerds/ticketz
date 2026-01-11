@@ -50,8 +50,8 @@ const reducer = (state, action) => {
     const contacts = action.payload;
     const newContacts = [];
 
-    contacts.forEach((contact) => {
-      const contactIndex = state.findIndex((c) => c.id === contact.id);
+    contacts.forEach(contact => {
+      const contactIndex = state.findIndex(c => c.id === contact.id);
       if (contactIndex !== -1) {
         state[contactIndex] = contact;
       } else {
@@ -64,7 +64,7 @@ const reducer = (state, action) => {
 
   if (action.type === "UPDATE_CONTACTS") {
     const contact = action.payload;
-    const contactIndex = state.findIndex((c) => c.id === contact.id);
+    const contactIndex = state.findIndex(c => c.id === contact.id);
 
     if (contactIndex !== -1) {
       state[contactIndex] = contact;
@@ -77,7 +77,7 @@ const reducer = (state, action) => {
   if (action.type === "DELETE_CONTACT") {
     const contactId = action.payload;
 
-    const contactIndex = state.findIndex((c) => c.id === contactId);
+    const contactIndex = state.findIndex(c => c.id === contactId);
     if (contactIndex !== -1) {
       state.splice(contactIndex, 1);
     }
@@ -89,7 +89,7 @@ const reducer = (state, action) => {
   }
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   mainPaper: {
     flex: 1,
     padding: theme.spacing(1),
@@ -123,7 +123,7 @@ const ContactListItems = () => {
   const socketManager = useContext(SocketContext);
 
   useEffect(() => {
-    findContactList(contactListId).then((data) => {
+    findContactList(contactListId).then(data => {
       setContactList(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,7 +158,7 @@ const ContactListItems = () => {
     const companyId = localStorage.getItem("companyId");
     const socket = socketManager.GetSocket(companyId);
 
-    const onContactListItem = (data) => {
+    const onContactListItem = data => {
       if (data.action === "update" || data.action === "create") {
         dispatch({ type: "UPDATE_CONTACTS", payload: data.record });
       }
@@ -170,23 +170,26 @@ const ContactListItems = () => {
       if (data.action === "reload") {
         dispatch({ type: "LOAD_CONTACTS", payload: data.records });
       }
-    }
+    };
 
-    const onContactListItemId = (data) => {
-        if (data.action === "reload") {
-          dispatch({ type: "LOAD_CONTACTS", payload: data.records });
-        }
+    const onContactListItemId = data => {
+      if (data.action === "reload") {
+        dispatch({ type: "LOAD_CONTACTS", payload: data.records });
       }
+    };
 
     socket.on(`company-${companyId}-ContactListItem`, onContactListItem);
-    socket.on(`company-${companyId}-ContactListItem-${contactListId}`, onContactListItemId);
-  
+    socket.on(
+      `company-${companyId}-ContactListItem-${contactListId}`,
+      onContactListItemId
+    );
+
     return () => {
       socket.disconnect();
     };
   }, [contactListId, socketManager]);
 
-  const handleSearch = (event) => {
+  const handleSearch = event => {
     setSearchParam(event.target.value.toLowerCase());
   };
 
@@ -200,12 +203,12 @@ const ContactListItems = () => {
     setContactListItemModalOpen(false);
   };
 
-  const hadleEditContact = (contactId) => {
+  const hadleEditContact = contactId => {
     setSelectedContactId(contactId);
     setContactListItemModalOpen(true);
   };
 
-  const handleDeleteContact = async (contactId) => {
+  const handleDeleteContact = async contactId => {
     try {
       await api.delete(`/contact-list-items/${contactId}`);
       toast.success(i18n.t("contacts.toasts.deleted"));
@@ -232,10 +235,10 @@ const ContactListItems = () => {
   };
 
   const loadMore = () => {
-    setPageNumber((prevState) => prevState + 1);
+    setPageNumber(prevState => prevState + 1);
   };
 
-  const handleScroll = (e) => {
+  const handleScroll = e => {
     if (!hasMore || loading) return;
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollHeight - (scrollTop + 100) < clientHeight) {
@@ -380,7 +383,7 @@ const ContactListItems = () => {
           </TableHead>
           <TableBody>
             <>
-              {contacts.map((contact) => (
+              {contacts.map(contact => (
                 <TableRow key={contact.id}>
                   <TableCell align="center" style={{ width: "0%" }}>
                     <IconButton>

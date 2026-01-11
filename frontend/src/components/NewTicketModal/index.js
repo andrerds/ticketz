@@ -1,17 +1,25 @@
-import React, { useState, useEffect, useContext } from "react";
+import {
+  FormControl,
+  Grid,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { i18n } from "../../translate/i18n";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { AuthContext } from "../../context/Auth/AuthContext";
+import toastError from "../../errors/toastError";
 import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
-import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { Grid, ListItemText, MenuItem, Select, TextField, FormControl, InputLabel } from "@material-ui/core";
-import { toast } from "react-toastify";
 import { ContactSelect } from "../ContactSelect";
 
 const NewTicketModal = ({ modalOpen, onClose, contact }) => {
@@ -41,7 +49,7 @@ const NewTicketModal = ({ modalOpen, onClose, contact }) => {
 
   const handleSaveTicket = async contactId => {
     if (!contactId) return;
-    if (selectedQueue === "" && user.profile !== 'admin') {
+    if (selectedQueue === "" && user.profile !== "admin") {
       toast.error("Selecione uma fila");
       return;
     }
@@ -116,7 +124,9 @@ const NewTicketModal = ({ modalOpen, onClose, contact }) => {
             </Grid>
             <Grid xs={12} item>
               <FormControl fullWidth variant="outlined" margin="dense">
-                <InputLabel id="queue-label">{i18n.t("common.queue")}</InputLabel>
+                <InputLabel id="queue-label">
+                  {i18n.t("common.queue")}
+                </InputLabel>
                 <Select
                   fullWidth
                   displayEmpty
@@ -124,8 +134,8 @@ const NewTicketModal = ({ modalOpen, onClose, contact }) => {
                   margin="dense"
                   value={selectedQueue || ""}
                   label={i18n.t("common.queue")}
-                  onChange={(e) => {
-                    setSelectedQueue(e.target.value)
+                  onChange={e => {
+                    setSelectedQueue(e.target.value);
                   }}
                   MenuProps={{
                     anchorOrigin: {
@@ -140,10 +150,10 @@ const NewTicketModal = ({ modalOpen, onClose, contact }) => {
                   }}
                   renderValue={() => {
                     if (!selectedQueue) {
-                      return
+                      return;
                     }
-                    const queue = user.queues.find(q => q.id === selectedQueue)
-                    return queue.name
+                    const queue = user.queues.find(q => q.id === selectedQueue);
+                    return queue.name;
                   }}
                 >
                   {user.queues?.length > 0 &&

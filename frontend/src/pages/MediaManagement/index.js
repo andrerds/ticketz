@@ -33,7 +33,7 @@ const DEFAULT_FILTERS = {
   storageLocation: "",
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   mainPaper: {
     flex: 1,
     padding: theme.spacing(2),
@@ -90,7 +90,7 @@ const MediaManagement = () => {
     loadStats();
   }, [loadMediaFiles, loadStats]);
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = e => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
@@ -98,7 +98,7 @@ const MediaManagement = () => {
     loadMediaFiles(filters);
   };
 
-  const handleDeleteClick = (file) => {
+  const handleDeleteClick = file => {
     openDeleteDialog(file);
   };
 

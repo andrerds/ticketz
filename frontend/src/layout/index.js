@@ -44,39 +44,46 @@ import { useDate } from "../hooks/useDate";
 import useAuth from "../hooks/useAuth.js";
 
 import ColorModeContext from "../layout/themeContext";
-import Brightness4Icon from '@material-ui/icons/Brightness4';
-import Brightness7Icon from '@material-ui/icons/Brightness7';
-import LanguageIcon from '@material-ui/icons/Language';
+import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
+import LanguageIcon from "@material-ui/icons/Language";
 import { getBackendURL } from "../services/config";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import OnlyForSuperUser from "../components/OnlyForSuperUser";
 import NewTicketModal from "../components/NewTicketModal/index.js";
 
-
-
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     height: "var(--vh)",
     backgroundColor: theme.palette.fancyBackground,
-    '& .MuiButton-outlinedPrimary': {
+    "& .MuiButton-outlinedPrimary": {
       color: theme.palette.primary,
-      border: theme.mode === 'light' ? '1px solid rgba(0 124 102)' : '1px solid rgba(255, 255, 255, 0.5)',
+      border:
+        theme.mode === "light"
+          ? "1px solid rgba(0 124 102)"
+          : "1px solid rgba(255, 255, 255, 0.5)",
     },
-    '& .MuiTab-textColorPrimary.Mui-selected': {
+    "& .MuiTab-textColorPrimary.Mui-selected": {
       color: theme.palette.primary,
-    }
+    },
   },
   avatar: {
     width: "100%",
   },
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
-    color: localStorage.getItem("impersonated") === "true" ? theme.palette.secondary.contrastText : theme.palette.primary.contrastText,
-    background: localStorage.getItem("impersonated") === "true" ? theme.palette.secondary.main : theme.palette.primary.main,
+    color:
+      localStorage.getItem("impersonated") === "true"
+        ? theme.palette.secondary.contrastText
+        : theme.palette.primary.contrastText,
+    background:
+      localStorage.getItem("impersonated") === "true"
+        ? theme.palette.secondary.main
+        : theme.palette.primary.main,
   },
   toolbarIcon: {
     display: "flex",
@@ -99,8 +106,8 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     [theme.breakpoints.down("sm")]: {
-      display: "none"
-    }
+      display: "none",
+    },
   },
   menuButton: {
     marginRight: 36,
@@ -122,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     overflowY: "clip",
-    ...theme.scrollbarStylesSoft
+    ...theme.scrollbarStylesSoft,
   },
   drawerPaperClose: {
     overflowX: "hidden",
@@ -151,7 +158,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     display: "flex",
     overflow: "auto",
-    flexDirection: "column"
+    flexDirection: "column",
   },
   containerWithScroll: {
     flex: 1,
@@ -168,11 +175,11 @@ const useStyles = makeStyles((theme) => ({
     maxHeight: "72px",
     logo: theme.logo,
     margin: "auto",
-    content: `url("${theme.calculatedLogo()}")`
+    content: `url("${theme.calculatedLogo()}")`,
   },
   hideLogo: {
-	display: "none",
-  }
+    display: "none",
+  },
 }));
 
 const LoggedInLayout = ({ children, themeToggle }) => {
@@ -203,9 +210,8 @@ const LoggedInLayout = ({ children, themeToggle }) => {
   const { dateToClient } = useDate();
 
   const socketManager = useContext(SocketContext);
-  
+
   const [newTicketContact, setNewTicketContact] = useState(null);
-  
 
   //################### CODIGOS DE TESTE #########################################
   // useEffect(() => {
@@ -259,25 +265,23 @@ const LoggedInLayout = ({ children, themeToggle }) => {
       setDrawerOpen(true);
     }
   }, []);
-  
+
   useEffect(() => {
-    getCurrentUserInfo().then(
-      (user) => {
-        setCurrentUser(user);
-      }
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    getCurrentUserInfo().then(user => {
+      setCurrentUser(user);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
-    window.mentionClick = (mention) => {
+    window.mentionClick = mention => {
       const contact = {
         id: mention.contactId || mention.id,
         name: mention.name,
-        number: mention.number
-      }
+        number: mention.number,
+      };
       setNewTicketContact(contact);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -294,23 +298,30 @@ const LoggedInLayout = ({ children, themeToggle }) => {
 
     const socket = socketManager.GetSocket(companyId);
 
-    const onCompanyAuthLayout = (data) => {
+    const onCompanyAuthLayout = data => {
       const impersonated = localStorage.getItem("impersonated") === "true";
-      if (!impersonated && !data.user.impersonated && data.user.id === +userId) {
+      if (
+        !impersonated &&
+        !data.user.impersonated &&
+        data.user.id === +userId
+      ) {
         toastError("Sua conta foi acessada em outro computador.");
         setTimeout(() => {
           localStorage.clear();
           window.location.reload();
         }, 1000);
       }
-    }
+    };
 
     socket.on(`company-${companyId}-auth`, onCompanyAuthLayout);
 
     socket.emit("userStatus");
-    const interval = setInterval(() => {
-      socket.emit("userStatus");
-    }, 1000 * 60 * 5);
+    const interval = setInterval(
+      () => {
+        socket.emit("userStatus");
+      },
+      1000 * 60 * 5
+    );
 
     return () => {
       socket.disconnect();
@@ -318,7 +329,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
     };
   }, [socketManager]);
 
-  const handleProfileMenu = (event) => {
+  const handleProfileMenu = event => {
     setAnchorEl(event.currentTarget);
     setMenuOpen(true);
   };
@@ -363,12 +374,12 @@ const LoggedInLayout = ({ children, themeToggle }) => {
 
   const toggleColorMode = () => {
     colorMode.toggleColorMode();
-  }
+  };
 
-  const handleChooseLanguage = (language) => {
-    localStorage.setItem("language",language);
+  const handleChooseLanguage = language => {
+    localStorage.setItem("language", language);
     window.location.reload(false);
-  }
+  };
 
   if (loading) {
     return <BackdropLoading />;
@@ -388,14 +399,21 @@ const LoggedInLayout = ({ children, themeToggle }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
-          <img  className={drawerOpen ? classes.logo : classes.hideLogo } alt="logo" />
+          <img
+            className={drawerOpen ? classes.logo : classes.hideLogo}
+            alt="logo"
+          />
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
         </div>
         <Divider />
         <List className={classes.containerWithScroll}>
-          <MainListItems drawerClose={drawerClose} drawerOpen={drawerOpen} collapsed={!drawerOpen} />
+          <MainListItems
+            drawerClose={drawerClose}
+            drawerOpen={drawerOpen}
+            collapsed={!drawerOpen}
+          />
         </List>
         <Divider />
       </Drawer>
@@ -434,29 +452,32 @@ const LoggedInLayout = ({ children, themeToggle }) => {
             noWrap
             className={classes.title}
           >
-             {greaterThenSm && user?.profile === "admin" && user?.company?.dueDate ? (
+            {greaterThenSm &&
+            user?.profile === "admin" &&
+            user?.company?.dueDate ? (
               <>
-                {i18n.t("settings.WelcomeGreeting.greetings")} <b>{user.name}</b>, {i18n.t("settings.WelcomeGreeting.welcome")} <b>{user?.company?.name}</b>! ({i18n.t("settings.WelcomeGreeting.expirationTime")} {dateToClient(user?.company?.dueDate)})
+                {i18n.t("settings.WelcomeGreeting.greetings")}{" "}
+                <b>{user.name}</b>, {i18n.t("settings.WelcomeGreeting.welcome")}{" "}
+                <b>{user?.company?.name}</b>! (
+                {i18n.t("settings.WelcomeGreeting.expirationTime")}{" "}
+                {dateToClient(user?.company?.dueDate)})
               </>
             ) : (
               <>
-                {i18n.t("settings.WelcomeGreeting.greetings")} <b>{user.name}</b>, {i18n.t("settings.WelcomeGreeting.welcome")} <b>{user?.company?.name}</b>! ({i18n.t("settings.WelcomeGreeting.expirationTime")} {dateToClient(user?.company?.dueDate)})
+                {i18n.t("settings.WelcomeGreeting.greetings")}{" "}
+                <b>{user.name}</b>, {i18n.t("settings.WelcomeGreeting.welcome")}{" "}
+                <b>{user?.company?.name}</b>! (
+                {i18n.t("settings.WelcomeGreeting.expirationTime")}{" "}
+                {dateToClient(user?.company?.dueDate)})
               </>
             )}
           </Typography>
 
-          <OnlyForSuperUser
-            user={currentUser}
-            yes={() => (
-              <Backendlogs />
-            )} />
-            
+          <OnlyForSuperUser user={currentUser} yes={() => <Backendlogs />} />
+
           <PhoneCall />
-          
-          <NotificationsVolume
-            setVolume={setVolume}
-            volume={volume}
-          />
+
+          <NotificationsVolume setVolume={setVolume} volume={volume} />
 
           {user.id && <NotificationsPopOver volume={volume} />}
 
@@ -480,16 +501,13 @@ const LoggedInLayout = ({ children, themeToggle }) => {
               open={languageOpen}
               onClose={handleCloseLanguageMenu}
             >
-            {
-              Object.keys(messages).map((m) => (
+              {Object.keys(messages).map(m => (
                 <MenuItem onClick={() => handleChooseLanguage(m)}>
                   {messages[m].translations.mainDrawer.appBar.i18n.language}
                 </MenuItem>
-              ))
-            }
+              ))}
             </Menu>
           </div>
-
 
           <div>
             <IconButton
@@ -521,35 +539,35 @@ const LoggedInLayout = ({ children, themeToggle }) => {
                 {i18n.t("mainDrawer.appBar.user.profile")}
               </MenuItem>
               <MenuItem onClick={toggleColorMode}>
-                {theme.mode === 'dark' ? i18n.t("mainDrawer.appBar.user.lightmode") : i18n.t("mainDrawer.appBar.user.darkmode")}
+                {theme.mode === "dark"
+                  ? i18n.t("mainDrawer.appBar.user.lightmode")
+                  : i18n.t("mainDrawer.appBar.user.darkmode")}
               </MenuItem>
               <NestedMenuItem
                 label={i18n.t("mainDrawer.appBar.user.language")}
                 parentMenuOpen={menuOpen}
               >
-                {
-                  Object.keys(messages).map((m) => (
-                    <MenuItem onClick={() => handleChooseLanguage(m)}>
-                      {messages[m].translations.mainDrawer.appBar.i18n.language}
-                    </MenuItem>
-                  ))
-                }
+                {Object.keys(messages).map(m => (
+                  <MenuItem onClick={() => handleChooseLanguage(m)}>
+                    {messages[m].translations.mainDrawer.appBar.i18n.language}
+                  </MenuItem>
+                ))}
               </NestedMenuItem>
               <MenuItem onClick={handleOpenAboutModal}>
-                {i18n.t("about.aboutthe")} {currentUser?.super ? "ticketz" : theme.appName}
+                {i18n.t("about.aboutthe")}{" "}
+                {currentUser?.super ? "ticketz" : theme.appName}
               </MenuItem>
               <MenuItem onClick={handleClickLogout}>
                 {i18n.t("mainDrawer.appBar.user.logout")}
               </MenuItem>
             </Menu>
           </div>
-
         </Toolbar>
       </AppBar>
       <NewTicketModal
         modalOpen={!!newTicketContact}
         contact={newTicketContact}
-        onClose={(ticket) => {
+        onClose={ticket => {
           setNewTicketContact(null);
           if (ticket !== undefined && ticket.uuid !== undefined) {
             history.push(`/tickets/${ticket.uuid}`);
@@ -558,11 +576,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
       />
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <OnlyForSuperUser
-          user={currentUser}
-          yes={() => (
-            <GoogleAnalytics />
-          )} />
+        <OnlyForSuperUser user={currentUser} yes={() => <GoogleAnalytics />} />
         {children ? children : null}
       </main>
     </div>

@@ -1,58 +1,58 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
-import "emoji-mart/css/emoji-mart.css";
-import { Picker } from "emoji-mart";
-import MicRecorder from "mic-recorder-to-mp3";
+import withWidth from "@material-ui/core/withWidth";
 import clsx from "clsx";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
+import MicRecorder from "mic-recorder-to-mp3";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { 
+import {
   Code,
-  FormatListNumbered,
   FormatListBulleted,
+  FormatListNumbered,
   FormatQuote,
 } from "@material-ui/icons";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
+import { InputAdornment, Popper, Tooltip, Typography } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
 import IconButton from "@material-ui/core/IconButton";
+import InputBase from "@material-ui/core/InputBase";
+import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import AttachFileIcon from "@material-ui/icons/AttachFile";
+import CameraAltIcon from "@material-ui/icons/CameraAlt";
+import CancelIcon from "@material-ui/icons/Cancel";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import ClearIcon from "@material-ui/icons/Clear";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import MicIcon from "@material-ui/icons/Mic";
 import MoodIcon from "@material-ui/icons/Mood";
 import SendIcon from "@material-ui/icons/Send";
-import CancelIcon from "@material-ui/icons/Cancel";
-import ClearIcon from "@material-ui/icons/Clear";
-import MicIcon from "@material-ui/icons/Mic";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import { FormControlLabel, Switch, Tooltip, InputAdornment, Typography, Popper } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { isString, isEmpty, isObject, has } from "lodash";
+import { has, isEmpty, isObject, isString } from "lodash";
 
-import { i18n } from "../../translate/i18n";
-import api from "../../services/api";
-import RecordingTimer from "./RecordingTimer";
-import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import toastError from "../../errors/toastError";
 import { EditMessageContext } from "../../context/EditingMessage/EditingMessageContext";
+import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+import toastError from "../../errors/toastError";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import api from "../../services/api";
+import { i18n } from "../../translate/i18n";
+import RecordingTimer from "./RecordingTimer";
 
 import useQuickMessages from "../../hooks/useQuickMessages";
 
-import Compressor from 'compressorjs';
-import LinearWithValueLabel from "./ProgressBarCustom";
-import WhatsMarked from "react-whatsmarked";
+import { faSignature } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignature } from '@fortawesome/free-solid-svg-icons';
-import { isMobile } from "../../helpers/isMobile";
+import Compressor from "compressorjs";
+import WhatsMarked from "react-whatsmarked";
 import { SocketContext } from "../../context/Socket/SocketContext";
+import { isMobile } from "../../helpers/isMobile";
+import LinearWithValueLabel from "./ProgressBarCustom";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   mainWrapper: {
     display: "flex",
     flexDirection: "column",
@@ -187,9 +187,9 @@ const useStyles = makeStyles((theme) => ({
   },
 
   iconSwitch: {
-    color: (props) => (props.value ? theme.palette.primary.main : "gray"),
+    color: props => (props.value ? theme.palette.primary.main : "gray"),
     width: 48,
-    height: 48
+    height: 48,
   },
 
   formatMenu: {
@@ -197,13 +197,13 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary,
     borderRadius: 30,
     boxShadow: theme.shadows[2],
-    padding: '4px 8px',
-    display: 'flex',
-    alignItems: 'center',
+    padding: "4px 8px",
+    display: "flex",
+    alignItems: "center",
   },
 }));
 
-const EmojiOptions = (props) => {
+const EmojiOptions = props => {
   const { disabled, showEmoji, setShowEmoji, handleAddEmoji } = props;
   const classes = useStyles();
   return (
@@ -212,7 +212,7 @@ const EmojiOptions = (props) => {
         aria-label="emojiPicker"
         component="span"
         disabled={disabled}
-        onClick={(e) => setShowEmoji((prevState) => !prevState)}
+        onClick={e => setShowEmoji(prevState => !prevState)}
       >
         <MoodIcon className={classes.sendMessageIcons} />
       </IconButton>
@@ -230,7 +230,7 @@ const EmojiOptions = (props) => {
   );
 };
 
-const SignSwitch = (props) => {
+const SignSwitch = props => {
   const { setSignMessage, signMessage } = props;
   const classes = useStyles({ signMessage });
 
@@ -244,23 +244,20 @@ const SignSwitch = (props) => {
   );
 };
 
-const IconSwitch = (props) => {
+const IconSwitch = props => {
   const { setter, value, icon, tooltip } = props;
   const classes = useStyles({ value });
 
   return (
     <Tooltip title={tooltip}>
-      <IconButton
-        onClick={() => setter(!value)}
-        className={classes.iconSwitch}
-      >
+      <IconButton onClick={() => setter(!value)} className={classes.iconSwitch}>
         <FontAwesomeIcon icon={icon} />
       </IconButton>
     </Tooltip>
   );
 };
 
-const FileInput = (props) => {
+const FileInput = props => {
   const { handleChangeMedias, disableOption } = props;
   const classes = useStyles();
   return (
@@ -286,7 +283,7 @@ const FileInput = (props) => {
   );
 };
 
-const ActionButtons = (props) => {
+const ActionButtons = props => {
   const {
     inputMessage,
     loading,
@@ -360,14 +357,14 @@ function UpwardPopper(props) {
       {...props}
       placement="top-start" // force always upwards
       modifiers={{
-        flip: { enabled: false },            // disable flipping
+        flip: { enabled: false }, // disable flipping
         preventOverflow: { enabled: false }, // disable overflow adjustment
       }}
     />
   );
 }
 
-const CustomInput = (props) => {
+const CustomInput = props => {
   const {
     loading,
     inputRef,
@@ -390,20 +387,20 @@ const CustomInput = (props) => {
   const { list: listQuickMessages } = useQuickMessages();
 
   useEffect(() => {
-    const handleClickAway = (event) => {
-      const menu = document.getElementById('format-menu');
+    const handleClickAway = event => {
+      const menu = document.getElementById("format-menu");
       if (menu && !menu.contains(event.target)) {
-        menu.style.display = 'none';
+        menu.style.display = "none";
       }
     };
-    document.addEventListener('mousedown', handleClickAway);
-    return () => document.removeEventListener('mousedown', handleClickAway);
+    document.addEventListener("mousedown", handleClickAway);
+    return () => document.removeEventListener("mousedown", handleClickAway);
   }, []);
 
   useEffect(() => {
     async function fetchData() {
       const messages = await listQuickMessages();
-      const options = messages.map((m) => {
+      const options = messages.map(m => {
         let truncatedMessage = m.message;
         if (isString(truncatedMessage) && truncatedMessage.length > 35) {
           truncatedMessage = m.message.substring(0, 35) + "...";
@@ -429,7 +426,7 @@ const CustomInput = (props) => {
       setPopupOpen(firstWord.indexOf("/") > -1);
 
       const filteredOptions = quickMessages.filter(
-        (m) => m.label.indexOf(inputMessage) > -1
+        m => m.label.indexOf(inputMessage) > -1
       );
       setOptions(filteredOptions);
     } else {
@@ -438,9 +435,9 @@ const CustomInput = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputMessage]);
 
-  const onKeyPress = (e) => {
+  const onKeyPress = e => {
     if (loading) return;
-    else if ( !e.shiftKey && e.key === "Enter" && !isMobile()) {
+    else if (!e.shiftKey && e.key === "Enter" && !isMobile()) {
       e.preventDefault();
       handleSendMessage();
       return;
@@ -448,7 +445,7 @@ const CustomInput = (props) => {
     handlePresenceUpdate && handlePresenceUpdate("composing");
   };
 
-  const onPaste = (e) => {
+  const onPaste = e => {
     if (ticketStatus === "open") {
       handleInputPaste(e);
     }
@@ -461,7 +458,7 @@ const CustomInput = (props) => {
     return i18n.t("messagesInput.placeholderClosed");
   };
 
-  const setInputRef = (input) => {
+  const setInputRef = input => {
     if (input) {
       inputRef.current = input;
       inputRef.current.spellcheck = true;
@@ -470,16 +467,16 @@ const CustomInput = (props) => {
 
   const showFormatMenu = () => {
     const selection = window.getSelection();
-    const menuElement = document.getElementById('format-menu');
+    const menuElement = document.getElementById("format-menu");
     if (!selection?.toString()) {
-      menuElement.style.display = 'none';
+      menuElement.style.display = "none";
     } else {
-      menuElement.style.display = 'flex';
+      menuElement.style.display = "flex";
       menuElement.style.top = `${selection.anchorNode.offsetTop - 40}px`;
       menuElement.style.left = `${selection.anchorNode.offsetLeft}px`;
     }
   };
-  
+
   const formatText = (prefix, suffix) => {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
@@ -490,19 +487,19 @@ const CustomInput = (props) => {
       const end = textArea.selectionEnd;
       const textBefore = inputMessage.substring(0, start);
       const textAfter = inputMessage.substring(end);
-      
+
       const prevChar = textBefore.charAt(start - 1);
-      if (prevChar && prevChar !== ' ' && prevChar !== '\n') {
+      if (prevChar && prevChar !== " " && prevChar !== "\n") {
         formattedText = ` ${formattedText}`;
       }
-      
+
       const nextChar = textAfter.charAt(0);
-      if (nextChar && nextChar !== ' ' && nextChar !== '\n') {
+      if (nextChar && nextChar !== " " && nextChar !== "\n") {
         formattedText = `${formattedText} `;
       }
-      
+
       setInputMessage(textBefore + formattedText + textAfter);
-      document.getElementById('format-menu').style.display = 'none';
+      document.getElementById("format-menu").style.display = "none";
       setTimeout(() => {
         textArea.focus();
         textArea.setSelectionRange(
@@ -522,27 +519,30 @@ const CustomInput = (props) => {
       const start = textArea.selectionStart;
       const end = textArea.selectionEnd;
 
-      const firstLineStart = inputMessage.substring(0, start).lastIndexOf("\n")+1;
-      const lastLineEnd = end+inputMessage.substring(end).indexOf("\n");
+      const firstLineStart =
+        inputMessage.substring(0, start).lastIndexOf("\n") + 1;
+      const lastLineEnd = end + inputMessage.substring(end).indexOf("\n");
       const textBefore = inputMessage.substring(0, firstLineStart);
       const textAfter = inputMessage.substring(lastLineEnd);
 
-      const lines = inputMessage.substring(firstLineStart, lastLineEnd).split('\n');
+      const lines = inputMessage
+        .substring(firstLineStart, lastLineEnd)
+        .split("\n");
       return { lines, textBefore, textAfter };
     }
     return { lines: [], textBefore: inputMessage, textAfter: "" };
   };
-  
+
   const formatCode = () => {
     const selection = window.getSelection();
-    if (selection.toString().indexOf('\n') === -1) {
-      formatText('`', '`');
+    if (selection.toString().indexOf("\n") === -1) {
+      formatText("`", "`");
       return;
     }
-      
+
     const { lines, textBefore, textAfter } = splitSelectionLines();
     if (lines.length > 0) {
-      const formattedText = "```\n" + lines.join('\n') + "\n```\n";
+      const formattedText = "```\n" + lines.join("\n") + "\n```\n";
       setInputMessage(textBefore + formattedText + textAfter);
       setTimeout(() => {
         const textArea = inputRef.current;
@@ -555,12 +555,14 @@ const CustomInput = (props) => {
       }, 0);
     }
   };
-          
+
   const formatListNumbered = () => {
     const { lines, textBefore, textAfter } = splitSelectionLines();
     if (lines.length > 0) {
-      const formattedLines = lines.map((line, index) => `${index + 1}. ${line}`);
-      const formattedText = formattedLines.join('\n');
+      const formattedLines = lines.map(
+        (line, index) => `${index + 1}. ${line}`
+      );
+      const formattedText = formattedLines.join("\n");
 
       setInputMessage(textBefore + formattedText + textAfter);
       setTimeout(() => {
@@ -579,7 +581,7 @@ const CustomInput = (props) => {
     const { lines, textBefore, textAfter } = splitSelectionLines();
     if (lines.length > 0) {
       const formattedLines = lines.map(line => `* ${line}`);
-      const formattedText = formattedLines.join('\n');
+      const formattedText = formattedLines.join("\n");
 
       setInputMessage(textBefore + formattedText + textAfter);
       setTimeout(() => {
@@ -598,7 +600,7 @@ const CustomInput = (props) => {
     const { lines, textBefore, textAfter } = splitSelectionLines();
     if (lines.length > 0) {
       const formattedLines = lines.map(line => `> ${line}`);
-      const formattedText = formattedLines.join('\n');
+      const formattedText = formattedLines.join("\n");
 
       setInputMessage(textBefore + formattedText + textAfter);
       setTimeout(() => {
@@ -624,7 +626,7 @@ const CustomInput = (props) => {
         value={inputMessage}
         options={options}
         closeIcon={null}
-        getOptionLabel={(option) => {
+        getOptionLabel={option => {
           if (isObject(option)) {
             return option.label;
           } else {
@@ -647,133 +649,140 @@ const CustomInput = (props) => {
         onPaste={onPaste}
         onKeyPress={onKeyPress}
         style={{ width: "100%" }}
-        renderInput={(params) => {
+        renderInput={params => {
           const { InputLabelProps, InputProps, ...rest } = params;
           return (
             <>
-            <InputBase
-              {...params.InputProps}
-              {...rest}
-              disabled={disableOption}
-              inputRef={(input) => setInputRef(input)}
-              placeholder={renderPlaceholder()}
-              multiline
-              className={classes.messageInput}
-              maxRows={5}
-              endAdornment={
-                isMobile() &&
-                <InputAdornment position="end">
-                  <input
-                    type="file"
-                    id="camera-button"
-                    accept="image/*"
-                    capture="camera"
-                    className={classes.uploadInput}
-                    onChange={handleChangeMedias}
-                  />
-                  <label htmlFor="camera-button">
-                    <IconButton
-                      aria-label="camera-upload"
-                      component="span"
-                      disabled={disableOption}
-                    >
-                      <CameraAltIcon className={classes.cameraIcon} />
-                    </IconButton>
-                  </label>
-                </InputAdornment>
-              }    
-              onKeyDownCapture={(e) => {
-                if (
-                  !popupOpen && (
-                    e.key === 'ArrowUp' ||
-                    e.key === 'ArrowDown'
+              <InputBase
+                {...params.InputProps}
+                {...rest}
+                disabled={disableOption}
+                inputRef={input => setInputRef(input)}
+                placeholder={renderPlaceholder()}
+                multiline
+                className={classes.messageInput}
+                maxRows={5}
+                endAdornment={
+                  isMobile() && (
+                    <InputAdornment position="end">
+                      <input
+                        type="file"
+                        id="camera-button"
+                        accept="image/*"
+                        capture="camera"
+                        className={classes.uploadInput}
+                        onChange={handleChangeMedias}
+                      />
+                      <label htmlFor="camera-button">
+                        <IconButton
+                          aria-label="camera-upload"
+                          component="span"
+                          disabled={disableOption}
+                        >
+                          <CameraAltIcon className={classes.cameraIcon} />
+                        </IconButton>
+                      </label>
+                    </InputAdornment>
                   )
-                ) {
-                  e.stopPropagation();
                 }
-              }}
-              onMouseUp={showFormatMenu}
-              onKeyUp={showFormatMenu}
-              onKeyDown={(e) => {
-                if (e.ctrlKey && e.key === 'b') {
-                  e.preventDefault();
-                  formatText('*', '*');
-                } else if (e.ctrlKey && e.key === 'i') {
-                  e.preventDefault();
-                  formatText('_', '_');
-                } else if (e.ctrlKey && e.key === 's') {
-                  e.preventDefault();
-                  formatText('~', '~');
-                } else if (e.ctrlKey && e.key === 'm') {
-                  e.preventDefault();
-                  formatCode();
-                } else if (e.ctrlKey && e.key === 'q') {
-                  e.preventDefault();
-                  formatQuote();
-                } else if (e.ctrlKey && e.key === 'n') {
-                  e.preventDefault();
-                  formatListNumbered();
-                } else if (e.ctrlKey && e.key === 'l') {
-                  e.preventDefault();
-                  formatListBulleted();
-                }
-              }}
-            />
-            <div
-              id="format-menu"
-              className={classes.formatMenu}
-              style={{ display: 'none', position: 'absolute', zIndex: 1000 }}
-            >
-              <IconButton 
-                size="small" 
-                onClick={() => formatText('*','*')}
-                style={{ padding: '6px', margin: '0 2px' }}
+                onKeyDownCapture={e => {
+                  if (
+                    !popupOpen &&
+                    (e.key === "ArrowUp" || e.key === "ArrowDown")
+                  ) {
+                    e.stopPropagation();
+                  }
+                }}
+                onMouseUp={showFormatMenu}
+                onKeyUp={showFormatMenu}
+                onKeyDown={e => {
+                  if (e.ctrlKey && e.key === "b") {
+                    e.preventDefault();
+                    formatText("*", "*");
+                  } else if (e.ctrlKey && e.key === "i") {
+                    e.preventDefault();
+                    formatText("_", "_");
+                  } else if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    formatText("~", "~");
+                  } else if (e.ctrlKey && e.key === "m") {
+                    e.preventDefault();
+                    formatCode();
+                  } else if (e.ctrlKey && e.key === "q") {
+                    e.preventDefault();
+                    formatQuote();
+                  } else if (e.ctrlKey && e.key === "n") {
+                    e.preventDefault();
+                    formatListNumbered();
+                  } else if (e.ctrlKey && e.key === "l") {
+                    e.preventDefault();
+                    formatListBulleted();
+                  }
+                }}
+              />
+              <div
+                id="format-menu"
+                className={classes.formatMenu}
+                style={{ display: "none", position: "absolute", zIndex: 1000 }}
               >
-                <Typography style={{ fontWeight: 'bold', fontSize: '15px' }}>B</Typography>
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={() => formatText('_','_')}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <Typography style={{ fontStyle: 'italic', fontSize: '15px' }}>I</Typography>
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={() => formatText('~','~')}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <Typography style={{ textDecoration: 'line-through', fontSize: '15px' }}>S</Typography>
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={formatCode}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <Code fontSize="small" />
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={formatListNumbered}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <FormatListNumbered fontSize="small" />
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={formatListBulleted}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <FormatListBulleted fontSize="small" />
-              </IconButton>
-              <IconButton 
-                size="small" 
-                onClick={formatQuote}
-                style={{ padding: '6px', margin: '0 2px' }}
-              >
-                <FormatQuote fontSize="small" />
-              </IconButton>
-            </div>
+                <IconButton
+                  size="small"
+                  onClick={() => formatText("*", "*")}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <Typography style={{ fontWeight: "bold", fontSize: "15px" }}>
+                    B
+                  </Typography>
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => formatText("_", "_")}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <Typography style={{ fontStyle: "italic", fontSize: "15px" }}>
+                    I
+                  </Typography>
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => formatText("~", "~")}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <Typography
+                    style={{ textDecoration: "line-through", fontSize: "15px" }}
+                  >
+                    S
+                  </Typography>
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatCode}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <Code fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatListNumbered}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <FormatListNumbered fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatListBulleted}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <FormatListBulleted fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={formatQuote}
+                  style={{ padding: "6px", margin: "0 2px" }}
+                >
+                  <FormatQuote fontSize="small" />
+                </IconButton>
+              </div>
             </>
           );
         }}
@@ -782,7 +791,7 @@ const CustomInput = (props) => {
   );
 };
 
-const MessageInputCustom = (props) => {
+const MessageInputCustom = props => {
   const { ticket, showTabGroups } = props;
   const { status: ticketStatus, id: ticketId } = ticket;
   const classes = useStyles();
@@ -797,9 +806,7 @@ const MessageInputCustom = (props) => {
   const inputRef = useRef();
   const { setReplyingMessage, replyingMessage } =
     useContext(ReplyMessageContext);
-  const { setEditingMessage, editingMessage } = useContext(
-		EditMessageContext
-	);  
+  const { setEditingMessage, editingMessage } = useContext(EditMessageContext);
   const { user } = useContext(AuthContext);
 
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
@@ -832,23 +839,24 @@ const MessageInputCustom = (props) => {
     return () => {
       socket.disconnect();
     };
-  }, [socketManager]);        
+  }, [socketManager]);
 
   useEffect(() => {
     if (editingMessage) {
       if (signMessage && editingMessage.body.startsWith(`*${user.name}:*\n`)) {
-        setInputMessage(editingMessage.body.substr(editingMessage.body.indexOf("\n")+1));
+        setInputMessage(
+          editingMessage.body.substr(editingMessage.body.indexOf("\n") + 1)
+        );
       } else {
         setInputMessage(editingMessage.body);
       }
     }
-    
+
     if (replyingMessage || editingMessage) {
       inputRef.current.focus();
     }
-    
   }, [replyingMessage, editingMessage, signMessage, user.name]);
-  
+
   useEffect(() => {
     inputRef.current.focus();
     return () => {
@@ -868,12 +876,12 @@ const MessageInputCustom = (props) => {
   // 	}
   // };
 
-  const handleAddEmoji = (e) => {
+  const handleAddEmoji = e => {
     let emoji = e.native;
-    setInputMessage((prevState) => prevState + emoji);
+    setInputMessage(prevState => prevState + emoji);
   };
 
-  const handleChangeMedias = (e) => {
+  const handleChangeMedias = e => {
     if (!e.target.files) {
       return;
     }
@@ -882,13 +890,13 @@ const MessageInputCustom = (props) => {
     setMedias(selectedMedias);
   };
 
-  const handleInputPaste = (e) => {
+  const handleInputPaste = e => {
     if (e.clipboardData.files[0]) {
       setMedias([e.clipboardData.files[0]]);
     }
   };
 
-  const handleUploadMedia = async (e) => {
+  const handleUploadMedia = async e => {
     setLoading(true);
     e.preventDefault();
 
@@ -896,12 +904,13 @@ const MessageInputCustom = (props) => {
     formData.append("fromMe", true);
 
     medias.forEach(async (media, idx) => {
-
       const file = media;
 
-      if (!file) { return; }
+      if (!file) {
+        return;
+      }
 
-      if (media?.type.split('/')[0] == 'image') {
+      if (media?.type.split("/")[0] == "image") {
         new Compressor(file, {
           quality: 0.7,
 
@@ -912,40 +921,33 @@ const MessageInputCustom = (props) => {
 
             formData.append("medias", media, media.name);
             formData.append("body", media.name);
-
           },
           error(err) {
-            alert('erro')
+            alert("erro");
             console.log(err.message);
           },
-
         });
       } else {
         formData.append("medias", media);
         formData.append("body", media.name);
-
       }
+    });
 
-
-    },);
-
-    setTimeout(async()=> {
-
+    setTimeout(async () => {
       try {
-        await api.post(`/messages/${ticketId}`, formData, {
-          onUploadProgress: (event) => {
-            let progress = Math.round(
-              (event.loaded * 100) / event.total
-            );
-            setPercentLoading(progress);
-          },
-        })
-          .then((response) => {
-            setLoading(false)
-            setMedias([])
+        await api
+          .post(`/messages/${ticketId}`, formData, {
+            onUploadProgress: event => {
+              let progress = Math.round((event.loaded * 100) / event.total);
+              setPercentLoading(progress);
+            },
+          })
+          .then(response => {
+            setLoading(false);
+            setMedias([]);
             setPercentLoading(0);
           })
-          .catch((err) => {
+          .catch(err => {
             setLoading(false);
             setMedias([]);
             setPercentLoading(0);
@@ -954,20 +956,17 @@ const MessageInputCustom = (props) => {
       } catch (err) {
         toastError(err);
       }
+    }, 2000);
+  };
 
-
-    },2000)
-
-  }
-
-  const handlePresenceUpdate = (presence) => {
+  const handlePresenceUpdate = presence => {
     if (!socket || currentPresence === presence) return;
-    
+
     if (presenceTimeout) {
       clearTimeout(presenceTimeout);
       setPresenceTimeout(null);
     }
-    
+
     if (!presence) {
       setCurrentPresence(null);
       socket.emit("presenceUpdate", {
@@ -976,7 +975,7 @@ const MessageInputCustom = (props) => {
       });
       return;
     }
-    
+
     setCurrentPresence(presence);
     socket.emit("presenceUpdate", {
       ticketId,
@@ -994,7 +993,7 @@ const MessageInputCustom = (props) => {
         }, 5000)
       );
     }
-  }  
+  };
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
@@ -1012,11 +1011,12 @@ const MessageInputCustom = (props) => {
     };
 
     handlePresenceUpdate(null);
-    
-    const url = editingMessage !== null ?
-      `/messages/edit/${editingMessage.id}` :
-      `/messages/${ticketId}`;
-    api.post(url, message).catch((err) => {
+
+    const url =
+      editingMessage !== null
+        ? `/messages/edit/${editingMessage.id}`
+        : `/messages/${ticketId}`;
+    api.post(url, message).catch(err => {
       toastError(err);
     });
 
@@ -1029,7 +1029,7 @@ const MessageInputCustom = (props) => {
   };
 
   const handleStartRecording = async () => {
-    if(disableOption)return;
+    if (disableOption) return;
     setLoading(true);
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1080,9 +1080,10 @@ const MessageInputCustom = (props) => {
   };
 
   const isGroup = showTabGroups && ticket.isGroup;
-  const disableOption = !isGroup && loading || recording || ticketStatus === "closed";
+  const disableOption =
+    (!isGroup && loading) || recording || ticketStatus === "closed";
 
-  const renderReplyingMessage = (message) => {
+  const renderReplyingMessage = message => {
     return (
       <div className={classes.replyginMsgWrapper}>
         <div className={classes.replyginMsgContainer}>
@@ -1097,7 +1098,9 @@ const MessageInputCustom = (props) => {
                 {i18n.t("messagesInput.replying")} {message.contact?.name}
               </span>
               <WhatsMarked>
-                { message.body.startsWith('{"ticketzvCard":') ? "🪪" : message.body }
+                {message.body.startsWith('{"ticketzvCard":')
+                  ? "🪪"
+                  : message.body}
               </WhatsMarked>
             </div>
           )}
@@ -1106,9 +1109,7 @@ const MessageInputCustom = (props) => {
               <span className={classes.messageContactName}>
                 {i18n.t("messagesInput.editing")}
               </span>
-              <WhatsMarked>
-                {message.body}
-              </WhatsMarked>
+              <WhatsMarked>{message.body}</WhatsMarked>
             </div>
           )}
         </div>
@@ -1117,9 +1118,9 @@ const MessageInputCustom = (props) => {
           component="span"
           disabled={disableOption}
           onClick={() => {
-              setReplyingMessage(null);
-              setEditingMessage(null);
-              setInputMessage("");
+            setReplyingMessage(null);
+            setEditingMessage(null);
+            setInputMessage("");
           }}
         >
           <ClearIcon className={classes.sendMessageIcons} />
@@ -1135,7 +1136,7 @@ const MessageInputCustom = (props) => {
           aria-label="cancel-upload"
           component="span"
           disabled={disableOption}
-          onClick={(e) => setMedias([])}
+          onClick={e => setMedias([])}
         >
           <CancelIcon className={classes.sendMessageIcons} />
         </IconButton>
@@ -1148,7 +1149,7 @@ const MessageInputCustom = (props) => {
         ) : (
           <span>
             {medias[0]?.name}
-            {/* <img src={media.preview} alt=""></img> */}
+            <img src={medias[0].preview} alt=""></img>
           </span>
         )}
         <IconButton
@@ -1164,17 +1165,17 @@ const MessageInputCustom = (props) => {
   else {
     return (
       <Paper square elevation={0} className={classes.mainWrapper}>
-        {(replyingMessage && renderReplyingMessage(replyingMessage)) || (editingMessage && renderReplyingMessage(editingMessage))}
+        {(replyingMessage && renderReplyingMessage(replyingMessage)) ||
+          (editingMessage && renderReplyingMessage(editingMessage))}
         <div className={classes.newMessageBox}>
-          {
-            isMobile() ||
+          {isMobile() || (
             <EmojiOptions
               disabled={disableOption}
               handleAddEmoji={handleAddEmoji}
               showEmoji={showEmoji}
               setShowEmoji={setShowEmoji}
             />
-          }
+          )}
 
           <FileInput
             disableOption={disableOption}
@@ -1191,7 +1192,7 @@ const MessageInputCustom = (props) => {
           <CustomInput
             loading={loading}
             inputRef={inputRef}
-            ticketStatus={(isGroup && "open" ) || ticketStatus}
+            ticketStatus={(isGroup && "open") || ticketStatus}
             inputMessage={inputMessage}
             setInputMessage={setInputMessage}
             // handleChangeInput={handleChangeInput}

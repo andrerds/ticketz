@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import MediaPreview from "../../../components/MediaPreview";
 import { i18n } from "../../../translate/i18n";
 import { formatBytes } from "../utils/formatters";
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   deleteButton: {
     color: theme.palette.error.main,
   },
@@ -33,7 +33,7 @@ const MediaTable = ({
 }) => {
   const classes = useStyles();
 
-  const deletableFiles = mediaFiles.filter((f) => f.canDelete);
+  const deletableFiles = mediaFiles.filter(f => f.canDelete);
   const isAllSelected =
     selectedFiles.length > 0 && selectedFiles.length === deletableFiles.length;
 
@@ -54,7 +54,7 @@ const MediaTable = ({
         </TableRow>
       </TableHead>
       <TableBody>
-        {mediaFiles.map((file) => (
+        {mediaFiles.map(file => (
           <TableRow key={file.id}>
             <TableCell padding="checkbox">
               {file.canDelete && (

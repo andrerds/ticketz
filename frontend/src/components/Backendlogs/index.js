@@ -6,14 +6,27 @@ import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBug, faTrash, faFileImport, faFileExport } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBug,
+  faTrash,
+  faFileImport,
+  faFileExport,
+} from "@fortawesome/free-solid-svg-icons";
 import { i18n } from "../../translate/i18n";
 import { SocketContext } from "../../context/Socket/SocketContext";
 import ReactJsonView from "@microlink/react-json-view";
 
-import { FormControl, Grid, InputBase, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
+import {
+  FormControl,
+  Grid,
+  InputBase,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   tabContainer: {
     padding: theme.spacing(2),
   },
@@ -66,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "text",
     "&:hover": {
       backgroundColor: "#333",
-    },    
+    },
   },
   logMetadata: {
     flexShrink: 0,
@@ -83,7 +96,7 @@ const useStyles = makeStyles((theme) => ({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     margin: 0,
-    marginLeft: 8
+    marginLeft: 8,
   },
   logDetails: {
     flexGrow: 1,
@@ -140,8 +153,8 @@ function processLogInfo(logInfo) {
   if (!logs || logs.length === 0) {
     return { details, message: "" };
   }
-  
-  logs.forEach((log) => {
+
+  logs.forEach(log => {
     if (typeof log === "string") {
       message += log + "\n";
     } else {
@@ -154,14 +167,15 @@ function processLogInfo(logInfo) {
 
 function LogLine({ logInfo, filter }) {
   const classes = useStyles();
-  const [ expanded, setExpanded ] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const { details, message } = processLogInfo(logInfo);
-  
+
   if (filter && filter.length > 0) {
-    if (!message.toLowerCase().includes(filter.toLowerCase()) && 
-        !JSON.stringify(details).toLowerCase().includes(filter.toLowerCase())
-      ) {
+    if (
+      !message.toLowerCase().includes(filter.toLowerCase()) &&
+      !JSON.stringify(details).toLowerCase().includes(filter.toLowerCase())
+    ) {
       return null;
     }
   }
@@ -170,7 +184,7 @@ function LogLine({ logInfo, filter }) {
 
   let levelName;
   let levelClass = classes.info;
-  
+
   if (level >= 50) {
     levelName = "ERROR";
     levelClass = classes.error;
@@ -187,39 +201,35 @@ function LogLine({ logInfo, filter }) {
     levelName = "TRACE";
     levelClass = classes.trace;
   }
-  
+
   const toggleExpand = () => {
-    setExpanded((prevExpanded) => !prevExpanded);
-  }
-  
+    setExpanded(prevExpanded => !prevExpanded);
+  };
+
   return (
     <div className={classes.logline}>
       <pre className={classes.logMetadata}>
         {new Date(timestamp).toLocaleString()}&nbsp;
         <span className={levelClass}>{levelName}</span>
       </pre>
-      {details?.length ?
-        <div
-          className={classes.logExpand}
-          onClick={(e) => toggleExpand()}
-        >{ expanded ? "▼" : "▶" }</div>
-        :
+      {details?.length ? (
+        <div className={classes.logExpand} onClick={e => toggleExpand()}>
+          {expanded ? "▼" : "▶"}
+        </div>
+      ) : (
         <div className={classes.logExpand}>&nbsp;</div>
-      }
-      {expanded ?
+      )}
+      {expanded ? (
         <div className={classes.logDetails}>
           {message}
           <br />
           {details.map((detail, _index) => {
-            return (
-              <ReactJsonView src={detail} theme='tomorrow' />
-            );
-          }
-          )}
+            return <ReactJsonView src={detail} theme="tomorrow" />;
+          })}
         </div>
-        :
+      ) : (
         <pre className={classes.logMessage}>{message}</pre>
-      }
+      )}
     </div>
   );
 }
@@ -239,34 +249,38 @@ export function Backendlogs() {
   useEffect(() => {
     const socket = socketManager.GetSocket();
 
-    socket.on("backendlog", (logInfo) => {
-      const isAtBottom = consoleRef.current &&
-        parseInt(consoleRef.current.scrollHeight - consoleRef.current.scrollTop) <=
-        consoleRef.current.clientHeight;
-        
-      consoleRef.current && console.log({
-        scrollHeight: consoleRef.current.scrollHeight,
-        scrollTop: consoleRef.current.scrollTop,
-        position: consoleRef.current.scrollHeight - consoleRef.current.scrollTop,
-        clientHeight: consoleRef.current.clientHeight,
-        isAtBottom
-      });
+    socket.on("backendlog", logInfo => {
+      const isAtBottom =
+        consoleRef.current &&
+        parseInt(
+          consoleRef.current.scrollHeight - consoleRef.current.scrollTop
+        ) <= consoleRef.current.clientHeight;
+
+      consoleRef.current &&
+        console.log({
+          scrollHeight: consoleRef.current.scrollHeight,
+          scrollTop: consoleRef.current.scrollTop,
+          position:
+            consoleRef.current.scrollHeight - consoleRef.current.scrollTop,
+          clientHeight: consoleRef.current.clientHeight,
+          isAtBottom,
+        });
 
       if (logInfo.logs?.[0].currentLevel) {
         setLogLevel(logInfo.logs[0].currentLevel);
       }
-      setLogs((prevLogs) => [...prevLogs, logInfo]);
-      
+      setLogs(prevLogs => [...prevLogs, logInfo]);
+
       if (isAtBottom) {
         consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
       }
     });
-    
+
     return () => {
       socket.disconnect();
     };
   }, [socketManager]);
-  
+
   useEffect(() => {
     if (!logLevel) return;
 
@@ -280,9 +294,9 @@ export function Backendlogs() {
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }, 500);
   }, [isOpen]);
-  
+
   const handleClick = () => {
-    setIsOpen((prevState) => !prevState);
+    setIsOpen(prevState => !prevState);
   };
 
   const handleClickAway = () => {
@@ -296,7 +310,7 @@ export function Backendlogs() {
     }
   };
 
-  const handleLoggingToggle = (event) => {
+  const handleLoggingToggle = event => {
     const socket = socketManager.GetSocket();
 
     if (event.target.checked) {
@@ -309,23 +323,23 @@ export function Backendlogs() {
     }
   };
 
-  const handleLogLevelChange = (event) => {
+  const handleLogLevelChange = event => {
     setLogLevel(event.target.value);
   };
-  
+
   const handleImport = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
-    input.onchange = (event) => {
+    input.onchange = event => {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const importedLogs = JSON.parse(e.target.result);
-          setLogs((prevLogs) => [...prevLogs, ...importedLogs]);
+          setLogs(prevLogs => [...prevLogs, ...importedLogs]);
         } catch (error) {
           console.error("Failed to import logs:", error);
         }
@@ -334,7 +348,7 @@ export function Backendlogs() {
     };
     input.click();
   };
-  
+
   const handleExport = () => {
     const dataStr = JSON.stringify(logs, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
@@ -348,7 +362,7 @@ export function Backendlogs() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  
+
   return (
     <>
       <IconButton
@@ -385,19 +399,26 @@ export function Backendlogs() {
               </Select>
             </FormControl>
           </Grid>
-          
+
           <Grid item md={4} xs={12}>
             <FormControl fullWidth>
               <TextField
                 label={i18n.t("common.filter")}
                 name="filter"
                 variant="standard"
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={e => setFilter(e.target.value)}
               />
             </FormControl>
           </Grid>
-              
-          <Grid item md={6} xs={12} container justifyContent="flex-end" alignItems="center">
+
+          <Grid
+            item
+            md={6}
+            xs={12}
+            container
+            justifyContent="flex-end"
+            alignItems="center"
+          >
             <FormControlLabel
               control={
                 <Switch

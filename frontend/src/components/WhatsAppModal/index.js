@@ -33,7 +33,7 @@ import HelpOutlineOutlinedIcon from "@material-ui/icons/HelpOutlineOutlined";
 
 import { SelectLanguage } from "../SelectLanguage";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -92,7 +92,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
         const { data } = await api.get(`whatsapp/${whatsAppId}?session=0`);
         setWhatsApp(data);
 
-        const whatsQueueIds = data.queues?.map((queue) => queue.id);
+        const whatsQueueIds = data.queues?.map(queue => queue.id);
         setSelectedQueueIds(whatsQueueIds);
       } catch (err) {
         toastError(err);
@@ -101,7 +101,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
     fetchSession();
   }, [whatsAppId]);
 
-  const handleSaveWhatsApp = async (values) => {
+  const handleSaveWhatsApp = async values => {
     const whatsappData = { ...values, queueIds: selectedQueueIds };
     delete whatsappData["queues"];
     delete whatsappData["session"];
@@ -203,11 +203,11 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                   />
                 </div>
                 <div>
-                 <Typography style={{fontSize: "11px"}}>
-                  {`Variaveis: ( {{ms}}=> Turno, 
+                  <Typography style={{ fontSize: "11px" }}>
+                    {`Variaveis: ( {{ms}}=> Turno, 
                   {{name}}=> Nome do contato, 
                   {{protocol}}=> protocolo, {{hora}}=> hora )`}
-                 </Typography>
+                  </Typography>
                 </div>
                 <div>
                   <Field
@@ -241,8 +241,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     name="transferMessage"
                     spellCheck={true}
                     error={
-                      touched.transferMessage &&
-                      Boolean(errors.transferMessage)
+                      touched.transferMessage && Boolean(errors.transferMessage)
                     }
                     helperText={
                       touched.transferMessage && errors.transferMessage
@@ -303,7 +302,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                 </div>
                 <QueueSelect
                   selectedQueueIds={selectedQueueIds}
-                  onChange={(selectedIds) => setSelectedQueueIds(selectedIds)}
+                  onChange={selectedIds => setSelectedQueueIds(selectedIds)}
                 />
                 <div>
                   <Field

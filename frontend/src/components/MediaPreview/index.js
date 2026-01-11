@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getBackendURL } from "../../services/config";
 import PdfPreview from "./PdfPreview";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   container: {
     position: "relative",
     display: "inline-block",
@@ -97,7 +97,7 @@ const MediaPreview = ({
   const MAX_RETRIES = 2;
 
   // Helper function to detect file type
-  const getFileType = useCallback((url) => {
+  const getFileType = useCallback(url => {
     if (!url) return "unknown";
 
     const extension = url.split(".").pop()?.toLowerCase();
@@ -183,7 +183,7 @@ const MediaPreview = ({
 
   const handleRetry = useCallback(() => {
     if (retryCount < MAX_RETRIES) {
-      setRetryCount((prev) => prev + 1);
+      setRetryCount(prev => prev + 1);
       generatePreviewUrl();
     }
   }, [retryCount, generatePreviewUrl]);
@@ -211,6 +211,7 @@ const MediaPreview = ({
 
   // Handle PDF files with PdfPreview component
   if (fileType === "pdf" && previewUrl) {
+    console.log("MediaPreview Debug: Rendering PdfPreview", fileType);
     return (
       <PdfPreview
         pdfUrl={previewUrl}

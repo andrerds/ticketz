@@ -31,7 +31,7 @@ import {
 } from "@material-ui/core";
 import ConfirmationModal from "../ConfirmationModal";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -91,7 +91,7 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
         if (!announcementId) return;
 
         const { data } = await api.get(`/announcements/${announcementId}`);
-        setAnnouncement((prevState) => {
+        setAnnouncement(prevState => {
           return { ...prevState, ...data };
         });
       })();
@@ -106,14 +106,14 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
     onClose();
   };
 
-  const handleAttachmentFile = (e) => {
+  const handleAttachmentFile = e => {
     const file = head(e.target.files);
     if (file) {
       setAttachment(file);
     }
   };
 
-  const handleSaveAnnouncement = async (values) => {
+  const handleSaveAnnouncement = async values => {
     const announcementData = { ...values };
     try {
       if (announcementId) {
@@ -152,7 +152,7 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
 
     if (announcement.mediaPath) {
       await api.delete(`/announcements/${announcement.id}/media-upload`);
-      setAnnouncement((prev) => ({
+      setAnnouncement(prev => ({
         ...prev,
         mediaPath: null,
       }));
@@ -190,7 +190,7 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
             type="file"
             accept=".png,.jpg,.jpeg"
             ref={attachmentFile}
-            onChange={(e) => handleAttachmentFile(e)}
+            onChange={e => handleAttachmentFile(e)}
           />
         </div>
         <Formik

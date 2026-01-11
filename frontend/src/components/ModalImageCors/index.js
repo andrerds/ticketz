@@ -6,7 +6,7 @@ import clsx from "clsx";
 import ModalImage from "react-modal-image";
 import { i18n } from "../../translate/i18n";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   messageMedia: {
     objectFit: "cover",
     width: "100%",

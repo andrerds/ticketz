@@ -35,7 +35,7 @@ export const useMediaManagement = () => {
   }, []);
 
   const deleteFile = useCallback(
-    async (messageId) => {
+    async messageId => {
       try {
         await api.delete(`/media/${messageId}`);
         toast.success(i18n.t("mediaManagement.messages.deleteSuccess"));
@@ -48,7 +48,7 @@ export const useMediaManagement = () => {
   );
 
   const bulkDeleteFiles = useCallback(
-    async (messageIds) => {
+    async messageIds => {
       try {
         await api.post("/media/bulk-delete", { messageIds });
         toast.success(i18n.t("mediaManagement.messages.bulkDeleteSuccess"));
@@ -61,20 +61,20 @@ export const useMediaManagement = () => {
     [loadMediaFiles, loadStats]
   );
 
-  const handleSelectFile = useCallback((fileId) => {
-    setSelectedFiles((prev) =>
+  const handleSelectFile = useCallback(fileId => {
+    setSelectedFiles(prev =>
       prev.includes(fileId)
-        ? prev.filter((id) => id !== fileId)
+        ? prev.filter(id => id !== fileId)
         : [...prev, fileId]
     );
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    const deletableFiles = mediaFiles.filter((f) => f.canDelete);
+    const deletableFiles = mediaFiles.filter(f => f.canDelete);
     if (selectedFiles.length === deletableFiles.length) {
       setSelectedFiles([]);
     } else {
-      setSelectedFiles(deletableFiles.map((f) => f.messageId));
+      setSelectedFiles(deletableFiles.map(f => f.messageId));
     }
   }, [mediaFiles, selectedFiles.length]);
 
