@@ -1487,7 +1487,6 @@ const MessagesList = ({
       if (!message.fromMe) {
         return (
           <React.Fragment key={message.id}>
-            <div> asdl;asmdadasda </div>
             {renderDailyTimestamps(message, index)}
             {renderMessageDivider(message, index)}
             <div
