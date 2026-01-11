@@ -5,3 +5,6 @@ free-react-tailwind-admin-dashboard-main
 .DS_Store
 .idea
 node_modules
+CUSTOMIZATIONS.md
+/.kiro
+.kiro/*

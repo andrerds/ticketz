@@ -13,67 +13,78 @@ Manter registro de todas as modificações para facilitar:
 
 ## 🎯 Customizações Principais
 
+Este projeto possui duas grandes features customizadas documentadas em specs:
+
+### 1. S3 Media Storage System (`.kiro/specs/s3-media-storage/`)
+
+Sistema flexível de armazenamento de mídia com suporte a Local e S3-compatible storage (AWS S3, MinIO, Cloudflare R2).
+
+**Principais mudanças:**
+
+- Storage abstraction layer com drivers Local/S3
+- Campo `fileSize` adicionado ao modelo Message
+- Hybrid mode: serve arquivos locais e S3 transparentemente
+- Image optimization para reduzir custos
+- Migration utilities para mover arquivos locais para S3
+- Criptografia de credenciais S3
+
+### 2. File Preview System (`.kiro/specs/file-preview/`)
+
+Sistema centralizado para geração e exibição de previews de arquivos com integração S3/Local.
+
+**Principais mudanças:**
+
+- MediaPreview component unificado com detecção automática de storage
+- Thumbnail handling robusto
+- Preview URL generation baseado em storage location
+- Loading states e error handling
+- Integração com MediaTable
+
+## 📋 Arquivos Modificados/Criados
+
 ### Backend
 
-#### Arquivos Modificados
+#### Storage & Media Services
 
-- **`backend/src/services/MessageService.ts`**
+- `backend/src/services/StorageServices/*` - **CRIADO** - Abstração de storage (Local/S3)
+- `backend/src/services/MediaServices/ListMediaFilesService.ts` - **MODIFICADO** - Storage detection
+- `backend/src/services/MediaServices/SaveMediaToFileService.ts` - **MODIFICADO** - Retorna {mediaPath, fileSize}
+- `backend/src/services/MessageServices/CreateMessageService.ts` - **MODIFICADO** - Persiste fileSize
+- `backend/src/services/MigrationServices/MigrateFileSizesService.ts` - **CRIADO** - Migration utility
 
-  - Linha: [número]
-  - Modificação: [descrição]
-  - Motivo: [razão da customização]
-  - Data: [YYYY-MM-DD]
+#### Controllers
 
-- **`backend/src/controllers/TicketController.ts`**
-  - Linha: [número]
-  - Modificação: [descrição]
-  - Motivo: [razão da customização]
-  - Data: [YYYY-MM-DD]
+- `backend/src/controllers/MediaController.ts` - **MODIFICADO** - Hybrid mode file serving
+- `backend/src/controllers/MigrationController.ts` - **CRIADO** - Migration endpoints
 
-#### Arquivos Adicionados
+#### Models & Database
 
-- **`backend/src/custom/`**
-  - Descrição: Diretório para lógica customizada
-  - Conteúdo: [listar arquivos]
+- `backend/src/models/Message.ts` - **MODIFICADO** - Campo fileSize adicionado
+- `backend/src/database/migrations/*-add-filesize-to-messages.ts` - **CRIADO** - Migration
+
+#### Helpers
+
+- `backend/src/helpers/wbotMessageListener.ts` - **MODIFICADO** - Captura fileSize no upload
 
 ### Frontend
 
-#### Arquivos Modificados
+#### Preview Components
 
-- **`frontend/src/components/MessagesList/index.js`**
+- `frontend/src/components/MediaPreview/index.js` - **CRIADO** - Unified preview component
+- `frontend/src/components/MediaPreview/PdfPreview.js` - **CRIADO** - PDF preview
+- `frontend/src/components/MediaPreview/ThumbnailPreview.js` - **CRIADO** - Thumbnail preview
 
-  - Modificação: Preview de mídia customizado
-  - Motivo: Melhorar experiência do usuário
-  - Data: [YYYY-MM-DD]
+#### Modified Components
 
-- **`frontend/src/components/Ticket/index.js`**
-
-  - Modificação: Interface de tickets modificada
-  - Motivo: Requisitos específicos do cliente
-  - Data: [YYYY-MM-DD]
-
-- **`frontend/src/components/MessageInputCustom/index.js`**
-
-  - Modificação: Input de mensagem customizado
-  - Motivo: [razão]
-  - Data: [YYYY-MM-DD]
-
-- **`frontend/src/components/MediaPreview/index.js`**
-
-  - Modificação: Preview de mídia
-  - Motivo: [razão]
-  - Data: [YYYY-MM-DD]
-
-- **`frontend/src/components/ModalImageCors/index.js`**
-  - Modificação: Modal de imagem com CORS
-  - Motivo: [razão]
-  - Data: [YYYY-MM-DD]
-
-#### Arquivos Adicionados
-
-- **`frontend/src/custom/`**
-  - Descrição: Componentes customizados
-  - Conteúdo: [listar componentes]
+- `frontend/src/components/MessagesList/index.js` - **MODIFICADO** - Preview integration
+- `frontend/src/components/Ticket/index.js` - **MODIFICADO** - Preview support
+- `frontend/src/components/MessageInputCustom/index.js` - **MODIFICADO** - Custom input
+- `frontend/src/components/MessageForwardModal/index.js` - **MODIFICADO** - Forward with preview
+- `frontend/src/components/MessageOptionsMenu/index.js` - **MODIFICADO** - Options integration
+- `frontend/src/components/ModalImageCors/index.js` - **MODIFICADO** - CORS-aware modal
+- `frontend/src/pages/MediaManagement/components/MediaTable.js` - **MODIFICADO** - Preview column
+- `frontend/src/context/ReplyingMessage/ReplyingMessageContext.js` - **MODIFICADO** - Reply context
+- `frontend/src/App.js` - **MODIFICADO** - Custom theme
 
 ### Configurações
 
@@ -163,12 +174,27 @@ Manter registro de todas as modificações para facilitar:
 
 Lista de arquivos/diretórios que contêm customizações críticas:
 
-1. `frontend/src/components/MessagesList/index.js`
-2. `frontend/src/components/Ticket/index.js`
-3. `frontend/src/components/MessageInputCustom/index.js`
-4. `frontend/src/components/MediaPreview/`
-5. `frontend/src/components/ModalImageCors/`
-6. `backend/src/custom/` (se existir)
+### Backend - S3 Media Storage
+
+1. `backend/src/services/StorageServices/*` - Storage drivers
+2. `backend/src/services/MediaServices/*` - Media handling
+3. `backend/src/services/MigrationServices/*` - Migration tools
+4. `backend/src/controllers/MediaController.ts` - Hybrid serving
+5. `backend/src/models/Message.ts` - FileSize field
+6. `backend/src/helpers/wbotMessageListener.ts` - Upload handling
+
+### Frontend - File Preview System
+
+1. `frontend/src/components/MediaPreview/*` - All preview components
+2. `frontend/src/components/MessagesList/index.js` - Preview integration
+3. `frontend/src/components/Ticket/index.js` - Preview support
+4. `frontend/src/components/MessageInputCustom/index.js` - Custom input
+5. `frontend/src/components/MessageForwardModal/index.js` - Forward modal
+6. `frontend/src/components/MessageOptionsMenu/index.js` - Options menu
+7. `frontend/src/components/ModalImageCors/index.js` - CORS modal
+8. `frontend/src/pages/MediaManagement/components/MediaTable.js` - Media table
+9. `frontend/src/context/ReplyingMessage/ReplyingMessageContext.js` - Reply context
+10. `frontend/src/App.js` - Custom theme
 
 ## 📝 Notas para Cherry-Pick
 
