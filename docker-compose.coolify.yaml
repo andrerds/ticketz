@@ -42,15 +42,14 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     environment:
-      NODE_ENV: production
-      PORT: 3000
+      PORT: 8080
       DB_DIALECT: postgres
       DB_HOST: postgres
-      DB_PORT: 5432
+      DB_PORT: ${POSTGRES_PORT:-5432}
       DB_USER: ${POSTGRES_USER:-ticketz}
       DB_PASS: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB:-ticketz}
-      REDIS_URI: redis://redis:6379
+      REDIS_URI: ${REDIS_URI:-redis://redis:6379}
       REDIS_OPT_LIMITER_MAX: ${REDIS_OPT_LIMITER_MAX:-1}
       REDIS_OPT_LIMITER_DURATION: ${REDIS_OPT_LIMITER_DURATION:-3000}
       BACKEND_URL: ${BACKEND_URL}
@@ -67,32 +66,47 @@ services:
     volumes:
       - backend_public:/usr/src/app/public
       - backend_private:/usr/src/app/private
+      - ./confs/pg_hba.conf:/var/lib/postgresql/pg_hba.conf:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
-    expose:
-      - 3000
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
     environment:
+      PORT: 3000
       BACKEND_SERVICE: backend
       BACKEND_HOST: ${BACKEND_HOST}
       BACKEND_PROTOCOL: ${BACKEND_PROTOCOL:-https}
-      BACKEND_PORT: ${BACKEND_PORT:-443}
-      BACKEND_PATH: ${BACKEND_PATH:-/api}
+      BACKEND_PORT: ${BACKEND_PORT:-8080}
+      BACKEND_PATH: ${BACKEND_PATH:-/backend}
       FRONTEND_HOST: ${FRONTEND_HOST}
-      FRONTEND_PORT: ${FRONTEND_PORT:-443}
-      EMAIL_ADDRESS: ${EMAIL_ADDRESS:-admin@ticketz.host}
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
     volumes:
       - backend_public:/var/www/backend-public:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
     depends_on:
       - backend
     restart: unless-stopped
-    expose:
-      - 80
