@@ -89,6 +89,7 @@ services:
     image: postgres:16-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./confs/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-ticketz}
       - POSTGRES_DB=${POSTGRES_DB:-ticketz}
