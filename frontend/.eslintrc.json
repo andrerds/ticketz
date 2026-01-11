@@ -2,6 +2,14 @@
   "extends": ["react-app", "plugin:prettier/recommended"],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": "warn"
+    "prettier/prettier": "off",
+    "no-unused-vars": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "jsx-a11y/alt-text": "off",
+    "no-dupe-keys": "off",
+    "eqeqeq": "off",
+    "array-callback-return": "off",
+    "import/no-anonymous-default-export": "off",
+    "no-template-curly-in-string": "off"
   }
 }

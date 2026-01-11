@@ -525,36 +525,6 @@ const messages = {
           deleted: "Jalur berhasil dihapus.",
         },
       },
-      queues: {
-        title: "Antrian",
-        table: {
-          name: "Nama",
-          color: "Warna",
-          actions: "Aksi",
-        },
-        toasts: {
-          deleted: "Antrian berhasil dihapus",
-        },
-        buttons: {
-          add: "Daftar Baru",
-        },
-        dialog: {
-          name: "Nama",
-          company: "Perusahaan",
-          okEdit: "Edit",
-          okAdd: "Tambah",
-          add: "Tambah",
-          edit: "Edit",
-          cancel: "Batal",
-        },
-        confirmationModal: {
-          deleteTitle: "Hapus",
-          deleteMessage: "Tindakan ini tidak dapat dibatalkan.",
-        },
-        toasts: {
-          deleted: "Data berhasil dihapus",
-        },
-      },
       contactLists: {
         title: "Daftar Kontak",
         table: {
