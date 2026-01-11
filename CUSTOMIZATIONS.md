@@ -94,17 +94,44 @@ Manter registro de todas as modificações para facilitar:
 
 ## 🔄 Histórico de Atualizações
 
+### [2025-01-11] - Atualização para v1.0.104
+
+**Commits do upstream aplicados:**
+
+- `c6edb60` - bump waversion (v1.0.103)
+- `aa3c140` - Limit user and owner attributes to id and name in chat services (SECURITY)
+- `28254fd` - Remove pagination from Tag ListService and simplify response structure
+- `8be1510` - Improve tag services & controllers security / remove old kanban routes (SECURITY)
+- `fd9f5fc` - Fix scroll trigger to use thisPageNumber instead of pageNumber
+
+**Commits ignorados:**
+
+- `4670809` - Improve chat UI colors and layout - Conflita com customizações de tema em App.js
+- `421e1a8` - Add readOnly prop to MessagesList - Conflita com customizações em MessagesList/index.js e Ticket/index.js
+- `f231b81` - Wrap emoji and menu items in a div - Mudança menor de UI
+- `2eb5d6f` - Add sticky message area - Conflita com customizações em MessagesList/index.js
+
+**Conflitos resolvidos:**
+
+- Nenhum - commits conflitantes foram ignorados para preservar customizações
+
+**Notas:**
+
+- Aplicados principalmente commits de segurança e correções de bugs
+- Commits de UI foram ignorados para preservar customizações existentes
+- Recomenda-se revisar manualmente os commits ignorados para avaliar funcionalidades
+
+---
+
 ### [YYYY-MM-DD] - Versão X.X.X
 
 **Commits do upstream aplicados:**
 
 - `abc1234` - Descrição do commit
-- `def5678` - Descrição do commit
 
 **Commits ignorados:**
 
-- `ghi9012` - Motivo: Conflita com customização X
-- `jkl3456` - Motivo: Funcionalidade não necessária
+- `ghi9012` - Motivo
 
 **Conflitos resolvidos:**
 
