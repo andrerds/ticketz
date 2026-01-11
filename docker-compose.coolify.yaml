@@ -16,6 +16,7 @@ services:
       TZ: ${TZ:-America/Sao_Paulo}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ticketz}"]
@@ -64,7 +65,6 @@ services:
     volumes:
       - backend_public:/usr/src/app/public
       - backend_private:/usr/src/app/private
-      - ./confs/pg_hba.conf:/var/lib/postgresql/pg_hba.conf:ro
     deploy:
       resources:
         limits:
