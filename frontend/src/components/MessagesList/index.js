@@ -33,6 +33,7 @@ import {
   Instagram,
   Launch,
   LocationOn,
+  PictureAsPdf,
   Reply,
   Warning,
 } from "@material-ui/icons";
@@ -50,6 +51,7 @@ import toastError from "../../errors/toastError";
 import { generateColor } from "../../helpers/colorGenerator";
 import { downloadFile } from "../../helpers/downloadFile";
 import { getInitials } from "../../helpers/getInitials";
+import MediaViewerModal from "../../pages/MediaManagement/components/MediaViewerModal";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import ThumbnailPreview from "../MediaPreview/ThumbnailPreview";
@@ -374,6 +376,28 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "inherit",
     padding: 10,
   },
+
+  pdfPreviewContainer: {
+    width: "100%",
+    maxWidth: 300,
+    height: 200,
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 8,
+    backgroundColor: "#525659",
+    cursor: "pointer",
+    "&:hover": {
+      opacity: 0.9,
+    },
+  },
+
+  pdfEmbed: {
+    width: "100%",
+    height: "100%",
+    border: "none",
+    pointerEvents: "none",
+  },
+
   imageLocation: {
     position: "relative",
     color: "red",
@@ -627,6 +651,8 @@ const MessagesList = ({
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
   const [contactPresence, setContactPresence] = useState("available");
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [selectedPdfFile, setSelectedPdfFile] = useState(null);
 
   const socketManager = useContext(SocketContext);
 
@@ -888,15 +914,65 @@ const MessagesList = ({
         </>
       );
     } else {
+      const isPdf =
+        document?.mimetype === "application/pdf" ||
+        document?.fileName?.toLowerCase().endsWith(".pdf") ||
+        message.body?.toLowerCase().endsWith(".pdf");
+
+      const handleOpenPdfViewer = () => {
+        setSelectedPdfFile({
+          fileName: document?.fileName || message.body,
+          mediaUrl: message.mediaUrl,
+          fileType: "application/pdf",
+          fileSize: 0,
+          uploadDate: message.createdAt,
+          storageLocation: "local",
+          canDelete: false,
+        });
+        setPdfViewerOpen(true);
+      };
+
       return (
         <>
+          {isPdf && message.mediaUrl && (
+            <div
+              className={classes.pdfPreviewContainer}
+              onClick={handleOpenPdfViewer}
+            >
+              <object
+                data={message.mediaUrl}
+                type="application/pdf"
+                className={classes.pdfEmbed}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    color: "#fff",
+                  }}
+                >
+                  <PictureAsPdf style={{ fontSize: 48, color: "#dc3545" }} />
+                </div>
+              </object>
+            </div>
+          )}
           <div className={classes.downloadMedia}>
             <Button
-              startIcon={<Description />}
+              startIcon={
+                isPdf ? (
+                  <PictureAsPdf style={{ color: "#dc3545" }} />
+                ) : (
+                  <Description />
+                )
+              }
               endIcon={<GetApp />}
               color="primary"
               variant="outlined"
               onClick={() => downloadFile(message.mediaUrl)}
+              style={isPdf ? { borderColor: "#dc3545", color: "#dc3545" } : {}}
             >
               {document?.fileName || message.body}
             </Button>
@@ -1764,6 +1840,14 @@ const MessagesList = ({
           <CircularProgress className={classes.circleLoading} />
         </div>
       )}
+      <MediaViewerModal
+        open={pdfViewerOpen}
+        file={selectedPdfFile}
+        onClose={() => {
+          setPdfViewerOpen(false);
+          setSelectedPdfFile(null);
+        }}
+      />
     </div>
   );
 };
