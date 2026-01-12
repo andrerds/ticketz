@@ -46,6 +46,7 @@ export class EncryptionService {
       key as crypto.CipherKey,
       iv as crypto.BinaryLike
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (decipher as any).setAuthTag(authTag);
 
     let decrypted = decipher.update(encrypted, "hex", "utf8");

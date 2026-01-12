@@ -23,8 +23,10 @@ export class LocalStorageDriver implements IStorageDriver {
     data: Buffer | NodeJS.ReadableStream,
     mimetype: string
   ): Promise<void> {
+    const isStream = !Buffer.isBuffer(data);
+
     logger.info(
-      { key, mimetype, isBuffer: Buffer.isBuffer(data) },
+      { key, mimetype, isBuffer: !isStream, isStream },
       "[LOCAL-DRIVER] Starting local write operation"
     );
 
@@ -32,16 +34,18 @@ export class LocalStorageDriver implements IStorageDriver {
       await this.storage.write(key, data);
 
       logger.info(
-        { key, mimetype },
+        { key, mimetype, streamMode: isStream },
         "[LOCAL-DRIVER] Local write operation completed successfully"
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const localError = error as { message: string; stack?: string };
       logger.error(
         {
-          error: error.message,
-          errorStack: error.stack,
+          error: localError.message,
+          errorStack: localError.stack,
           key,
-          mimetype
+          mimetype,
+          streamMode: isStream
         },
         "[LOCAL-DRIVER] Local write operation failed"
       );
@@ -89,10 +93,11 @@ export class LocalStorageDriver implements IStorageDriver {
       );
 
       return fileSize;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const localError = error as { message: string };
       logger.warn(
         {
-          error: error.message,
+          error: localError.message,
           key,
           fullPath
         },

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import axios from "axios";
+import React, { useState } from "react";
 
-import { i18n } from "../../translate/i18n";
 import {
   Button,
   CircularProgress,
@@ -12,9 +11,11 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
-import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
+import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 import { getBackendURL } from "../../services/config";
+import { i18n } from "../../translate/i18n";
 
 const useStyles = makeStyles(theme => ({
   mainPaper: {
@@ -38,6 +39,7 @@ const useStyles = makeStyles(theme => ({
 
 const MessagesAPI = () => {
   const classes = useStyles();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const [formMessageTextData] = useState({ token: "", number: "", body: "" });
   const [formMessageMediaData] = useState({
@@ -77,28 +79,46 @@ const MessagesAPI = () => {
   const handleSendMediaMessage = async values => {
     try {
       const firstFile = file[0];
-      const data = new FormData();
-      data.append("number", values.number);
-      data.append("body", firstFile.name);
-      data.append("medias", firstFile);
-      var options = {
-        method: "POST",
-        url: `${getBackendURL()}/api/messages/send`,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${values.token}`,
-        },
-        data,
-      };
 
-      axios
-        .request(options)
-        .then(function (response) {
+      // Use multipart upload for large files
+      if (firstFile.size >= 10 * 1024 * 1024) {
+        const result = await uploadLargeFile(firstFile);
+        if (result) {
+          const options = {
+            method: "POST",
+            url: `${getBackendURL()}/api/messages/send`,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${values.token}`,
+            },
+            data: {
+              number: values.number,
+              body: firstFile.name,
+              mediaKey: result.key,
+              mediaName: firstFile.name,
+            },
+          };
+          await axios.request(options);
           toast.success("Mensagem enviada com sucesso");
-        })
-        .catch(function (error) {
-          toastError(error);
-        });
+        }
+      } else {
+        const data = new FormData();
+        data.append("number", values.number);
+        data.append("body", firstFile.name);
+        data.append("medias", firstFile);
+        const options = {
+          method: "POST",
+          url: `${getBackendURL()}/api/messages/send`,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${values.token}`,
+          },
+          data,
+        };
+
+        await axios.request(options);
+        toast.success("Mensagem enviada com sucesso");
+      }
     } catch (err) {
       toastError(err);
     }

@@ -1,4 +1,3 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -11,23 +10,25 @@ import {
   Typography,
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { useDate } from "../../hooks/useDate";
 import api from "../../services/api";
 
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
+import { GetApp } from "@material-ui/icons";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import CancelIcon from "@material-ui/icons/Cancel";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import ModalImageCors from "../../components/ModalImageCors";
-import { GetApp } from "@material-ui/icons";
-import toastError from "../../errors/toastError";
-import MicRecorder from "mic-recorder-to-mp3";
-import MicIcon from "@material-ui/icons/Mic";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import MicIcon from "@material-ui/icons/Mic";
+import MicRecorder from "mic-recorder-to-mp3";
 import RecordingTimer from "../../components/MessageInputCustom/RecordingTimer";
+import ModalImageCors from "../../components/ModalImageCors";
+import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
@@ -154,6 +155,7 @@ export default function ChatMessages({
   const classes = useStyles();
   const { user } = useContext(AuthContext);
   const { datetimeToClient } = useDate();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
   const baseRef = useRef();
 
   const [contentMessage, setContentMessage] = useState("");
@@ -246,15 +248,35 @@ export default function ChatMessages({
     setLoading(true);
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("fromMe", true);
-    medias.forEach(media => {
-      formData.append("medias", media);
-      formData.append("body", media.name);
-    });
-
     try {
-      await api.post(`/chats/${chat.id}/messages`, formData);
+      // Separate large and small files
+      const largeFiles = medias.filter(media => media.size >= 10 * 1024 * 1024);
+      const smallFiles = medias.filter(media => media.size < 10 * 1024 * 1024);
+
+      // Upload large files using multipart
+      for (const file of largeFiles) {
+        const result = await uploadLargeFile(file);
+        if (result) {
+          // Send message with the uploaded file key
+          await api.post(`/chats/${chat.id}/messages`, {
+            fromMe: true,
+            body: file.name,
+            mediaKey: result.key,
+            mediaName: file.name,
+          });
+        }
+      }
+
+      // Upload small files using traditional method
+      if (smallFiles.length > 0) {
+        const formData = new FormData();
+        formData.append("fromMe", true);
+        smallFiles.forEach(media => {
+          formData.append("medias", media);
+          formData.append("body", media.name);
+        });
+        await api.post(`/chats/${chat.id}/messages`, formData);
+      }
     } catch (err) {
       console.log(err);
       toastError(err);
@@ -288,14 +310,26 @@ export default function ChatMessages({
         return;
       }
 
-      const formData = new FormData();
       const filename = `audio-${new Date().getTime()}.mp3`;
 
-      formData.append("medias", blob, filename);
-      formData.append("body", filename);
-      formData.append("fromMe", true);
-
-      await api.post(`/chats/${chat.id}/messages`, formData);
+      // Use multipart upload for large files
+      if (blob.size >= 10 * 1024 * 1024) {
+        const result = await uploadLargeFile(blob);
+        if (result) {
+          await api.post(`/chats/${chat.id}/messages`, {
+            fromMe: true,
+            body: filename,
+            mediaKey: result.key,
+            mediaName: filename,
+          });
+        }
+      } else {
+        const formData = new FormData();
+        formData.append("medias", blob, filename);
+        formData.append("body", filename);
+        formData.append("fromMe", true);
+        await api.post(`/chats/${chat.id}/messages`, formData);
+      }
     } catch (err) {
       toastError(err);
     }

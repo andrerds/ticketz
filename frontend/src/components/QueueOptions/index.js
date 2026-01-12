@@ -1,33 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import Typography from "@material-ui/core/Typography";
 import {
   Button,
+  FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
-  StepContent,
-  TextField,
-  FormControlLabel,
-  Switch,
-  FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Select,
+  StepContent,
+  Switch,
+  TextField,
 } from "@material-ui/core";
+import Step from "@material-ui/core/Step";
+import StepLabel from "@material-ui/core/StepLabel";
+import Stepper from "@material-ui/core/Stepper";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import { AttachFile, DeleteOutline } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import SaveIcon from "@material-ui/icons/Save";
 import EditIcon from "@material-ui/icons/Edit";
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import { AttachFile, DeleteOutline } from "@material-ui/icons";
+import SaveIcon from "@material-ui/icons/Save";
 import { head } from "lodash";
+import React, { useEffect, useRef, useState } from "react";
+import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 import useQueues from "../../hooks/useQueues";
-import ConfirmationModal from "../ConfirmationModal";
+import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
+import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -59,6 +60,7 @@ const useStyles = makeStyles(theme => ({
 
 export function QueueOptionStepper({ queueId, options, updateOptions }) {
   const classes = useStyles();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
   const [activeOption, setActiveOption] = useState(-1);
   const [attachment, setAttachment] = useState(null);
   const attachmentFile = useRef(null);
@@ -126,9 +128,23 @@ export function QueueOptionStepper({ queueId, options, updateOptions }) {
         });
 
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/queue-options/${option.id}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/queue-options/${option.id}/media-upload`, {
+                mediaKey: result.key,
+                mediaName: attachment.name,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(
+              `/queue-options/${option.id}/media-upload`,
+              formData
+            );
+          }
         }
       } else {
         const { data } = await api.request({
@@ -139,9 +155,23 @@ export function QueueOptionStepper({ queueId, options, updateOptions }) {
         option.id = data.id;
 
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/queue-options/${option.id}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/queue-options/${option.id}/media-upload`, {
+                mediaKey: result.key,
+                mediaName: attachment.name,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(
+              `/queue-options/${option.id}/media-upload`,
+              formData
+            );
+          }
         }
       }
       option.edition = false;

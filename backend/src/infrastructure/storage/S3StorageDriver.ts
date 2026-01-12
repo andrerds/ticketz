@@ -60,6 +60,7 @@ export class S3StorageDriver implements IStorageDriver {
     mimetype: string
   ): Promise<void> {
     const fullKey = this.getFullKey(key);
+    const isStream = !Buffer.isBuffer(data);
 
     logger.info(
       {
@@ -67,29 +68,16 @@ export class S3StorageDriver implements IStorageDriver {
         fullKey,
         bucket: this.bucket,
         mimetype,
-        isBuffer: Buffer.isBuffer(data)
+        isBuffer: !isStream,
+        isStream
       },
       "[S3-DRIVER] Starting S3 write operation"
-    );
-
-    const body = Buffer.isBuffer(data)
-      ? data
-      : await S3StorageDriver.streamToBuffer(data);
-
-    logger.info(
-      {
-        fullKey,
-        bucket: this.bucket,
-        size: body.length,
-        mimetype
-      },
-      "[S3-DRIVER] Sending PutObjectCommand to S3"
     );
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: fullKey,
-      Body: body,
+      Body: isStream ? (data as Readable) : data,
       ContentType: mimetype
     });
 
@@ -100,22 +88,28 @@ export class S3StorageDriver implements IStorageDriver {
         {
           fullKey,
           bucket: this.bucket,
-          size: body.length,
           etag: response.ETag,
-          versionId: response.VersionId
+          versionId: response.VersionId,
+          streamMode: isStream
         },
         "[S3-DRIVER] S3 write operation completed successfully"
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const s3Error = error as {
+        message: string;
+        Code?: string;
+        name: string;
+        stack?: string;
+      };
       logger.error(
         {
-          error: error.message,
-          errorCode: error.Code,
-          errorName: error.name,
-          errorStack: error.stack,
+          error: s3Error.message,
+          errorCode: s3Error.Code,
+          errorName: s3Error.name,
+          errorStack: s3Error.stack,
           fullKey,
           bucket: this.bucket,
-          size: body.length
+          streamMode: isStream
         },
         "[S3-DRIVER] S3 write operation failed"
       );
@@ -150,12 +144,13 @@ export class S3StorageDriver implements IStorageDriver {
       );
 
       return response.Body as Readable;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const s3Error = error as { message: string; Code?: string; name: string };
       logger.error(
         {
-          error: error.message,
-          errorCode: error.Code,
-          errorName: error.name,
+          error: s3Error.message,
+          errorCode: s3Error.Code,
+          errorName: s3Error.name,
           fullKey,
           bucket: this.bucket
         },
@@ -174,8 +169,9 @@ export class S3StorageDriver implements IStorageDriver {
       });
       await this.client.send(command);
       return true;
-    } catch (error: any) {
-      if (error.name === "NotFound") {
+    } catch (error: unknown) {
+      const s3Error = error as { name: string };
+      if (s3Error.name === "NotFound") {
         return false;
       }
       throw error;
@@ -205,12 +201,13 @@ export class S3StorageDriver implements IStorageDriver {
       );
 
       return fileSize;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const s3Error = error as { message: string; Code?: string; name: string };
       logger.warn(
         {
-          error: error.message,
-          errorCode: error.Code,
-          errorName: error.name,
+          error: s3Error.message,
+          errorCode: s3Error.Code,
+          errorName: s3Error.name,
           fullKey,
           bucket: this.bucket
         },

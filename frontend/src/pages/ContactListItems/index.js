@@ -1,49 +1,50 @@
 import React, {
-  useState,
+  useContext,
   useEffect,
   useReducer,
-  useContext,
   useRef,
+  useState,
 } from "react";
 
+import { useHistory, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useParams, useHistory } from "react-router-dom";
 
+import Button from "@material-ui/core/Button";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import SearchIcon from "@material-ui/icons/Search";
 
 import IconButton from "@material-ui/core/IconButton";
+import BlockIcon from "@material-ui/icons/Block";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import BlockIcon from "@material-ui/icons/Block";
 
-import api from "../../services/api";
-import TableRowSkeleton from "../../components/TableRowSkeleton";
-import ContactListItemModal from "../../components/ContactListItemModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
+import ContactListItemModal from "../../components/ContactListItemModal";
+import TableRowSkeleton from "../../components/TableRowSkeleton";
+import api from "../../services/api";
 
-import { i18n } from "../../translate/i18n";
+import { Grid } from "@material-ui/core";
+import { Can } from "../../components/Can";
+import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
 import Title from "../../components/Title";
-import MainContainer from "../../components/MainContainer";
-import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../../components/Can";
+import toastError from "../../errors/toastError";
 import useContactLists from "../../hooks/useContactLists";
-import { Grid } from "@material-ui/core";
+import { i18n } from "../../translate/i18n";
 
 import planilhaExemplo from "../../assets/planilha.xlsx";
 import { SocketContext } from "../../context/Socket/SocketContext";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -100,6 +101,7 @@ const useStyles = makeStyles(theme => ({
 
 const ContactListItems = () => {
   const classes = useStyles();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const { user } = useContext(AuthContext);
   const { contactListId } = useParams();
@@ -222,13 +224,30 @@ const ContactListItems = () => {
 
   const handleImportContacts = async () => {
     try {
-      const formData = new FormData();
-      formData.append("file", fileUploadRef.current.files[0]);
-      await api.request({
-        url: `contact-lists/${contactListId}/upload`,
-        method: "POST",
-        data: formData,
-      });
+      const file = fileUploadRef.current.files[0];
+
+      // Use multipart upload for large files
+      if (file.size >= 10 * 1024 * 1024) {
+        const result = await uploadLargeFile(file);
+        if (result) {
+          await api.request({
+            url: `contact-lists/${contactListId}/upload`,
+            method: "POST",
+            data: {
+              mediaKey: result.key,
+              mediaName: file.name,
+            },
+          });
+        }
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+        await api.request({
+          url: `contact-lists/${contactListId}/upload`,
+          method: "POST",
+          data: formData,
+        });
+      }
     } catch (err) {
       toastError(err);
     }

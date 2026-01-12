@@ -11,6 +11,7 @@ import {
   Select,
   Switch,
   TextField,
+  Tooltip,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
@@ -47,6 +48,8 @@ export default function StorageSettings() {
   const [testing, setTesting] = useState(false);
 
   const [driver, setDriver] = useState("local");
+  const [originalDriver, setOriginalDriver] = useState("local");
+  const [hasPersistedCredentials, setHasPersistedCredentials] = useState(false);
   const [endpoint, setEndpoint] = useState("");
   const [region, setRegion] = useState("");
   const [bucket, setBucket] = useState("");
@@ -72,6 +75,7 @@ export default function StorageSettings() {
       const { data } = await api.get(STORAGE_API_ENDPOINT);
 
       setDriver(data.driver || "local");
+      setOriginalDriver(data.driver || "local");
 
       if (data.s3Config) {
         setEndpoint(data.s3Config.endpoint || "");
@@ -81,6 +85,11 @@ export default function StorageSettings() {
         setSecretAccessKey(data.s3Config.secretAccessKey || "");
         setPrefix(data.s3Config.prefix || "");
         setForcePathStyle(data.s3Config.forcePathStyle || false);
+        setHasPersistedCredentials(
+          data.s3Config.hasPersistedCredentials || false
+        );
+      } else {
+        setHasPersistedCredentials(false);
       }
 
       if (data.imageOptimization) {
@@ -102,7 +111,17 @@ export default function StorageSettings() {
       return false;
     }
 
-    if (!secretAccessKey || secretAccessKey === MASKED_SECRET) {
+    // Only require secret key if:
+    // 1. No persisted credentials exist, OR
+    // 2. User has modified the secret key field (it's not the masked value)
+    const isSecretKeyRequired =
+      !hasPersistedCredentials ||
+      (secretAccessKey && secretAccessKey !== MASKED_SECRET);
+
+    if (
+      isSecretKeyRequired &&
+      (!secretAccessKey || secretAccessKey === MASKED_SECRET)
+    ) {
       toast.error("Please provide the S3 secret access key");
       return false;
     }
@@ -264,25 +283,35 @@ export default function StorageSettings() {
 
             <Grid xs={12} sm={6} md={4} item>
               <FormControl className={classes.fieldContainer}>
-                <TextField
-                  label="Secret Access Key *"
-                  type={showSecretKey ? "text" : "password"}
-                  value={secretAccessKey}
-                  onChange={e => setSecretAccessKey(e.target.value)}
-                  variant="standard"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowSecretKey(!showSecretKey)}
-                          edge="end"
-                        >
-                          {showSecretKey ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                <Tooltip
+                  title={
+                    hasPersistedCredentials
+                      ? "Existing credentials will be reused when field is masked"
+                      : ""
+                  }
+                  placement="top"
+                  arrow
+                >
+                  <TextField
+                    label={`Secret Access Key ${hasPersistedCredentials ? "" : "*"}`}
+                    type={showSecretKey ? "text" : "password"}
+                    value={secretAccessKey}
+                    onChange={e => setSecretAccessKey(e.target.value)}
+                    variant="standard"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowSecretKey(!showSecretKey)}
+                            edge="end"
+                          >
+                            {showSecretKey ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Tooltip>
               </FormControl>
             </Grid>
 

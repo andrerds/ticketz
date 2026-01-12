@@ -2,6 +2,7 @@ import { EncryptionService } from "../../domain/storage/EncryptionService";
 import {
   ImageOptimizationConfig,
   S3Config,
+  S3HistoryConfig,
   StorageConfig
 } from "../../domain/storage/StorageConfig";
 import { SimpleObjectCache } from "../../helpers/simpleObjectCache";
@@ -46,7 +47,12 @@ const GetStorageConfigService = async ({
   const settings = await Setting.findAll({
     where: {
       companyId,
-      key: ["storageDriver", "storageS3Config", "storageImageOptimization"]
+      key: [
+        "storageDriver",
+        "storageS3Config",
+        "storageImageOptimization",
+        "storageS3History"
+      ]
     }
   });
 
@@ -151,11 +157,39 @@ const GetStorageConfigService = async ({
     }
   }
 
+  let s3History: S3HistoryConfig | undefined;
+  if (settingsMap.storageS3History) {
+    try {
+      const parsed = JSON.parse(settingsMap.storageS3History);
+      s3History = {
+        hasS3History: parsed.hasS3History || false,
+        s3DeactivatedAt: parsed.s3DeactivatedAt
+          ? new Date(parsed.s3DeactivatedAt)
+          : undefined,
+        legacyS3Config: parsed.legacyS3Config
+      };
+      logger.info(
+        {
+          companyId,
+          hasS3History: s3History.hasS3History,
+          s3DeactivatedAt: s3History.s3DeactivatedAt
+        },
+        "[STORAGE-CONFIG] S3 history configuration parsed"
+      );
+    } catch (error) {
+      logger.error(
+        { error: error.message, companyId },
+        "[STORAGE-CONFIG] Failed to parse S3 history configuration"
+      );
+    }
+  }
+
   const config = new StorageConfig(
     companyId,
     driver,
     s3Config,
-    imageOptimization
+    imageOptimization,
+    s3History
   );
 
   configCache.set(cacheKey, config);

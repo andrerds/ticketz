@@ -86,7 +86,7 @@ export default async function saveMediaToFile(
     },
     "[MEDIA-STORAGE] Starting media file save operation"
   );
-  let finalFileSize;
+  let finalFileSize: number;
   try {
     logger.info(
       { companyId },
@@ -123,7 +123,7 @@ export default async function saveMediaToFile(
     if (isStream && !storageConfig.imageOptimization) {
       logger.info(
         { companyId, mediaPath, driver: storageConfig.driver },
-        "[MEDIA-STORAGE] Streaming file directly to storage (no buffer)"
+        "[MEDIA-STORAGE] Streaming file directly to storage (no buffer conversion)"
       );
 
       await driver.write(
@@ -132,12 +132,14 @@ export default async function saveMediaToFile(
         media.mimetype
       );
 
+      const fileSize = await driver.getFileSize(mediaPath);
+
       logger.info(
-        { companyId, mediaPath, driver: storageConfig.driver },
+        { companyId, mediaPath, driver: storageConfig.driver, fileSize },
         "[MEDIA-STORAGE] Media file streamed successfully"
       );
 
-      return { mediaPath, fileSize: 0 };
+      return { mediaPath, fileSize };
     }
 
     logger.info(

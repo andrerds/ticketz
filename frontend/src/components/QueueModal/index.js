@@ -27,6 +27,7 @@ import {
 } from "@material-ui/core";
 import { AttachFile, Colorize, DeleteOutline } from "@material-ui/icons";
 import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 import api from "../../services/api";
 import ColorPicker from "../ColorPicker";
 import ConfirmationModal from "../ConfirmationModal";
@@ -76,6 +77,7 @@ const QueueSchema = Yup.object().shape({
 
 const QueueModal = ({ open, onClose, queueId }) => {
   const classes = useStyles();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const initialState = {
     name: "",
@@ -203,16 +205,38 @@ const QueueModal = ({ open, onClose, queueId }) => {
       if (queueId) {
         await api.put(`/queue/${queueId}`, { ...values, schedules });
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/queue/${queueId}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/queue/${queueId}/media-upload`, {
+                mediaKey: result.key,
+                mediaName: attachment.name,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(`/queue/${queueId}/media-upload`, formData);
+          }
         }
       } else {
-        await api.post("/queue", { ...values, schedules });
+        const { data } = await api.post("/queue", { ...values, schedules });
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/queue/${queueId}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/queue/${data.id}/media-upload`, {
+                mediaKey: result.key,
+                mediaName: attachment.name,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(`/queue/${data.id}/media-upload`, formData);
+          }
         }
       }
       toast.success(i18n.t("queueModal.toasts.saved"));

@@ -4,18 +4,18 @@
 
    VERSÃO EM PORTUGUÊS MAIS ABAIXO
 
-   
+
    BASIC LICENSE INFORMATION:
 
    Author: Claudemir Todo Bom
    Email: claudemir@todobom.com
-   
+
    Licensed under the AGPLv3 as stated on LICENSE.md file
-   
-   Any work that uses code from this file is obligated to 
+
+   Any work that uses code from this file is obligated to
    give access to its source code to all of its users (not only
    the system's owner running it)
-   
+
    EXCLUSIVE LICENSE to use on closed source derived work can be
    purchased from the author and put at the root of the source
    code tree as proof-of-purchase.
@@ -28,37 +28,38 @@
    Email: claudemir@todobom.com
 
    Licenciado sob a licença AGPLv3 conforme arquivo LICENSE.md
-    
+
    Qualquer sistema que inclua este código deve ter o seu código
    fonte fornecido a todos os usuários do sistema (não apenas ao
    proprietário da infraestrutura que o executa)
-   
+
    LICENÇA EXCLUSIVA para uso em produto derivado em código fechado
    pode ser adquirida com o autor e colocada na raiz do projeto
-   como prova de compra. 
-   
+   como prova de compra.
+
  */
 
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import { blue, grey } from "@material-ui/core/colors";
 import FormControl from "@material-ui/core/FormControl";
-import TextField from "@material-ui/core/TextField";
-import useSettings from "../../hooks/useSettings";
+import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
-import { grey, blue } from "@material-ui/core/colors";
-import OnlyForSuperUser from "../OnlyForSuperUser";
+import TextField from "@material-ui/core/TextField";
 import useAuth from "../../hooks/useAuth.js";
+import useSettings from "../../hooks/useSettings";
+import OnlyForSuperUser from "../OnlyForSuperUser";
 
 import { IconButton, InputAdornment, Typography } from "@material-ui/core";
 
-import { Colorize, AttachFile, Delete } from "@material-ui/icons";
-import ColorPicker from "../ColorPicker";
+import { AttachFile, Colorize, Delete } from "@material-ui/icons";
+import { i18nToast } from "../../helpers/i18nToast";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload/index.js";
 import ColorModeContext from "../../layout/themeContext";
 import api from "../../services/api";
 import { getBackendURL } from "../../services/config";
-import { i18nToast } from "../../helpers/i18nToast";
 import { i18n } from "../../translate/i18n.js";
+import ColorPicker from "../ColorPicker";
 
 const defaultLogoLight = "/vector/logo.svg";
 const defaultLogoDark = "/vector/logo-dark.svg";
@@ -176,6 +177,7 @@ export default function Whitelabel(props) {
   const { settings } = props;
   const classes = useStyles();
   const [settingsLoaded, setSettingsLoaded] = useState({});
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const { getCurrentUserInfo } = useAuth();
   const [currentUser, setCurrentUser] = useState({});
@@ -250,28 +252,42 @@ export default function Whitelabel(props) {
     }
 
     const file = e.target.files[0];
-    const formData = new FormData();
 
-    formData.append("file", file);
-    formData.append("mode", mode);
+    try {
+      // Use multipart upload for large files
+      if (file.size >= 10 * 1024 * 1024) {
+        const result = await uploadLargeFile(file);
+        if (result) {
+          const response = await api.post("/settings/logo", {
+            mediaKey: result.key,
+            mediaName: file.name,
+            mode,
+          });
+          updateSettingsLoaded(`appLogo${mode}`, response.data);
+          colorMode[`setAppLogo${mode}`](
+            getBackendURL() + "/public/" + response.data
+          );
+        }
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("mode", mode);
 
-    api
-      .post("/settings/logo", formData, {
-        onUploadProgress: event => {
-          let progress = Math.round((event.loaded * 100) / event.total);
-          console.log(`A imagem  está ${progress}% carregada... `);
-        },
-      })
-      .then(response => {
+        const response = await api.post("/settings/logo", formData, {
+          onUploadProgress: event => {
+            let progress = Math.round((event.loaded * 100) / event.total);
+            console.log(`A imagem  está ${progress}% carregada... `);
+          },
+        });
         updateSettingsLoaded(`appLogo${mode}`, response.data);
         colorMode[`setAppLogo${mode}`](
           getBackendURL() + "/public/" + response.data
         );
-      })
-      .catch(err => {
-        console.error(`Houve um problema ao realizar o upload da imagem.`);
-        console.log(err);
-      });
+      }
+    } catch (err) {
+      console.error(`Houve um problema ao realizar o upload da imagem.`);
+      console.log(err);
+    }
   };
 
   return (

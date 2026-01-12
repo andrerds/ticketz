@@ -4,18 +4,18 @@
 
    VERSÃO EM PORTUGUÊS MAIS ABAIXO
 
-   
+
    BASIC LICENSE INFORMATION:
 
    Author: Claudemir Todo Bom
    Email: claudemir@todobom.com
-   
+
    Licensed under the AGPLv3 as stated on LICENSE.md file
-   
-   Any work that uses code from this file is obligated to 
+
+   Any work that uses code from this file is obligated to
    give access to its source code to all of its users (not only
    the system's owner running it)
-   
+
    EXCLUSIVE LICENSE to use on closed source derived work can be
    purchased from the author and put at the root of the source
    code tree as proof-of-purchase.
@@ -28,27 +28,28 @@
    Email: claudemir@todobom.com
 
    Licenciado sob a licença AGPLv3 conforme arquivo LICENSE.md
-    
+
    Qualquer sistema que inclua este código deve ter o seu código
    fonte fornecido a todos os usuários do sistema (não apenas ao
    proprietário da infraestrutura que o executa)
-   
+
    LICENÇA EXCLUSIVA para uso em produto derivado em código fechado
    pode ser adquirida com o autor e colocada na raiz do projeto
-   como prova de compra. 
-   
+   como prova de compra.
+
  */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import { IconButton } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
-import useSettings from "../../../hooks/useSettings";
-import { toast } from "react-toastify";
+import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AttachFile, Delete } from "@material-ui/icons";
-import { IconButton, InputAdornment } from "@material-ui/core";
+import { toast } from "react-toastify";
+import { useMultipartUpload } from "../../../hooks/useMultipartUpload";
+import useSettings from "../../../hooks/useSettings";
 import api from "../../../services/api";
 
 const useStyles = makeStyles(_ => ({
@@ -66,6 +67,7 @@ export default function EfiSettings(props) {
   const { settings } = props;
   const classes = useStyles();
   const [efiSettings, setEfiSettings] = useState({});
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
   const efiCertificateFileInput = useRef(null);
   const efiCertificateNameInput = useRef(null);
 
@@ -77,27 +79,40 @@ export default function EfiSettings(props) {
     }
 
     const file = e.target.files[0];
-    const formData = new FormData();
 
-    formData.append("file", file);
-    formData.append("settingKey", key);
+    try {
+      // Use multipart upload for large files
+      if (file.size >= 10 * 1024 * 1024) {
+        const result = await uploadLargeFile(file);
+        if (result) {
+          const response = await api.post("/settings/privateFile", {
+            mediaKey: result.key,
+            mediaName: file.name,
+            settingKey: key,
+          });
+          const newSettings = { ...efiSettings };
+          newSettings[key] = response.data;
+          setEfiSettings(newSettings);
+        }
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("settingKey", key);
 
-    api
-      .post("/settings/privateFile", formData, {
-        onUploadProgress: event => {
-          let progress = Math.round((event.loaded * 100) / event.total);
-          console.log(`Upload ${progress}%`);
-        },
-      })
-      .then(response => {
+        const response = await api.post("/settings/privateFile", formData, {
+          onUploadProgress: event => {
+            let progress = Math.round((event.loaded * 100) / event.total);
+            console.log(`Upload ${progress}%`);
+          },
+        });
         const newSettings = { ...efiSettings };
         newSettings[key] = response.data;
         setEfiSettings(newSettings);
-      })
-      .catch(err => {
-        console.error(`Houve um problema ao realizar o upload da imagem.`);
-        console.log(err);
-      });
+      }
+    } catch (err) {
+      console.error(`Houve um problema ao realizar o upload da imagem.`);
+      console.log(err);
+    }
   };
 
   useEffect(() => {
