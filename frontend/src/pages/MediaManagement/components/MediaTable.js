@@ -25,6 +25,7 @@ import {
   FaTrash,
   FaVideo,
 } from "react-icons/fa";
+import { getBackendURL } from "../../../services/config";
 import { i18n } from "../../../translate/i18n";
 import { formatBytes } from "../utils/formatters";
 import MediaViewerModal from "./MediaViewerModal";
@@ -180,11 +181,9 @@ const MediaTable = ({
     const imageKey = file.mediaUrl;
 
     if (fileType.includes("image") && !failedImages.has(imageKey)) {
-      const backendUrl =
-        process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
       const imageUrl = file.mediaUrl.startsWith("http")
         ? file.mediaUrl
-        : `${backendUrl}/public/${file.mediaUrl}`;
+        : `${getBackendURL()}/public/${file.mediaUrl}`;
 
       return (
         <img
