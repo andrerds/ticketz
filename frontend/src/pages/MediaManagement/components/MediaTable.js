@@ -18,8 +18,9 @@ import {
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import {
-  FaDropbox,
+  FaEye,
   FaFile,
+  FaFilePdf,
   FaImage,
   FaSoundcloud,
   FaTrash,
@@ -173,6 +174,7 @@ const MediaTable = ({
     if (type.includes("image")) return <FaImage />;
     if (type.includes("video")) return <FaVideo />;
     if (type.includes("audio")) return <FaSoundcloud />;
+    if (type.includes("pdf")) return <FaFilePdf style={{ color: "#dc3545" }} />;
     return <FaFile />;
   };
 
@@ -189,6 +191,7 @@ const MediaTable = ({
         <img
           src={imageUrl}
           alt={file.fileName}
+          loading="lazy"
           className={classes.previewImage}
           onClick={() => handleViewFile(file)}
           onError={() => {
@@ -297,7 +300,7 @@ const MediaTable = ({
                           className={classes.viewButton}
                           onClick={() => handleViewFile(file)}
                         >
-                          <FaDropbox />
+                          <FaEye />
                         </IconButton>
                       </Tooltip>
                       {file.canDelete ? (
