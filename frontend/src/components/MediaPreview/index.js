@@ -155,6 +155,15 @@ const MediaPreview = ({
         return;
       }
 
+      if (mediaUrl.startsWith("data:")) {
+        setPreviewUrl(mediaUrl);
+        setLoading(false);
+        if (onLoadComplete) {
+          onLoadComplete();
+        }
+        return;
+      }
+
       const baseUrl = getBackendURL();
       const apiUrl = `${baseUrl}/public/${mediaUrl}`;
 

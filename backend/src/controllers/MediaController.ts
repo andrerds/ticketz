@@ -23,9 +23,31 @@ export const serve = async (req: Request, res: Response): Promise<void> => {
   const companyId = companyIdMatch ? parseInt(companyIdMatch[1], 10) : null;
 
   if (!companyId) {
-    logger.debug({ mediaKey }, "Invalid media key format, no company ID found");
-    res.status(404).end();
-    return;
+    try {
+      await fs.promises.access(localFilePath, fs.constants.F_OK);
+
+      logger.info(
+        { mediaKey },
+        "[MEDIA-CONTROLLER] Serving static file from public root"
+      );
+
+      const contentType = mime.lookup(mediaKey) || "application/octet-stream";
+      res.setHeader("Content-Type", contentType);
+
+      res.sendFile(localFilePath, err => {
+        if (err) {
+          logger.error({ err, mediaKey }, "Error sending static file");
+          if (!res.headersSent) {
+            res.status(500).end();
+          }
+        }
+      });
+      return;
+    } catch {
+      logger.debug({ mediaKey }, "Static file not found in public root");
+      res.status(404).end();
+      return;
+    }
   }
 
   try {
