@@ -1,27 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import IconButton from "@material-ui/core/IconButton";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import IconButton from "@material-ui/core/IconButton";
 
-import { i18n } from "../../translate/i18n";
 import { head } from "lodash";
+import { i18n } from "../../translate/i18n";
 
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
 import {
   FormControl,
   Grid,
@@ -29,6 +27,9 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
+import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
+import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
@@ -72,6 +73,7 @@ const AnnouncementSchema = Yup.object().shape({
 
 const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
   const classes = useStyles();
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const initialState = {
     title: "",
@@ -119,19 +121,39 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
       if (announcementId) {
         await api.put(`/announcements/${announcementId}`, announcementData);
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(
-            `/announcements/${announcementId}/media-upload`,
-            formData
-          );
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/announcements/${announcementId}/media-upload`, {
+                mediaKey: result.key,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(
+              `/announcements/${announcementId}/media-upload`,
+              formData
+            );
+          }
         }
       } else {
         const { data } = await api.post("/announcements", announcementData);
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/announcements/${data.id}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/announcements/${data.id}/media-upload`, {
+                mediaKey: result.key,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(`/announcements/${data.id}/media-upload`, formData);
+          }
         }
       }
       toast.success(i18n.t("announcements.toasts.success"));
@@ -230,7 +252,7 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
                       variant="outlined"
                       margin="dense"
                       multiline={true}
-                      rows={7}
+                      minRows={7}
                       fullWidth
                     />
                   </Grid>
@@ -248,8 +270,12 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
                         name="status"
                         error={touched.status && Boolean(errors.status)}
                       >
-                        <MenuItem value={true}>Ativo</MenuItem>
-                        <MenuItem value={false}>Inativo</MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={true}>
+                          Ativo
+                        </MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={false}>
+                          Inativo
+                        </MenuItem>
                       </Field>
                     </FormControl>
                   </Grid>
@@ -269,9 +295,15 @@ const AnnouncementModal = ({ open, onClose, announcementId, reload }) => {
                         name="priority"
                         error={touched.priority && Boolean(errors.priority)}
                       >
-                        <MenuItem value={1}>Alta</MenuItem>
-                        <MenuItem value={2}>Média</MenuItem>
-                        <MenuItem value={3}>Baixa</MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={1}>
+                          Alta
+                        </MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={2}>
+                          Média
+                        </MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={3}>
+                          Baixa
+                        </MenuItem>
                       </Field>
                     </FormControl>
                   </Grid>

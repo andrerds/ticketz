@@ -1,57 +1,50 @@
-import React, { useState, useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import clsx from "clsx";
-import moment from "moment";
 import {
-  makeStyles,
-  Drawer,
   AppBar,
-  Toolbar,
-  List,
-  Typography,
   Divider,
-  MenuItem,
+  Drawer,
   IconButton,
+  List,
+  makeStyles,
   Menu,
-  useTheme,
+  MenuItem,
+  Toolbar,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@material-ui/core";
+import clsx from "clsx";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import CachedIcon from "@material-ui/icons/Cached";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import MenuIcon from "@material-ui/icons/Menu";
 
-import MainListItems from "./MainListItems";
-import NotificationsPopOver from "../components/NotificationsPopOver";
-import { Backendlogs } from "../components/Backendlogs";
-import { PhoneCall } from "../components/PhoneCall";
-import NotificationsVolume from "../components/NotificationsVolume";
-import UserModal from "../components/UserModal";
 import AboutModal from "../components/AboutModal";
-import { AuthContext } from "../context/Auth/AuthContext";
+import AnnouncementsPopover from "../components/AnnouncementsPopover";
 import BackdropLoading from "../components/BackdropLoading";
-import DarkMode from "../components/DarkMode";
+import { Backendlogs } from "../components/Backendlogs";
+import NotificationsPopOver from "../components/NotificationsPopOver";
+import NotificationsVolume from "../components/NotificationsVolume";
+import { PhoneCall } from "../components/PhoneCall";
+import UserModal from "../components/UserModal";
+import { AuthContext } from "../context/Auth/AuthContext";
+import toastError from "../errors/toastError";
 import { i18n } from "../translate/i18n";
 import { messages } from "../translate/languages";
-import toastError from "../errors/toastError";
-import AnnouncementsPopover from "../components/AnnouncementsPopover";
+import MainListItems from "./MainListItems";
 
 import { SocketContext } from "../context/Socket/SocketContext";
 import ChatPopover from "../pages/Chat/ChatPopover";
 
-import { useDate } from "../hooks/useDate";
 import useAuth from "../hooks/useAuth.js";
+import { useDate } from "../hooks/useDate";
 
-import ColorModeContext from "../layout/themeContext";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
-import Brightness7Icon from "@material-ui/icons/Brightness7";
-import LanguageIcon from "@material-ui/icons/Language";
-import { getBackendURL } from "../services/config";
 import NestedMenuItem from "material-ui-nested-menu-item";
 import GoogleAnalytics from "../components/GoogleAnalytics";
-import OnlyForSuperUser from "../components/OnlyForSuperUser";
 import NewTicketModal from "../components/NewTicketModal/index.js";
+import OnlyForSuperUser from "../components/OnlyForSuperUser";
+import ColorModeContext from "../layout/themeContext";
 
 const drawerWidth = 240;
 
@@ -501,8 +494,8 @@ const LoggedInLayout = ({ children, themeToggle }) => {
               open={languageOpen}
               onClose={handleCloseLanguageMenu}
             >
-              {Object.keys(messages).map(m => (
-                <MenuItem onClick={() => handleChooseLanguage(m)}>
+              {Object.keys(messages).map((m, i) => (
+                <MenuItem key={i} onClick={() => handleChooseLanguage(m)}>
                   {messages[m].translations.mainDrawer.appBar.i18n.language}
                 </MenuItem>
               ))}
@@ -547,8 +540,8 @@ const LoggedInLayout = ({ children, themeToggle }) => {
                 label={i18n.t("mainDrawer.appBar.user.language")}
                 parentMenuOpen={menuOpen}
               >
-                {Object.keys(messages).map(m => (
-                  <MenuItem onClick={() => handleChooseLanguage(m)}>
+                {Object.keys(messages).map((m, i) => (
+                  <MenuItem key={i} onClick={() => handleChooseLanguage(m)}>
                     {messages[m].translations.mainDrawer.appBar.i18n.language}
                   </MenuItem>
                 ))}

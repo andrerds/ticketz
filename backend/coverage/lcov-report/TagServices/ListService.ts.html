@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/75</span>
+                <span class='fraction'>0/67</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/75</span>
+                <span class='fraction'>0/67</span>
             </div>
         
             
@@ -130,23 +130,7 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -234,12 +218,9 @@
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >const ListService = async ({</span>
 <span class="cstat-no" title="statement not covered" >  companyId,</span>
-<span class="cstat-no" title="statement not covered" >  searchParam,</span>
-<span class="cstat-no" title="statement not covered" >  pageNumber = "1"</span>
+<span class="cstat-no" title="statement not covered" >  searchParam</span>
 <span class="cstat-no" title="statement not covered" >}: Request): Promise&lt;Response&gt; =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  let where: WhereOptions&lt;Tag&gt; = { companyId };</span>
-<span class="cstat-no" title="statement not covered" >  const limit = 20;</span>
-<span class="cstat-no" title="statement not covered" >  const offset = limit * (+pageNumber - 1);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  if (searchParam) {</span>
 <span class="cstat-no" title="statement not covered" >    const searchPattern = `%${searchParam}%`;</span>
@@ -255,10 +236,8 @@
 <span class="cstat-no" title="statement not covered" >    };</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >  const { count, rows: tags } = await Tag.findAndCountAll({</span>
+<span class="cstat-no" title="statement not covered" >  const tags = await Tag.findAll({</span>
 <span class="cstat-no" title="statement not covered" >    where,</span>
-<span class="cstat-no" title="statement not covered" >    limit,</span>
-<span class="cstat-no" title="statement not covered" >    offset,</span>
 <span class="cstat-no" title="statement not covered" >    order: [Sequelize.literal('immutable_unaccent(LOWER("name")) ASC')],</span>
 <span class="cstat-no" title="statement not covered" >    include: [</span>
 <span class="cstat-no" title="statement not covered" >      {</span>
@@ -274,16 +253,13 @@
 <span class="cstat-no" title="statement not covered" >        required: false</span>
 <span class="cstat-no" title="statement not covered" >      }</span>
 <span class="cstat-no" title="statement not covered" >    ],</span>
-<span class="cstat-no" title="statement not covered" >    attributes: ["id", "name", "color", "ticketsCount", "contactsCount"],</span>
-<span class="cstat-no" title="statement not covered" >    distinct: true</span>
+<span class="cstat-no" title="statement not covered" >    attributes: ["id", "name", "color", "ticketsCount", "contactsCount"]</span>
 <span class="cstat-no" title="statement not covered" >  });</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >  const hasMore = count &gt; offset + tags.length;</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  return {</span>
 <span class="cstat-no" title="statement not covered" >    tags,</span>
-<span class="cstat-no" title="statement not covered" >    count,</span>
-<span class="cstat-no" title="statement not covered" >    hasMore</span>
+<span class="cstat-no" title="statement not covered" >    count: tags.length,</span>
+<span class="cstat-no" title="statement not covered" >    hasMore: false</span>
 <span class="cstat-no" title="statement not covered" >  };</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -295,7 +271,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-10T05:08:16.430Z
+                at 2026-01-11T22:52:53.292Z
             </div>
         <script src="../prettify.js"></script>
         <script>

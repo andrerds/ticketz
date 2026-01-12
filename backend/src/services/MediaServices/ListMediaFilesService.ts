@@ -25,6 +25,19 @@ export interface MediaFilters {
   storageLocation?: "local" | "s3";
 }
 
+export interface PaginationParams {
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+}
+
 const extractFileName = (mediaUrl: string): string => {
   if (!mediaUrl) return "unknown";
   const parts = mediaUrl.split("/");
@@ -41,7 +54,11 @@ const detectStorageLocation = async (
 
   const mediaKey = mediaUrl.replace(/^\/public\//, "");
   const fullPath = path.join(getPublicPath(), mediaKey);
-
+  const companyPath = path.join(getPublicPath(), `company_${companyId}`);
+  logger.info(
+    { mediaUrl, companyId, fullPath, companyPath },
+    "[MEDIA-LIST] Detected storage location"
+  );
   try {
     await fs.access(fullPath);
     return "local";
@@ -52,8 +69,12 @@ const detectStorageLocation = async (
 
 export const ListMediaFilesService = async (
   companyId: number,
-  filters?: MediaFilters
-): Promise<MediaFileInfo[]> => {
+  filters?: MediaFilters,
+  pagination?: PaginationParams
+): Promise<PaginatedResult<MediaFileInfo>> => {
+  const limit = pagination?.limit || 50;
+  const offset = pagination?.offset || 0;
+
   const whereClause = {
     companyId,
     mediaUrl: { [Op.ne]: null },
@@ -74,13 +95,24 @@ export const ListMediaFilesService = async (
   }
 
   logger.info(
-    { companyId, filters },
+    { companyId, filters, pagination: { limit, offset } },
     "[MEDIA-LIST] Fetching media files from database"
   );
 
+  // Get total count first
+  const total = await Message.count({ where: whereClause });
+
+  logger.info(
+    { companyId, total },
+    "[MEDIA-LIST] Total messages count retrieved"
+  );
+
+  // Then get paginated results
   const messages = await Message.findAll({
     where: whereClause,
-    order: [["createdAt", "DESC"]]
+    order: [["createdAt", "DESC"]],
+    limit,
+    offset
   });
 
   logger.info(
@@ -148,5 +180,11 @@ export const ListMediaFilesService = async (
     "[MEDIA-LIST] Media files processed successfully"
   );
 
-  return filteredFiles;
+  return {
+    data: filteredFiles,
+    total,
+    limit,
+    offset,
+    hasMore: offset + filteredFiles.length < total
+  };
 };

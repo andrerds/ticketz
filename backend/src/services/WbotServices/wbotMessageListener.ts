@@ -1,3 +1,6 @@
+/* eslint-disable quotes */
+/* eslint-disable dot-notation */
+/* eslint-disable prettier/prettier */
 import * as Sentry from "@sentry/node";
 import { head, isNil, keys } from "lodash";
 import path from "path";
@@ -448,12 +451,17 @@ export const normalizeMediaType = (
   return type as "audio" | "video" | "image" | "document";
 };
 
-const downloadMedia = async (
+const downloadMediaAsStream = async (
   msg: proto.IMessage,
   wbot: Session,
   ticket: Ticket,
   fromMe: boolean
-) => {
+): Promise<{
+  stream: Transform;
+  mimetype: string;
+  filename: string;
+  fileSize?: number;
+} | null> => {
   const message = getMessageMedia(msg);
 
   if (!message) {
@@ -520,14 +528,6 @@ const downloadMedia = async (
     throw new Error("Failed to get stream");
   }
 
-  const buffer = await downloadStream(stream);
-
-  if (!buffer) {
-    Sentry.setExtra("ERR_WAPP_DOWNLOAD_MEDIA", { msg });
-    Sentry.captureException(new Error("ERR_WAPP_DOWNLOAD_MEDIA"));
-    throw new Error("ERR_WAPP_DOWNLOAD_MEDIA");
-  }
-
   let filename = msg?.documentMessage?.fileName || "";
 
   if (!filename) {
@@ -535,12 +535,40 @@ const downloadMedia = async (
     filename = `${makeRandomId(5)}-${new Date().getTime()}.${ext}`;
   }
 
-  const media = {
-    data: buffer,
+  return {
+    stream,
     mimetype: message.mimetype,
-    filename
+    filename,
+    fileSize: message.fileLength ? +message.fileLength : undefined
   };
-  return media;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const downloadMediaLegacy = async (
+  msg: proto.IMessage,
+  wbot: Session,
+  ticket: Ticket,
+  fromMe: boolean
+) => {
+  const mediaStream = await downloadMediaAsStream(msg, wbot, ticket, fromMe);
+
+  if (!mediaStream) {
+    return null;
+  }
+
+  const buffer = await downloadStream(mediaStream.stream);
+
+  if (!buffer) {
+    Sentry.setExtra("ERR_WAPP_DOWNLOAD_MEDIA", { msg });
+    Sentry.captureException(new Error("ERR_WAPP_DOWNLOAD_MEDIA"));
+    throw new Error("ERR_WAPP_DOWNLOAD_MEDIA");
+  }
+
+  return {
+    data: buffer,
+    mimetype: mediaStream.mimetype,
+    filename: mediaStream.filename
+  };
 };
 
 const storeQuotedMessage = async (
@@ -567,8 +595,24 @@ const storeQuotedMessage = async (
       : null;
   const thumbnailMedia =
     thumbnailMsg && (await downloadThumbnail(thumbnailMsg));
-  const media =
-    messageMedia && (await downloadMedia(quotedMsg, wbot, ticket, fromMe));
+
+  let media = null;
+  if (messageMedia) {
+    const mediaStream = await downloadMediaAsStream(
+      quotedMsg,
+      wbot,
+      ticket,
+      fromMe
+    );
+
+    if (mediaStream) {
+      media = {
+        data: mediaStream.stream,
+        mimetype: mediaStream.mimetype,
+        filename: mediaStream.filename
+      };
+    }
+  }
 
   let mediaUrl = null;
   let mediaFileSize = null;
@@ -580,9 +624,8 @@ const storeQuotedMessage = async (
         mimetype: media.mimetype,
         filename: media.filename
       },
-      "[MESSAGE-LISTENER] Saving quoted message media"
+      "[MESSAGE-LISTENER] Saving quoted message media via stream"
     );
-    // eslint-disable-next-line no-use-before-define
     const mediaResult = await saveMediaToFile(media, ticket);
     mediaUrl = mediaResult.mediaPath;
     mediaFileSize = mediaResult.fileSize;
@@ -709,21 +752,31 @@ export const verifyMediaMessage = async (
   const thumbnailMsg = messageMedia || msg?.message?.extendedTextMessage;
   const thumbnailMedia =
     thumbnailMsg && (await downloadThumbnail(thumbnailMsg));
-  const media =
-    !mediaInfo &&
-    (await downloadMedia(
+
+  let media = null;
+  if (!mediaInfo) {
+    const mediaStream = await downloadMediaAsStream(
       getUnpackedMessage(msg),
       wbot,
       ticket,
       msg.key?.fromMe
-    ));
+    );
+
+    if (mediaStream) {
+      media = {
+        data: mediaStream.stream,
+        mimetype: mediaStream.mimetype,
+        filename: mediaStream.filename
+      };
+    }
+  }
 
   if (!mediaInfo && !media && !thumbnailMedia) {
     throw new Error("ERR_WAPP_DOWNLOAD_MEDIA");
   }
 
   let mediaUrl = mediaInfo?.mediaUrl || null;
-  let mediaFileSize = null; // MediaInfo doesn't have fileSize, only calculated files do
+  let mediaFileSize = null;
   if (media) {
     logger.info(
       {
@@ -733,7 +786,7 @@ export const verifyMediaMessage = async (
         filename: media.filename,
         messageId: msg.key?.id
       },
-      "[MESSAGE-LISTENER] Saving received message media"
+      "[MESSAGE-LISTENER] Saving received message media via stream"
     );
     const mediaResult = await saveMediaToFile(media, ticket);
     mediaUrl = mediaResult.mediaPath;
@@ -2149,9 +2202,9 @@ const wbotMessageListener = async (
         "wbotMessageListener: message-receipt.update"
       );
       if (messageReceipt.length === 0) return;
-      messageReceipt.forEach(async (receipt: any) => {
+      messageReceipt.forEach(async (receipt: unknown) => {
         await ackMutex.runExclusive(async () => {
-          handleMsgAck(receipt.key.id, wbot.id, 2);
+          handleMsgAck(receipt["key"]["id"], wbot.id, 2);
         });
       });
     });

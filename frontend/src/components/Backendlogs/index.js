@@ -1,25 +1,24 @@
-import { useState, useRef, useContext, useEffect } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
-import Popover from "@material-ui/core/Popover";
-import IconButton from "@material-ui/core/IconButton";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { makeStyles } from "@material-ui/core/styles";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBug,
-  faTrash,
-  faFileImport,
   faFileExport,
+  faFileImport,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { i18n } from "../../translate/i18n";
-import { SocketContext } from "../../context/Socket/SocketContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import IconButton from "@material-ui/core/IconButton";
+import Popover from "@material-ui/core/Popover";
+import { makeStyles } from "@material-ui/core/styles";
+import Switch from "@material-ui/core/Switch";
 import ReactJsonView from "@microlink/react-json-view";
+import { SocketContext } from "../../context/Socket/SocketContext";
+import { i18n } from "../../translate/i18n";
 
 import {
   FormControl,
   Grid,
-  InputBase,
   InputLabel,
   MenuItem,
   Select,

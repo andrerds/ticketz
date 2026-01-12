@@ -1,35 +1,29 @@
-import React, { useState, useEffect } from "react";
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Field, Form, Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
+import { makeStyles } from "@material-ui/core/styles";
 
 import {
+  Button,
+  CircularProgress,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
-  Button,
-  DialogActions,
-  CircularProgress,
-  TextField,
-  Switch,
   FormControlLabel,
-  FormControl,
-  FormGroup,
-  Typography,
-  Tooltip,
-  Paper,
   Grid,
-  Checkbox,
+  Switch,
+  TextField,
+  Typography,
 } from "@material-ui/core";
 
+import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
-import toastError from "../../errors/toastError";
 import QueueSelect from "../QueueSelect";
-import HelpOutlineOutlinedIcon from "@material-ui/icons/HelpOutlineOutlined";
 
 import { SelectLanguage } from "../SelectLanguage";
 
@@ -188,7 +182,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     label={i18n.t("queueModal.form.greetingMessage")}
                     type="greetingMessage"
                     multiline
-                    rows={4}
+                    minRows={4}
                     fullWidth
                     name="greetingMessage"
                     spellCheck={true}
@@ -204,8 +198,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                 </div>
                 <div>
                   <Typography style={{ fontSize: "11px" }}>
-                    {`Variaveis: ( {{ms}}=> Turno, 
-                  {{name}}=> Nome do contato, 
+                    {`Variaveis: ( {{ms}}=> Turno,
+                  {{name}}=> Nome do contato,
                   {{protocol}}=> protocolo, {{hora}}=> hora )`}
                   </Typography>
                 </div>
@@ -215,7 +209,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     label={i18n.t("queueModal.form.complationMessage")}
                     type="complationMessage"
                     multiline
-                    rows={4}
+                    minRows={4}
                     fullWidth
                     name="complationMessage"
                     spellCheck={true}
@@ -236,7 +230,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     label={i18n.t("queueModal.form.transferMessage")}
                     type="transferMessage"
                     multiline
-                    rows={4}
+                    minRows={4}
                     fullWidth
                     name="transferMessage"
                     spellCheck={true}
@@ -256,7 +250,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     label={i18n.t("queueModal.form.outOfHoursMessage")}
                     type="outOfHoursMessage"
                     multiline
-                    rows={4}
+                    minRows={4}
                     fullWidth
                     name="outOfHoursMessage"
                     spellCheck={true}
@@ -277,7 +271,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     label={i18n.t("queueModal.form.ratingMessage")}
                     type="ratingMessage"
                     multiline
-                    rows={4}
+                    minRows={4}
                     fullWidth
                     name="ratingMessage"
                     spellCheck={true}

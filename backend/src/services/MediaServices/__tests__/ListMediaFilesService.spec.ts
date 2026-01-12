@@ -83,16 +83,17 @@ describe("ListMediaFilesService", () => {
             }));
 
             (Message.findAll as jest.Mock).mockResolvedValue(mockMessages);
+            (Message.count as jest.Mock).mockResolvedValue(mockMessages.length);
 
             const result = await ListMediaFilesService(companyId);
 
-            const groupedByType = result.reduce((acc, file) => {
+            const groupedByType = result.data.reduce((acc, file) => {
               if (!acc[file.fileType]) {
                 acc[file.fileType] = [];
               }
               acc[file.fileType].push(file);
               return acc;
-            }, {} as Record<string, typeof result>);
+            }, {} as Record<string, Array<(typeof result.data)[0]>>);
 
             Object.values(groupedByType).forEach(group => {
               expect(group.length).toBeGreaterThanOrEqual(0);
@@ -101,16 +102,16 @@ describe("ListMediaFilesService", () => {
               expect(types.size).toBe(1);
             });
 
-            const sortedByDate = [...result];
+            const sortedByDate = [...result.data];
             sortedByDate.sort(
               (a, b) => b.uploadDate.getTime() - a.uploadDate.getTime()
             );
 
-            expect(result.map(f => f.uploadDate)).toEqual(
+            expect(result.data.map(f => f.uploadDate)).toEqual(
               sortedByDate.map(f => f.uploadDate)
             );
 
-            result.forEach(file => {
+            result.data.forEach(file => {
               expect(file).toHaveProperty("id");
               expect(file).toHaveProperty("fileName");
               expect(file).toHaveProperty("fileSize");
@@ -180,12 +181,13 @@ describe("ListMediaFilesService", () => {
             }));
 
             (Message.findAll as jest.Mock).mockResolvedValue(mockMessages);
+            (Message.count as jest.Mock).mockResolvedValue(mockMessages.length);
 
             const result = await ListMediaFilesService(companyId);
 
-            expect(result.length).toBeGreaterThan(0);
+            expect(result.data.length).toBeGreaterThan(0);
 
-            result.forEach(file => {
+            result.data.forEach(file => {
               expect(file.fileName).toBeDefined();
               expect(typeof file.fileName).toBe("string");
               expect(file.fileName.length).toBeGreaterThan(0);

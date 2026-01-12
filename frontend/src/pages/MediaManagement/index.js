@@ -62,8 +62,10 @@ const MediaManagement = () => {
     mediaFiles,
     stats,
     selectedFiles,
+    pagination,
     loadMediaFiles,
     loadStats,
+    loadMore,
     deleteFile,
     bulkDeleteFiles,
     handleSelectFile,
@@ -88,7 +90,8 @@ const MediaManagement = () => {
   useEffect(() => {
     loadMediaFiles();
     loadStats();
-  }, [loadMediaFiles, loadStats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFilterChange = e => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -165,6 +168,8 @@ const MediaManagement = () => {
             onSelectFile={handleSelectFile}
             onSelectAll={handleSelectAll}
             onDeleteClick={handleDeleteClick}
+            pagination={pagination}
+            onLoadMore={loadMore}
           />
         </div>
       </Paper>

@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
-  TextField,
-  DialogContent,
   DialogActions,
+  DialogContent,
   Grid,
+  TextField,
 } from "@material-ui/core";
-import PropType from "prop-types";
-import Dialog from "../Dialog";
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { i18n } from "../../translate/i18n";
 import { makeStyles } from "@material-ui/core/styles";
-import ButtonWithSpinner from "../ButtonWithSpinner";
+import { Field, Form, Formik } from "formik";
+import PropType from "prop-types";
+import React, { useContext, useEffect, useState } from "react";
+import * as Yup from "yup";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { i18n } from "../../translate/i18n";
+import ButtonWithSpinner from "../ButtonWithSpinner";
+import Dialog from "../Dialog";
 
-import { isNil, isObject, has, get } from "lodash";
+import { get, has, isNil, isObject } from "lodash";
 
 const MessageSchema = Yup.object().shape({
   shortcode: Yup.string()
@@ -145,7 +145,7 @@ function QuickMessageDialog(props) {
                   <Field
                     as={TextField}
                     name="message"
-                    rows={6}
+                    minRows={6}
                     label={i18n.t("quickMessages.dialog.message")}
                     multiline={true}
                     spellCheck={true}

@@ -65,3 +65,4 @@ temp/
 free-react-tailwind-admin-dashboard-main
 .kiro/*
 *.zip
+./backend/coverage/*

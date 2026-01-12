@@ -6,12 +6,14 @@ import { DeleteMediaFileService } from "../services/MediaServices/DeleteMediaFil
 import { GetMediaStatsService } from "../services/MediaServices/GetMediaStatsService";
 import {
   ListMediaFilesService,
-  MediaFilters
+  MediaFilters,
+  PaginationParams
 } from "../services/MediaServices/ListMediaFilesService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
   const { companyId } = req.user;
-  const { startDate, endDate, fileType, storageLocation } = req.query;
+  const { startDate, endDate, fileType, storageLocation, limit, offset } =
+    req.query;
 
   const filters: MediaFilters = {};
 
@@ -31,9 +33,25 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     filters.storageLocation = storageLocation as "local" | "s3";
   }
 
-  const mediaFiles = await ListMediaFilesService(companyId, filters);
+  const pagination: PaginationParams = {};
 
-  return res.status(200).json(mediaFiles);
+  if (limit) {
+    const parsedLimit = parseInt(limit as string, 10);
+    if (!isNaN(parsedLimit) && parsedLimit > 0) {
+      pagination.limit = parsedLimit;
+    }
+  }
+
+  if (offset) {
+    const parsedOffset = parseInt(offset as string, 10);
+    if (!isNaN(parsedOffset) && parsedOffset >= 0) {
+      pagination.offset = parsedOffset;
+    }
+  }
+
+  const result = await ListMediaFilesService(companyId, filters, pagination);
+
+  return res.status(200).json(result);
 };
 
 export const stats = async (req: Request, res: Response): Promise<Response> => {

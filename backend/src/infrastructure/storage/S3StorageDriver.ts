@@ -12,11 +12,11 @@ import { S3Config } from "../../domain/storage/StorageConfig";
 import { logger } from "../../utils/logger";
 
 export class S3StorageDriver implements IStorageDriver {
-  private client: S3Client;
+  public readonly client: S3Client;
 
-  private bucket: string;
+  public readonly bucket: string;
 
-  private prefix: string;
+  public readonly prefix: string;
 
   constructor(config: S3Config) {
     logger.info(

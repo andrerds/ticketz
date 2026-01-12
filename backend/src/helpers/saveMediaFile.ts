@@ -114,13 +114,39 @@ export default async function saveMediaToFile(
     );
     const driver = await StorageDriverFactory.createDriver(storageConfig);
 
+    const isStream =
+      media.data &&
+      typeof media.data === "object" &&
+      "pipe" in media.data &&
+      typeof media.data.pipe === "function";
+
+    if (isStream && !storageConfig.imageOptimization) {
+      logger.info(
+        { companyId, mediaPath, driver: storageConfig.driver },
+        "[MEDIA-STORAGE] Streaming file directly to storage (no buffer)"
+      );
+
+      await driver.write(
+        mediaPath,
+        media.data as NodeJS.ReadableStream,
+        media.mimetype
+      );
+
+      logger.info(
+        { companyId, mediaPath, driver: storageConfig.driver },
+        "[MEDIA-STORAGE] Media file streamed successfully"
+      );
+
+      return { mediaPath, fileSize: 0 };
+    }
+
     logger.info(
       { companyId, mimetype: media.mimetype },
       "[MEDIA-STORAGE] Converting media data to buffer"
     );
     let dataBuffer = await convertToBuffer(media.data);
     const originalSize = dataBuffer.length;
-    const fileSize = originalSize; // Calculate fileSize once from buffer
+    const fileSize = originalSize;
 
     logger.info(
       { companyId, originalSize, fileSize },
@@ -157,10 +183,10 @@ export default async function saveMediaToFile(
         "[MEDIA-STORAGE] Image optimization completed"
       );
 
-      // Update fileSize after optimization
       finalFileSize = dataBuffer.length;
+    } else {
+      finalFileSize = fileSize;
     }
-    finalFileSize = fileSize; // Initialize with original size
 
     logger.info(
       {

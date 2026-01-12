@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import { Field, Form, Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
 
-import ContactNotesDialogListItem from "../ContactNotesDialogListItem";
 import ConfirmationModal from "../ConfirmationModal";
+import ContactNotesDialogListItem from "../ContactNotesDialogListItem";
 
 import { toast } from "react-toastify";
 
@@ -174,7 +174,7 @@ export default function ContactNotesDialog({ modalOpen, onClose, ticket }) {
                 <Field
                   as={TextField}
                   name="note"
-                  rows={3}
+                  minRows={3}
                   label={i18n.t("ticketOptionsMenu.appointmentsModal.textarea")}
                   placeholder={i18n.t(
                     "ticketOptionsMenu.appointmentsModal.placeholder"

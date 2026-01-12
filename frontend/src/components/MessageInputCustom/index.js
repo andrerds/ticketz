@@ -48,6 +48,7 @@ import Compressor from "compressorjs";
 import WhatsMarked from "react-whatsmarked";
 import { SocketContext } from "../../context/Socket/SocketContext";
 import { isMobile } from "../../helpers/isMobile";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
 import LinearWithValueLabel from "./ProgressBarCustom";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -810,6 +811,7 @@ const MessageInputCustom = props => {
   const { user } = useContext(AuthContext);
 
   const [signMessage, setSignMessage] = useLocalStorage("signOption", true);
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const socketManager = useContext(SocketContext);
   const [socket, setSocket] = useState(null);
@@ -900,63 +902,72 @@ const MessageInputCustom = props => {
     setLoading(true);
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("fromMe", true);
+    try {
+      // Check if any file is large enough for multipart upload
+      const largeFiles = medias.filter(media => media.size >= 10 * 1024 * 1024);
+      const smallFiles = medias.filter(media => media.size < 10 * 1024 * 1024);
 
-    medias.forEach(async (media, idx) => {
-      const file = media;
-
-      if (!file) {
-        return;
+      // Upload large files using multipart
+      for (const file of largeFiles) {
+        const result = await uploadLargeFile(file);
+        if (result) {
+          // Send message with the uploaded file key
+          await api.post(`/messages/${ticketId}`, {
+            fromMe: true,
+            body: file.name,
+            mediaKey: result.key,
+          });
+        }
       }
 
-      if (media?.type.split("/")[0] == "image") {
-        new Compressor(file, {
-          quality: 0.7,
+      // Upload small files using traditional method
+      if (smallFiles.length > 0) {
+        const formData = new FormData();
+        formData.append("fromMe", true);
 
-          async success(media) {
-            //const formData = new FormData();
-            // The third parameter is required for server
-            //formData.append('file', result, result.name);
-
-            formData.append("medias", media, media.name);
+        for (const media of smallFiles) {
+          if (media?.type.split("/")[0] === "image") {
+            await new Promise((resolve, reject) => {
+              new Compressor(media, {
+                quality: 0.7,
+                success(compressedMedia) {
+                  formData.append(
+                    "medias",
+                    compressedMedia,
+                    compressedMedia.name
+                  );
+                  formData.append("body", compressedMedia.name);
+                  resolve();
+                },
+                error(err) {
+                  console.error("Compression error:", err);
+                  reject(err);
+                },
+              });
+            });
+          } else {
+            formData.append("medias", media);
             formData.append("body", media.name);
-          },
-          error(err) {
-            alert("erro");
-            console.log(err.message);
+          }
+        }
+
+        await api.post(`/messages/${ticketId}`, formData, {
+          onUploadProgress: event => {
+            let progress = Math.round((event.loaded * 100) / event.total);
+            setPercentLoading(progress);
           },
         });
-      } else {
-        formData.append("medias", media);
-        formData.append("body", media.name);
       }
-    });
 
-    setTimeout(async () => {
-      try {
-        await api
-          .post(`/messages/${ticketId}`, formData, {
-            onUploadProgress: event => {
-              let progress = Math.round((event.loaded * 100) / event.total);
-              setPercentLoading(progress);
-            },
-          })
-          .then(response => {
-            setLoading(false);
-            setMedias([]);
-            setPercentLoading(0);
-          })
-          .catch(err => {
-            setLoading(false);
-            setMedias([]);
-            setPercentLoading(0);
-            toastError(err);
-          });
-      } catch (err) {
-        toastError(err);
-      }
-    }, 2000);
+      setLoading(false);
+      setMedias([]);
+      setPercentLoading(0);
+    } catch (err) {
+      setLoading(false);
+      setMedias([]);
+      setPercentLoading(0);
+      toastError(err);
+    }
   };
 
   const handlePresenceUpdate = presence => {

@@ -1,28 +1,26 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
+import { Field, Form, Formik } from "formik";
 import { head } from "lodash";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import IconButton from "@material-ui/core/IconButton";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 
-import { i18n } from "../../translate/i18n";
 import moment from "moment";
+import { i18n } from "../../translate/i18n";
 
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
 import {
   Box,
   FormControl,
@@ -34,6 +32,9 @@ import {
   Tabs,
 } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import toastError from "../../errors/toastError";
+import { useMultipartUpload } from "../../hooks/useMultipartUpload";
+import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
@@ -86,6 +87,7 @@ const CampaignModal = ({
   const isMounted = useRef(true);
   const { user } = useContext(AuthContext);
   const { companyId } = user;
+  const { uploadFile: uploadLargeFile } = useMultipartUpload();
 
   const initialState = {
     name: "",
@@ -197,18 +199,38 @@ const CampaignModal = ({
         await api.put(`/campaigns/${campaignId}`, dataValues);
 
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/campaigns/${campaignId}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/campaigns/${campaignId}/media-upload`, {
+                mediaKey: result.key,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(`/campaigns/${campaignId}/media-upload`, formData);
+          }
         }
         handleClose();
       } else {
         const { data } = await api.post("/campaigns", dataValues);
 
         if (attachment != null) {
-          const formData = new FormData();
-          formData.append("file", attachment);
-          await api.post(`/campaigns/${data.id}/media-upload`, formData);
+          // Use multipart upload for large files
+          if (attachment.size >= 10 * 1024 * 1024) {
+            const result = await uploadLargeFile(attachment);
+            if (result) {
+              await api.post(`/campaigns/${data.id}/media-upload`, {
+                mediaKey: result.key,
+              });
+            }
+          } else {
+            const formData = new FormData();
+            formData.append("file", attachment);
+            await api.post(`/campaigns/${data.id}/media-upload`, formData);
+          }
         }
         if (onSave) {
           onSave(data);
@@ -243,7 +265,7 @@ const CampaignModal = ({
         name={identifier}
         spellCheck={true}
         fullWidth
-        rows={5}
+        minRows={5}
         label={i18n.t(`campaigns.dialog.form.${identifier}`)}
         placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
         multiline={true}
@@ -262,7 +284,7 @@ const CampaignModal = ({
         name={identifier}
         spellCheck={true}
         fullWidth
-        rows={5}
+        minRows={5}
         label={i18n.t(`campaigns.dialog.form.${identifier}`)}
         placeholder={i18n.t("campaigns.dialog.form.messagePlaceholder")}
         multiline={true}
@@ -382,8 +404,12 @@ const CampaignModal = ({
                         }
                         disabled={!campaignEditable}
                       >
-                        <MenuItem value={false}>Desabilitada</MenuItem>
-                        <MenuItem value={true}>Habilitada</MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={false}>
+                          Desabilitada
+                        </MenuItem>
+                        <MenuItem key={new Date().setSeconds} value={true}>
+                          Habilitada
+                        </MenuItem>
                       </Field>
                     </FormControl>
                   </Grid>
@@ -447,7 +473,10 @@ const CampaignModal = ({
                         <MenuItem value="">Nenhuma</MenuItem>
                         {whatsapps &&
                           whatsapps.map(whatsapp => (
-                            <MenuItem key={whatsapp.id} value={whatsapp.id}>
+                            <MenuItem
+                              key={whatsapp?.id + 1}
+                              value={whatsapp.id}
+                            >
                               {whatsapp.name}
                             </MenuItem>
                           ))}

@@ -39,8 +39,10 @@ export const DebugS3Service = async (
     // Get storage configuration
     const config = await GetStorageConfigService({ companyId });
 
-    if (config.driver !== "s3" || !config.s3Config) {
-      throw new Error("Company is not configured to use S3 storage");
+    // Check if S3 configuration exists (regardless of current driver setting)
+    // This allows debugging S3 files even when driver is temporarily set to local
+    if (!config.s3Config) {
+      throw new Error("Company does not have S3 configuration available");
     }
 
     // Create S3 client

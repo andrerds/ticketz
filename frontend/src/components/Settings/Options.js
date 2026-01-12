@@ -1,24 +1,24 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import useSettings from "../../hooks/useSettings";
-import { i18nToast } from "../../helpers/i18nToast";
-import { makeStyles } from "@material-ui/core/styles";
-import { grey, blue } from "@material-ui/core/colors";
-import OnlyForSuperUser from "../OnlyForSuperUser";
-import useAuth from "../../hooks/useAuth.js";
-import { Delete } from "@material-ui/icons";
 import { IconButton, TextField } from "@material-ui/core";
+import { blue, grey } from "@material-ui/core/colors";
+import FormControl from "@material-ui/core/FormControl";
+import Grid from "@material-ui/core/Grid";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import { makeStyles } from "@material-ui/core/styles";
+import { Delete } from "@material-ui/icons";
+import { i18nToast } from "../../helpers/i18nToast";
+import useAuth from "../../hooks/useAuth.js";
+import useSettings from "../../hooks/useSettings";
+import OnlyForSuperUser from "../OnlyForSuperUser";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faGears } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { generateSecureToken } from "../../helpers/generateSecureToken";
 import { copyToClipboard } from "../../helpers/copyToClipboard";
+import { generateSecureToken } from "../../helpers/generateSecureToken";
 import useQueues from "../../hooks/useQueues";
 import { i18n } from "../../translate/i18n.js";
 import { SelectLanguage } from "../SelectLanguage";
@@ -580,7 +580,7 @@ export default function Options(props) {
               placeholder={i18n.t("settings.ticketAcceptedMessage.placeholder")}
               variant="standard"
               multiline
-              rows={4}
+              minRows={4}
               value={ticketAcceptedMessage}
               onChange={e => {
                 setTicketAcceptedMessage(e.target.value);
@@ -604,7 +604,7 @@ export default function Options(props) {
               placeholder={i18n.t("settings.transferMessage.placeholder")}
               variant="standard"
               multiline
-              rows={4}
+              minRows={4}
               value={transferMessage}
               onChange={e => {
                 setTransferMessage(e.target.value);

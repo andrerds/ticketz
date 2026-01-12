@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/222</span>
+                <span class='fraction'>0/228</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/222</span>
+                <span class='fraction'>0/228</span>
             </div>
         
             
@@ -285,7 +285,13 @@
 <a name='L220'></a><a href='#L220'>220</a>
 <a name='L221'></a><a href='#L221'>221</a>
 <a name='L222'></a><a href='#L222'>222</a>
-<a name='L223'></a><a href='#L223'>223</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -507,23 +513,33 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { WAMessage, AnyMediaMessageContent, AnyMessageContent } from "libzapitu-rf";</span></span></span>
-<span class="cstat-no" title="statement not covered" >import fs from "fs";</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import ffmpegPath from "@ffmpeg-installer/ffmpeg";</span></span></span>
 <span class="cstat-no" title="statement not covered" >import { exec } from "child_process";</span>
-<span class="cstat-no" title="statement not covered" >import path from "path";</span>
-<span class="cstat-no" title="statement not covered" >import ffmpegPath from "@ffmpeg-installer/ffmpeg";</span>
-<span class="cstat-no" title="statement not covered" >import mime from "mime-types";</span>
+<span class="cstat-no" title="statement not covered" >import fs from "fs";</span>
 <span class="cstat-no" title="statement not covered" >import iconv from "iconv-lite";</span>
+<span class="cstat-no" title="statement not covered" >import {</span>
+<span class="cstat-no" title="statement not covered" >  AnyMediaMessageContent,</span>
+<span class="cstat-no" title="statement not covered" >  AnyMessageContent,</span>
+<span class="cstat-no" title="statement not covered" >  WAMessage</span>
+<span class="cstat-no" title="statement not covered" >} from "libzapitu-rf";</span>
+<span class="cstat-no" title="statement not covered" >import mime from "mime-types";</span>
+<span class="cstat-no" title="statement not covered" >import path from "path";</span>
 <span class="cstat-no" title="statement not covered" >import { Readable } from "stream";</span>
 <span class="cstat-no" title="statement not covered" >import AppError from "../../errors/AppError";</span>
-<span class="cstat-no" title="statement not covered" >import GetTicketWbot from "../../helpers/GetTicketWbot";</span>
-<span class="cstat-no" title="statement not covered" >import Ticket from "../../models/Ticket";</span>
-<span class="cstat-no" title="statement not covered" >import { verifyMediaMessage, verifyMessage } from "./wbotMessageListener";</span>
 <span class="cstat-no" title="statement not covered" >import CheckSettings from "../../helpers/CheckSettings";</span>
+<span class="cstat-no" title="statement not covered" >import GetTicketWbot from "../../helpers/GetTicketWbot";</span>
 <span class="cstat-no" title="statement not covered" >import saveMediaToFile from "../../helpers/saveMediaFile";</span>
-<span class="cstat-no" title="statement not covered" >import { getJidOf } from "./getJidOf";</span>
-<span class="cstat-no" title="statement not covered" >import { logger } from "../../utils/logger";</span>
 <span class="cstat-no" title="statement not covered" >import { URLCharEncoder } from "../../helpers/URLCharEncoder";</span>
+<span class="cstat-no" title="statement not covered" >import Ticket from "../../models/Ticket";</span>
+<span class="cstat-no" title="statement not covered" >import { logger } from "../../utils/logger";</span>
+<span class="cstat-no" title="statement not covered" >import { getJidOf } from "./getJidOf";</span>
+<span class="cstat-no" title="statement not covered" >import { verifyMediaMessage, verifyMessage } from "./wbotMessageListener";</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >interface Request {</span>
 <span class="cstat-no" title="statement not covered" >  media: Express.Multer.File;</span>
@@ -536,6 +552,7 @@
 <span class="cstat-no" title="statement not covered" >  mediaUrl: string;</span>
 <span class="cstat-no" title="statement not covered" >  mimetype: string;</span>
 <span class="cstat-no" title="statement not covered" >  filename: string;</span>
+<span class="cstat-no" title="statement not covered" >  fileSize: number;</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >const publicFolder = __dirname.endsWith("/dist")</span>
@@ -686,7 +703,7 @@
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >    // convert multer file to Readable</span>
 <span class="cstat-no" title="statement not covered" >    const readableFile = fs.createReadStream(pathMedia);</span>
-<span class="cstat-no" title="statement not covered" >    const savedPath = await saveMediaToFile(</span>
+<span class="cstat-no" title="statement not covered" >    const savedResult = await saveMediaToFile(</span>
 <span class="cstat-no" title="statement not covered" >      {</span>
 <span class="cstat-no" title="statement not covered" >        data: readableFile,</span>
 <span class="cstat-no" title="statement not covered" >        mimetype: media.mimetype,</span>
@@ -697,15 +714,16 @@
 <span class="cstat-no" title="statement not covered" >    readableFile.destroy();</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >    const mediaInfo = {</span>
-<span class="cstat-no" title="statement not covered" >      mediaUrl: savedPath,</span>
+<span class="cstat-no" title="statement not covered" >      mediaUrl: savedResult.mediaPath,</span>
 <span class="cstat-no" title="statement not covered" >      mimetype: media.mimetype,</span>
-<span class="cstat-no" title="statement not covered" >      filename: fileName || media.originalname</span>
+<span class="cstat-no" title="statement not covered" >      filename: fileName || media.originalname,</span>
+<span class="cstat-no" title="statement not covered" >      fileSize: savedResult?.fileSize || 0</span>
 <span class="cstat-no" title="statement not covered" >    };</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >    if (media.size &gt; fileLimit * 1024 * 1024) {</span>
-<span class="cstat-no" title="statement not covered" >      const fileUrl = savedPath.startsWith("http")</span>
-<span class="cstat-no" title="statement not covered" >        ? savedPath</span>
-<span class="cstat-no" title="statement not covered" >        : `${process.env.BACKEND_URL}/public/${savedPath}`;</span>
+<span class="cstat-no" title="statement not covered" >      const fileUrl = savedResult.mediaPath.startsWith("http")</span>
+<span class="cstat-no" title="statement not covered" >        ? savedResult.mediaPath</span>
+<span class="cstat-no" title="statement not covered" >        : `${process.env.BACKEND_URL}/public/${savedResult.mediaPath}`;</span>
 <span class="cstat-no" title="statement not covered" >      return SendWhatsAppMessage(ticket, {</span>
 <span class="cstat-no" title="statement not covered" >        text: `📎 *${fileName}*\n\n🔗 ${URLCharEncoder(fileUrl)}`</span>
 <span class="cstat-no" title="statement not covered" >      });</span>
@@ -736,7 +754,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-10T05:08:16.430Z
+                at 2026-01-11T22:52:53.292Z
             </div>
         <script src="../prettify.js"></script>
         <script>

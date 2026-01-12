@@ -1,25 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
+import { Field, Form, Formik } from "formik";
 import { head } from "lodash";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
 
 import { i18n } from "../../translate/i18n";
 
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import ColorPicker from "../ColorPicker";
 import {
   Grid,
   IconButton,
@@ -29,9 +26,12 @@ import {
   Tabs,
 } from "@material-ui/core";
 import { AttachFile, Colorize, DeleteOutline } from "@material-ui/icons";
+import toastError from "../../errors/toastError";
+import api from "../../services/api";
+import ColorPicker from "../ColorPicker";
+import ConfirmationModal from "../ConfirmationModal";
 import { QueueOptions } from "../QueueOptions";
 import SchedulesForm from "../SchedulesForm";
-import ConfirmationModal from "../ConfirmationModal";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -345,7 +345,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
                         type="greetingMessage"
                         multiline
                         inputRef={greetingRef}
-                        rows={5}
+                        minRows={5}
                         fullWidth
                         name="greetingMessage"
                         spellCheck={true}
@@ -366,7 +366,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
                           label={i18n.t("queueModal.form.outOfHoursMessage")}
                           type="outOfHoursMessage"
                           multiline
-                          rows={5}
+                          minRows={5}
                           fullWidth
                           name="outOfHoursMessage"
                           spellCheck={true}

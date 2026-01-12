@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import List from "@material-ui/core/List";
 import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import { Field, Form, Formik } from "formik";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
 
-import ContactNotesDialogListItem from "../ContactNotesDialogListItem";
 import ConfirmationModal from "../ConfirmationModal";
+import ContactNotesDialogListItem from "../ContactNotesDialogListItem";
 
 import { toast } from "react-toastify";
 
@@ -15,8 +15,8 @@ import { i18n } from "../../translate/i18n";
 
 import ButtonWithSpinner from "../ButtonWithSpinner";
 
-import useTicketNotes from "../../hooks/useTicketNotes";
 import { Grid } from "@material-ui/core";
+import useTicketNotes from "../../hooks/useTicketNotes";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -154,7 +154,7 @@ export function ContactNotes({ ticket }) {
                 <Field
                   as={TextField}
                   name="note"
-                  rows={3}
+                  minRows={3}
                   label={i18n.t("ticketOptionsMenu.appointmentsModal.textarea")}
                   placeholder={i18n.t(
                     "ticketOptionsMenu.appointmentsModal.placeholder"

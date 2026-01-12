@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/83</span>
+                <span class='fraction'>0/109</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/83</span>
+                <span class='fraction'>0/109</span>
             </div>
         
             
@@ -146,7 +146,59 @@
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -243,34 +295,40 @@
 <span class="cstat-no" title="statement not covered" >  byLocation: Record&lt;string, { count: number; size: number }&gt;;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >const getFileSize = async (</span>
-<span class="cstat-no" title="statement not covered" >  mediaUrl: string,</span>
-<span class="cstat-no" title="statement not covered" >  storageLocation: "local" | "s3"</span>
-<span class="cstat-no" title="statement not covered" >): Promise&lt;number&gt; =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  if (storageLocation === "local") {</span>
-<span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");</span>
-<span class="cstat-no" title="statement not covered" >      const fullPath = path.join(getPublicPath(), mediaKey);</span>
-<span class="cstat-no" title="statement not covered" >      const stats = await fs.stat(fullPath);</span>
-<span class="cstat-no" title="statement not covered" >      return stats.size;</span>
-<span class="cstat-no" title="statement not covered" >    } catch (error) {</span>
-<span class="cstat-no" title="statement not covered" >      logger.warn({ error, mediaUrl }, "Failed to get file size");</span>
-<span class="cstat-no" title="statement not covered" >      return 0;</span>
-<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >const detectStorageLocation = async (</span>
+<span class="cstat-no" title="statement not covered" >  mediaUrl: string</span>
+<span class="cstat-no" title="statement not covered" >): Promise&lt;"local" | "s3"&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  if (/^https?:\/\//.test(mediaUrl)) {</span>
+<span class="cstat-no" title="statement not covered" >    return "s3";</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
-<span class="cstat-no" title="statement not covered" >  return 0;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    const mediaKey = mediaUrl.replace(/^https?:\/\/[^/]+\/public\//, "");</span>
+<span class="cstat-no" title="statement not covered" >    const fullPath = path.join(getPublicPath(), mediaKey);</span>
+<span class="cstat-no" title="statement not covered" >    await fs.access(fullPath);</span>
+<span class="cstat-no" title="statement not covered" >    return "local";</span>
+<span class="cstat-no" title="statement not covered" >  } catch {</span>
+<span class="cstat-no" title="statement not covered" >    return "s3";</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >export const GetMediaStatsService = async (</span>
 <span class="cstat-no" title="statement not covered" >  companyId: number</span>
 <span class="cstat-no" title="statement not covered" >): Promise&lt;MediaStats&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  logger.info({ companyId }, "[MEDIA-STATS] Calculating media statistics");</span>
+<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  const messages = await Message.findAll({</span>
 <span class="cstat-no" title="statement not covered" >    where: {</span>
 <span class="cstat-no" title="statement not covered" >      companyId,</span>
 <span class="cstat-no" title="statement not covered" >      mediaUrl: { [Op.ne]: null }</span>
 <span class="cstat-no" title="statement not covered" >    },</span>
-<span class="cstat-no" title="statement not covered" >    attributes: ["mediaType", "mediaUrl", "createdAt"]</span>
+<span class="cstat-no" title="statement not covered" >    attributes: ["mediaType", "mediaUrl", "fileSize", "createdAt"]</span>
 <span class="cstat-no" title="statement not covered" >  });</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  logger.info(</span>
+<span class="cstat-no" title="statement not covered" >    { companyId, messageCount: messages.length },</span>
+<span class="cstat-no" title="statement not covered" >    "[MEDIA-STATS] Messages retrieved from database"</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  const stats: MediaStats = {</span>
 <span class="cstat-no" title="statement not covered" >    totalFiles: messages.length,</span>
@@ -279,20 +337,29 @@
 <span class="cstat-no" title="statement not covered" >    byLocation: { local: { count: 0, size: 0 }, s3: { count: 0, size: 0 } }</span>
 <span class="cstat-no" title="statement not covered" >  };</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >  const fileSizePromises = messages.map(async msg =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  const locationPromises = messages.map(async msg =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    const mediaUrl = msg.getDataValue("mediaUrl");</span>
 <span class="cstat-no" title="statement not covered" >    if (!mediaUrl) return null;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    const isAbsoluteUrl = mediaUrl.match(/^https?:\/\//);</span>
-<span class="cstat-no" title="statement not covered" >    const location: "local" | "s3" = isAbsoluteUrl ? "s3" : "local";</span>
+<span class="cstat-no" title="statement not covered" >    const location = await detectStorageLocation(mediaUrl);</span>
 <span class="cstat-no" title="statement not covered" >    const type = msg.mediaType || "unknown";</span>
+<span class="cstat-no" title="statement not covered" >    const fileSize = parseInt(msg.getDataValue("fileSize") || "0", 10);</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    const fileSize = await getFileSize(mediaUrl, location);</span>
+<span class="cstat-no" title="statement not covered" >    logger.debug(</span>
+<span class="cstat-no" title="statement not covered" >      {</span>
+<span class="cstat-no" title="statement not covered" >        messageId: msg.id,</span>
+<span class="cstat-no" title="statement not covered" >        mediaUrl,</span>
+<span class="cstat-no" title="statement not covered" >        fileSize,</span>
+<span class="cstat-no" title="statement not covered" >        type,</span>
+<span class="cstat-no" title="statement not covered" >        location</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >      "[MEDIA-STATS] Processing media file"</span>
+<span class="cstat-no" title="statement not covered" >    );</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >    return { type, location, fileSize };</span>
 <span class="cstat-no" title="statement not covered" >  });</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >  const results = await Promise.all(fileSizePromises);</span>
+<span class="cstat-no" title="statement not covered" >  const results = await Promise.all(locationPromises);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  results.forEach(result =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (!result) return;</span>
@@ -310,6 +377,17 @@
 <span class="cstat-no" title="statement not covered" >    stats.totalSize += fileSize;</span>
 <span class="cstat-no" title="statement not covered" >  });</span>
 <span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  logger.info(</span>
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      companyId,</span>
+<span class="cstat-no" title="statement not covered" >      totalFiles: stats.totalFiles,</span>
+<span class="cstat-no" title="statement not covered" >      totalSize: stats.totalSize,</span>
+<span class="cstat-no" title="statement not covered" >      byType: stats.byType,</span>
+<span class="cstat-no" title="statement not covered" >      byLocation: stats.byLocation</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >    "[MEDIA-STATS] Statistics calculated successfully"</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
+<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  return stats;</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;</pre></td></tr></table></pre>
@@ -319,7 +397,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-10T05:08:16.430Z
+                at 2026-01-11T22:52:53.292Z
             </div>
         <script src="../prettify.js"></script>
         <script>
